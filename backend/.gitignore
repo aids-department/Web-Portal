@@ -1,0 +1,36 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Google OAuth Secrets
+credentials.json
+token.json
+
+
+# Build / Dist (if you ever add)
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Your events data (optional – see note below)
+# events.json        ← remove the # if you DON'T want to share real events

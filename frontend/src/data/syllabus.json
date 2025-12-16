@@ -1,0 +1,45 @@
+{
+  "semesters": [
+    {
+      "semester": "Semester 1",
+      "theory": [
+        { "code": "CS101", "title": "Introduction to Programming" },
+        { "code": "MA101", "title": "Calculus" }
+      ],
+      "lab": [
+        { "code": "CS101L", "title": "Intro Programming Lab" }
+      ]
+    },
+    {
+      "semester": "Semester 2",
+      "theory": [
+        { "code": "CS102", "title": "Data Structures" },
+        { "code": "MA102", "title": "Discrete Mathematics" }
+      ],
+      "lab": [
+        { "code": "CS102L", "title": "Data Structures Lab" }
+      ]
+    },
+    {
+      "semester": "Semester 3",
+      "theory": [
+        { "code": "CS201", "title": "Algorithms" },
+        { "code": "CS202", "title": "OOP" }
+      ],
+      "lab": [
+        { "code": "CS201L", "title": "Algorithms Lab" }
+      ]
+    },
+    {
+      "semester": "Semester 4",
+      "theory": [
+        { "code": "CS301", "title": "Operating Systems" },
+        { "code": "CS302", "title": "Databases" }
+      ],
+      "lab": [
+        { "code": "CS301L", "title": "OS Lab" },
+        { "code": "CS302L", "title": "DB Lab" }
+      ]
+    }
+  ]
+}

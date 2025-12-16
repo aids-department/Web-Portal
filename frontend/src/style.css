@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === GLOBAL === */
+body {
+  background-color: #f5f7fb;
+}
+
+/* Smooth transitions globally */
+* {
+  transition: 0.15s ease-in-out;
+}
+
+/* === HIDE SCROLLBAR FOR CAROUSELS === */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Desktop scrollbar */
+@media (min-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e3a8a;
+    border-radius: 10px;
+  }
+}
+
+/* === BLUE & WHITE PALETTE (improved UI) === */
+:root {
+  --bg: #f5f7fb; /* subtle pale background */
+  --surface: #ffffff; /* white surfaces/cards */
+  --text: #0b2545; /* deep navy for body text */
+  --muted-text: #475569; /* secondary/muted text */
+  --primary: #1e3a8a; /* deeper navy-blue for headings/buttons */
+  --primary-contrast: #ffffff; /* contrast for primary colored elements */
+  --card-shadow: 0 8px 20px rgba(30,58,138,0.08);
+}
+
+/* Global background and readable body text (no blanket !important overrides) */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings use the primary blue to create visual hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Links use primary blue; underline on hover for affordance */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Card/surface styles to emphasize white/blue contrast */
+.card, .surface {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--card-shadow);
+  border-radius: 8px;
+}
+
+.btn {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn.secondary, .btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid rgba(30,58,138,0.12);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Don't override native/utility button styles used by components (e.g., sidebar)
+   Components use Tailwind classes to control `button` elements; avoid global
+   `button` selector so those continue to render as intended. */
+
+/* Form labels and helper text */
+label {
+  color: var(--muted-text);
+}
+.small, .muted, .text-muted {
+  color: var(--muted-text);
+}
+
+/* Keep the existing custom scrollbar styling */
