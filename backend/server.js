@@ -25,6 +25,9 @@ const QuestionPaper = require("./models/QuestionPaper");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const leaderboardRoutes = require("./routes/leaderboard");
+const profileRoutes = require("./routes/profile");
+
 // ============================================
 // CLOUDINARY CONFIG
 // ============================================
@@ -95,6 +98,8 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api/profile", profileRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 // ============================================
 // GOOGLE CALENDAR SETUP
@@ -267,7 +272,7 @@ app.post("/api/auth/login", async (req, res) => {
       success: true,
       message: "Login successful",
       user: {
-        id: user._id,
+        id: user._id.toString(),
         fullName: user.fullName,
         username: user.username,
         email: user.email,

@@ -27,6 +27,12 @@ import img1 from "./assets/leetcode.png";
 import img2 from "./assets/project_expo.jpeg";
 import Dashboard_Carousel from "./components/Dashboard_Carousel";
 
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
+import AdminLeaderboards from "./pages/AdminLeaderboards";
+import { Toaster } from "react-hot-toast";
+import UserLeaderboards from "./pages/UserLeaderboards";
+
 import "./style.css";
 
 // ============================================
@@ -210,6 +216,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* 
           ============================================
@@ -249,6 +256,25 @@ export default function App() {
           All pages wrapped in MainLayout with Sidebar/Navbar
           ============================================
         */}
+
+        <Route
+          path="/profile"
+          element={
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <Profile />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/edit-profile"
+          element={
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <EditProfile />
+            </MainLayout>
+          }
+        />
+
         
         {/* Dashboard/Home - PUBLIC */}
         <Route
@@ -265,10 +291,11 @@ export default function App() {
           path="/leaderboards"
           element={
             <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
-              <LeaderboardsPage />
+              <UserLeaderboards />
             </MainLayout>
           }
         />
+
 
         {/* Events Section */}
         <Route
@@ -398,6 +425,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin/leaderboard"
+          element={
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <AdminLeaderboards />
+            </MainLayout>
+          }
+        />
+
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

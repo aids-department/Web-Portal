@@ -103,3 +103,1021 @@ label {
 }
 
 /* Keep the existing custom scrollbar styling */
+/* ------------------- EDIT PROFILE PAGE STYLES (EditProfile.js) ------------------- */
+
+.edit-title {
+    font-size: 1.8em;
+    margin-bottom: 5px;
+}
+
+.edit-subtitle {
+    color: #777;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 0.95em;
+}
+
+.edit-card {
+    /* Base card styling for the editable cards */
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* 1. Profile Info Card (Top Section) */
+.profile-info-card-edit {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Makes the profile icon clickable and changes cursor */
+.profile-icon-edit.clickable-icon {
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Subtle blue highlight on interaction */
+    transition: transform 0.1s;
+}
+.profile-icon-edit.clickable-icon:hover {
+    transform: scale(1.02);
+}
+
+.profile-icon-edit {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.profile-icon-edit img {
+    width: 60%;
+    height: 60%;
+}
+
+.profile-fields input {
+    display: block;
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 1em;
+    width: 250px;
+}
+.profile-fields .name-input {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #333;
+}
+
+/* 2. Bio and Skills */
+.bio-textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    resize: vertical;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 1em;
+}
+
+.sub-section-title {
+    font-size: 1em;
+    font-weight: bold;
+    color: #555;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Skills Tags in Edit Mode */
+.skills-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    align-items: center;
+}
+.removable-tag {
+    background-color: #e0f7fa;
+    color: #007bff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid #b2ebf2;
+    cursor: default;
+    display: flex;
+    align-items: center;
+}
+.remove-btn {
+    margin-left: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #007bff;
+    line-height: 1;
+}
+
+.add-skill-input {
+    flex-grow: 1;
+    border: none;
+    padding: 5px 0;
+    font-size: 0.95em;
+    min-width: 150px;
+    outline: none;
+}
+
+/* 3. Achievements */
+.achievement-item-edit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.achievement-item-edit:last-of-type {
+    border-bottom: none;
+    margin-bottom: 20px;
+}
+
+.achievement-text {
+    flex-grow: 1;
+    padding-right: 20px;
+}
+
+.achievement-actions .action-btn {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    margin-left: 10px;
+}
+
+.edit-btn {
+    background-color: #fff;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.delete-btn {
+    background-color: #fdd;
+    color: #c0392b;
+    border-color: #c0392b;
+}
+
+.add-more-btn {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+/* --- SUBMIT BUTTON AND MESSAGE STYLES --- */
+
+.submit-profile-btn {
+    width: 100%;
+    max-width: 300px; /* Adjust width to fit standard buttons */
+    padding: 12px 20px;
+    margin-top: 15px; /* Spacing below the achievement card */
+    background-color: #28a745; /* Green color for submit */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    align-self: flex-start; /* Ensures button aligns left */
+    transition: background-color 0.2s;
+}
+
+.submit-profile-btn:hover {
+    background-color: #1e7e34;
+}
+
+.profile-updated-message {
+    /* Styles for the confirmation box below the button/cards */
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    max-width: 600px; /* Match width to content area */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- PROFILE PICTURE PAGE STYLES (Sub-view within EditProfile.js) --- */
+
+.profile-picture-page {
+    /* Styles for the temporary full-page view */
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.current-image-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    border: 3px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9em;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 1em;
+}/* src/App.css: FINAL COMPLETE STYLING */
+
+/* Global Reset and Layout */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ------------------- Sidebar Styles ------------------- */
+.sidebar {
+    width: 250px;
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+}
+
+.sidebar-header {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+    padding: 0 20px 30px 20px;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav ul li {
+    padding: 12px 20px;
+    color: #555;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-nav ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.sidebar-nav ul li.active {
+    font-weight: bold;
+    color: #007bff;
+    background-color: #f0f8ff;
+    border-left: 3px solid #007bff;
+}
+
+/* ------------------- Main Content Area ------------------- */
+.main-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* Top Right Header */
+.main-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+    margin-right: 15px;
+}
+
+.profile-icon-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Profile Content Layout (Applies to both ProfilePage and EditProfilePage containers) */
+.profile-main-area {
+    padding: 30px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ------------------- READ-ONLY CARD STYLES (ProfilePage.js) ------------------- */
+
+.profile-info-card,
+.profile-section-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.profile-info-card {
+    text-align: center;
+}
+
+.profile-icon-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profile-icon-large img {
+    width: 60%;
+    height: 60%;
+}
+
+.profile-info-card h2 {
+    margin: 5px 0 2px 0;
+    font-size: 1.5em;
+}
+
+.profile-info-card p {
+    color: #777;
+    margin: 0;
+}
+
+.section-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #eee;
+}
+
+/* Bio Placeholder */
+.bio-placeholder {
+    margin: 15px 0;
+}
+.bio-line {
+    border: none;
+    border-top: 1px dashed #ccc;
+    margin: 10px 0;
+    width: 90%;
+}
+
+/* Skills Tags (Read-Only) */
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.skill-tag {
+    background-color: #e0f7fa;
+    color: #007bff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid #b2ebf2;
+}
+
+/* Achievements */
+.achievement-item {
+    margin-bottom: 20px;
+    padding-left: 10px;
+    border-left: 3px solid #007bff;
+}
+
+.achievement-item h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.achievement-item p {
+    margin: 0;
+    color: #555;
+    font-size: 0.9em;
+}
+
+
+/* ------------------- EDIT PROFILE PAGE STYLES (EditProfile.js) ------------------- */
+
+.edit-title {
+    font-size: 1.8em;
+    margin-bottom: 5px;
+}
+
+.edit-subtitle {
+    color: #777;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 0.95em;
+}
+
+.edit-card {
+    /* Base card styling for the editable cards */
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* 1. Profile Info Card (Top Section) */
+.profile-info-card-edit {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Makes the profile icon clickable and changes cursor */
+.profile-icon-edit.clickable-icon {
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Subtle blue highlight on interaction */
+    transition: transform 0.1s;
+}
+.profile-icon-edit.clickable-icon:hover {
+    transform: scale(1.02);
+}
+
+.profile-icon-edit {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.profile-icon-edit img {
+    width: 60%;
+    height: 60%;
+}
+
+.profile-fields input {
+    display: block;
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 1em;
+    width: 250px;
+}
+.profile-fields .name-input {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #333;
+}
+
+/* 2. Bio and Skills */
+.bio-textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    resize: vertical;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 1em;
+}
+
+.sub-section-title {
+    font-size: 1em;
+    font-weight: bold;
+    color: #555;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Skills Tags in Edit Mode */
+.skills-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    align-items: center;
+}
+.removable-tag {
+    background-color: #e0f7fa;
+    color: #007bff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid #b2ebf2;
+    cursor: default;
+    display: flex;
+    align-items: center;
+}
+.remove-btn {
+    margin-left: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #007bff;
+    line-height: 1;
+}
+
+.add-skill-input {
+    flex-grow: 1;
+    border: none;
+    padding: 5px 0;
+    font-size: 0.95em;
+    min-width: 150px;
+    outline: none;
+}
+
+/* 3. Achievements */
+.achievement-item-edit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.achievement-item-edit:last-of-type {
+    border-bottom: none;
+    margin-bottom: 20px;
+}
+
+.achievement-text {
+    flex-grow: 1;
+    padding-right: 20px;
+}
+
+.achievement-actions .action-btn {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    margin-left: 10px;
+}
+
+.edit-btn {
+    background-color: #fff;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.delete-btn {
+    background-color: #fdd;
+    color: #c0392b;
+    border-color: #c0392b;
+}
+
+.add-more-btn {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+/* --- SUBMIT BUTTON AND MESSAGE STYLES --- */
+
+.submit-profile-btn {
+    width: 100%;
+    max-width: 300px; /* Adjust width to fit standard buttons */
+    padding: 12px 20px;
+    margin-top: 15px; /* Spacing below the achievement card */
+    background-color: #28a745; /* Green color for submit */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    align-self: flex-start; /* Ensures button aligns left */
+    transition: background-color 0.2s;
+}
+
+.submit-profile-btn:hover {
+    background-color: #1e7e34;
+}
+
+.profile-updated-message {
+    /* Styles for the confirmation box below the button/cards */
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    max-width: 600px; /* Match width to content area */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- PROFILE PICTURE PAGE STYLES (Sub-view within EditProfile.js) --- */
+
+.profile-picture-page {
+    /* Styles for the temporary full-page view */
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.current-image-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    border: 3px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9em;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 1em;
+}
+
+/* Hide arrows in Chrome, Edge, Safari */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ------------------- Main Content & Tabs Styles ------------------- */
+
+.main-content {
+    flex-grow: 1;
+    /* Ensures content is centered nicely on the page */
+    padding: 20px 0 20px 0;
+}
+
+.main-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.main-header h1 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Main Leaderboard Tabs (Enigma/Genesis) */
+.leaderboard-tabs {
+    display: flex;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.leaderboard-tabs button {
+    background: none;
+    border: none;
+    padding: 5px 15px;
+    margin-left: 0;
+    margin-right: 15px;
+    cursor: pointer;
+    font-size: 1em;
+    color: #777;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.leaderboard-tabs button:hover {
+    color: #007bff;
+}
+
+.leaderboard-tabs button.active-tab {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.leaderboard-tabs button.active-tab::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #007bff;
+}
+
+/* Sub-Tabs (First Years / Non First Years) */
+.leaderboard-sub-tabs {
+    display: flex;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    width: 100%;
+}
+
+.leaderboard-sub-tabs button {
+    background: none;
+    border: none;
+    padding: 5px 15px;
+    margin-left: 0;
+    margin-right: 15px;
+    cursor: pointer;
+    font-size: 1em;
+    color: #777;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.leaderboard-sub-tabs button.active-tab {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.leaderboard-sub-tabs button.active-tab::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #007bff;
+}
+
+.leaderboard-display {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ------------------- Leaderboard Content & Table Styles ------------------- */
+
+.leaderboard-content {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    /* CRITICAL for aligning widgets with table content */
+    align-items: flex-start;
+}
+
+.leaderboard-table-container {
+    /* Set table to take up 75% of the space */
+    flex-basis: 75%;
+    flex-grow: 1;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    table-layout: fixed;
+}
+
+/* --- New Class for Tooltip Trigger (Team Lead Cell) --- */
+.tooltip-container {
+    position: relative;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* --- Tooltip Class (FLIPPED TO THE LEFT to stay on screen) --- */
+.team-tooltip {
+    position: absolute;
+    top: 50%;
+
+    /* FLIPPED POSITIONING: Position to the left of the cell content */
+    right: calc(100% + 15px);
+    left: auto;
+    transform: translateY(-50%);
+    z-index: 99999;
+
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    min-width: 180px;
+
+    color: #333;
+    font-size: 0.9em;
+}
+
+/* --- Tooltip Pointer (FLIPPED TO POINT RIGHT) --- */
+.team-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+
+    /* Pointer appears on the right edge of the tooltip box */
+    right: -10px;
+    left: auto;
+
+    /* Rotated to point toward the Team Lead name */
+    transform: translateY(-50%) rotate(-45deg);
+    width: 15px;
+    height: 15px;
+    background-color: white;
+    border-right: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    z-index: 100000;
+}
+
+
+/* Table cell styling */
+table th,
+table td {
+    border: 2px solid #ddd;
+    padding: 18px;
+    text-align: left;
+    border-radius: 4px;
+}
+
+table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    color: #333;
+}
+
+table tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* ------------------- Right Sidebar Boxes (Enigma) ------------------- */
+
+.sidebar-widgets {
+    /* Set widgets to take up 25% of the space */
+    flex-basis: 25%;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    /* CRITICAL FIX: Pushes the widgets down to align with the table rows */
+    padding-top: 155px;
+}
+
+.codenigma-winners-box,
+.organizers-box,
+.organizers-box-genesis {
+    background-color: #ffffff;
+    border: 2px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.codenigma-winners-box h3,
+.organizers-box h3,
+.organizers-box-genesis h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.codenigma-winners-box ol {
+    padding-left: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+.codenigma-winners-box li {
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.organizers-box p,
+.organizers-box-genesis p {
+    margin: 7px 0;
+    color: #555;
+}
+
+/* Genesis Specific Layout Fix */
+.leaderboard-display .leaderboard-content:has(.organizers-box-genesis) {
+    flex-direction: column;
+}
+
+.leaderboard-display .leaderboard-content:has(.organizers-box-genesis) .organizers-box-genesis {
+    width: 50%;
+    align-self: flex-start;
+}
+
+
+
+
+
+/* ------------------- Main Content Area ------------------- */
+.main-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* Top Right Header */
+.main-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+    margin-right: 15px;
+}
+
+.profile-icon-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+}
