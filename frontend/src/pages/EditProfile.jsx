@@ -58,7 +58,7 @@ export default function EditProfile() {
         return;
     }
 
-    fetch(`http://localhost:5000/api/profile/${userId}`)
+    fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`)
         .then(res => res.json())
         .then(data => {
         if (!data) {
@@ -137,7 +137,7 @@ const handleSubmit = async () => {
     };
 
     const res = await fetch(
-      `http://localhost:5000/api/profile/${userId}`,
+      `https://web-portal-760h.onrender.com/api/profile/${userId}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

@@ -21,7 +21,7 @@ export default function Alumni() {
     const fetchAlumni = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:5000/api/alumni");
+        const response = await fetch("https://web-portal-760h.onrender.com/api/alumni");
         if (!response.ok) throw new Error("Failed to fetch alumni");
         const data = await response.json();
         setAlumni(data);

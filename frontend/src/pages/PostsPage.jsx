@@ -17,7 +17,7 @@ const PostsPage = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/posts');
+      const response = await fetch('https://web-portal-760h.onrender.com/api/posts');
       const data = await response.json();
       setPosts(data);
       setLoading(false);
@@ -42,7 +42,7 @@ const PostsPage = () => {
         });
       }
 
-      const response = await fetch('http://localhost:5000/api/posts', {
+      const response = await fetch('https://web-portal-760h.onrender.com/api/posts', {
         method: 'POST',
         body: formData,
       });
@@ -59,7 +59,7 @@ const PostsPage = () => {
 
   const handleUpvote = async (postId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${postId}/upvote`, {
+      const response = await fetch(`https://web-portal-760h.onrender.com/api/posts/${postId}/upvote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser.id }),
@@ -75,7 +75,7 @@ const PostsPage = () => {
 
   const handleAddComment = async (postId, comment) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${postId}/comments`, {
+      const response = await fetch(`https://web-portal-760h.onrender.com/api/posts/${postId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +89,7 @@ const PostsPage = () => {
         fetchPosts();
         // Update selected post if sidebar is open
         if (selectedPost && selectedPost._id === postId) {
-          const updatedPosts = await fetch('http://localhost:5000/api/posts').then(r => r.json());
+          const updatedPosts = await fetch('https://web-portal-760h.onrender.com/api/posts').then(r => r.json());
           const updated = updatedPosts.find(p => p._id === postId);
           setSelectedPost(updated);
         }
@@ -101,7 +101,7 @@ const PostsPage = () => {
 
   const handleAddReply = async (commentId, reply) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/comments/${commentId}/replies`, {
+      const response = await fetch(`https://web-portal-760h.onrender.com/api/comments/${commentId}/replies`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -114,7 +114,7 @@ const PostsPage = () => {
       if (response.ok) {
         fetchPosts();
         if (selectedPost) {
-          const updatedPosts = await fetch('http://localhost:5000/api/posts').then(r => r.json());
+          const updatedPosts = await fetch('https://web-portal-760h.onrender.com/api/posts').then(r => r.json());
           const updated = updatedPosts.find(p => p._id === selectedPost._id);
           setSelectedPost(updated);
         }
@@ -126,7 +126,7 @@ const PostsPage = () => {
 
   const handleUpvoteComment = async (commentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/comments/${commentId}/upvote`, {
+      const response = await fetch(`https://web-portal-760h.onrender.com/api/comments/${commentId}/upvote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser.id }),
@@ -135,7 +135,7 @@ const PostsPage = () => {
       if (response.ok) {
         fetchPosts();
         if (selectedPost) {
-          const updatedPosts = await fetch('http://localhost:5000/api/posts').then(r => r.json());
+          const updatedPosts = await fetch('https://web-portal-760h.onrender.com/api/posts').then(r => r.json());
           const updated = updatedPosts.find(p => p._id === selectedPost._id);
           setSelectedPost(updated);
         }

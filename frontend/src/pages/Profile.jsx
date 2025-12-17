@@ -17,7 +17,7 @@ export default function Profile() {
       return;
     }
 
-    fetch(`http://localhost:5000/api/profile/${userId}`)
+    fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load profile");
         return res.json();

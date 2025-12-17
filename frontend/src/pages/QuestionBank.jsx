@@ -89,7 +89,7 @@ export default function QuestionBank() {
 
   const fetchPapers = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/qp?search=${searchQuery}`);
+      const res = await fetch(`https://web-portal-760h.onrender.com/api/qp?search=${searchQuery}`);
       const data = await res.json();
       setUploads(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -167,7 +167,7 @@ export default function QuestionBank() {
     formData.append("authorId", user.id);
 
     try {
-      const res = await fetch("http://localhost:5000/api/qp", {
+      const res = await fetch("https://web-portal-760h.onrender.com/api/qp", {
         method: "POST",
         body: formData,
       });

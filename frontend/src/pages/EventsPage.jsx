@@ -16,7 +16,7 @@ const EventsPage = () => {
 
   // Fetch events from backend on mount
   useEffect(() => {
-    fetch('http://localhost:5000/api/events')
+    fetch('https://web-portal-760h.onrender.com/api/events')
       .then(res => res.json())
       .then(data => setEventsData(data))
       .catch(err => {
