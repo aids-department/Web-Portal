@@ -18,7 +18,7 @@ export default function ManageUploads() {
 
   const fetchUploads = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/qp");
+      const res = await fetch("https://web-portal-760h.onrender.com/api/qp");
       const data = await res.json();
       setUploads(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -40,7 +40,7 @@ export default function ManageUploads() {
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/qp/${deleteId}`, {
+      const res = await fetch(`https://web-portal-760h.onrender.com/api/qp/${deleteId}`, {
         method: "DELETE",
       });
       const result = await res.json();

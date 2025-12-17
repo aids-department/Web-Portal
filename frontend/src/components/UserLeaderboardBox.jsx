@@ -30,17 +30,17 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
       setLoading(true);
 
       const res1 = await fetch(
-        "http://localhost:5000/api/leaderboard/Enigma First Year"
+        "https://web-portal-760h.onrender.com/api/leaderboard/Enigma First Year"
       );
       const fy = await res1.json();
 
       const res2 = await fetch(
-        "http://localhost:5000/api/leaderboard/Enigma Non-First Year"
+        "https://web-portal-760h.onrender.com/api/leaderboard/Enigma Non-First Year"
       );
       const nf = await res2.json();
 
       const res3 = await fetch(
-        "http://localhost:5000/api/leaderboard/Codenigma"
+        "https://web-portal-760h.onrender.com/api/leaderboard/Codenigma"
       );
       const cd = await res3.json();
 

@@ -137,7 +137,7 @@ export default function EventsAdminPage() {
         formData.append('poster', eventData.poster);
       }
 
-      const res = await fetch("http://localhost:5000/api/events", {
+      const res = await fetch("https://web-portal-760h.onrender.com/api/events", {
         method: "POST",
         body: formData, // Send FormData, not JSON
         // Don't set Content-Type header - browser will set it with boundary
@@ -187,7 +187,7 @@ export default function EventsAdminPage() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/events", {
+      const res = await fetch("https://web-portal-760h.onrender.com/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

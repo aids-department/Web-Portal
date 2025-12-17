@@ -32,7 +32,7 @@ export default function LeaderboardBox({ title, count }) {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:5000/api/leaderboard/${category}`
+          `https://web-portal-760h.onrender.com/api/leaderboard/${category}`
         );
         const data = await res.json();
 
@@ -177,7 +177,7 @@ export default function LeaderboardBox({ title, count }) {
 
     try {
       for (const r of toSave) {
-        await fetch("http://localhost:5000/api/leaderboard", {
+        await fetch("https://web-portal-760h.onrender.com/api/leaderboard", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
