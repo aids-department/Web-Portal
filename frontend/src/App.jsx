@@ -32,6 +32,8 @@ import EditProfile from "./pages/EditProfile";
 import AdminLeaderboards from "./pages/AdminLeaderboards";
 import { Toaster } from "react-hot-toast";
 import UserLeaderboards from "./pages/UserLeaderboards";
+import AdminAchievements from "./pages/AdminAchievements";
+import UserAchievements from "./pages/UserAchievements";
 
 import "./style.css";
 
@@ -108,23 +110,6 @@ function DashboardPage() {
 // ============================================
 // PLACEHOLDER PAGES (From App 2)
 // ============================================
-function LeaderboardsPage() {
-  return (
-    <div className="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-      <h2 className="text-3xl font-bold text-blue-900 mb-4">Leaderboards</h2>
-      <p className="text-gray-600">Leaderboards content coming soon...</p>
-    </div>
-  );
-}
-
-function AchievementsPage() {
-  return (
-    <div className="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-      <h2 className="text-3xl font-bold text-blue-900 mb-4">Achievements</h2>
-      <p className="text-gray-600">Achievements content coming soon...</p>
-    </div>
-  );
-}
 
 function ConnectPage() {
   return (
@@ -364,7 +349,7 @@ export default function App() {
           path="/achievements"
           element={
             <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
-              <AchievementsPage />
+              <UserAchievements />
             </MainLayout>
           }
         />
@@ -435,6 +420,14 @@ export default function App() {
           }
         />
 
+        <Route
+          path="/admin/achievements"
+          element={
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <AdminAchievements />
+            </MainLayout>
+          }
+        />
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

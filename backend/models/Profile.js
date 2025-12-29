@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-const AchievementSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-});
-
 const ProfileSchema = new mongoose.Schema(
   {
     userId: {
@@ -17,7 +12,6 @@ const ProfileSchema = new mongoose.Schema(
     year: String,
     bio: String,
     skills: [String],
-    achievements: [AchievementSchema],
     profileImage: String,
   },
   { timestamps: true }

@@ -27,6 +27,7 @@ const PORT = process.env.PORT || 5000;
 
 const leaderboardRoutes = require("./routes/leaderboard");
 const profileRoutes = require("./routes/profile");
+const achievementRoutes = require("./routes/achievements");
 
 // ============================================
 // CLOUDINARY CONFIG
@@ -100,6 +101,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/profile", profileRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api/achievements", achievementRoutes);
 
 // ============================================
 // GOOGLE CALENDAR SETUP

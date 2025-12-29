@@ -27,6 +27,18 @@ export default function Profile() {
       .finally(() => setLoading(false));
   }, []);
 
+  const [achievements, setAchievements] = useState([]);
+
+    useEffect(() => {
+      if (!userId) return;
+
+      fetch(`http://localhost:5000/api/achievements/user/${userId}`)
+        .then(res => res.json())
+        .then(data => setAchievements(data))
+        .catch(err => console.error(err));
+    }, [userId]);
+
+
   if (loading) return <p>Loading profile…</p>;
   if (!profile) return <p>No profile found.</p>;
 
@@ -57,14 +69,17 @@ export default function Profile() {
       {/* Achievements */}
       <div className="profile-section-card">
         <h3 className="section-title">Achievements</h3>
-        <div className="achievements-container">
-          {(profile.achievements || []).map((a, i) => (
+
+        {achievements.length === 0 ? (
+          <p>No approved achievements yet.</p>
+        ) : (
+          achievements.map((a, i) => (
             <div key={i} className="achievement-item">
               <h4>{a.title}</h4>
               <p>{a.description}</p>
             </div>
-          ))}
-        </div>
+          ))
+        )}
       </div>
     </div>
   );

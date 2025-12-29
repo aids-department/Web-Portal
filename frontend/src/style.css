@@ -103,7 +103,7 @@ label {
 }
 
 /* Keep the existing custom scrollbar styling */
-/* ------------------- EDIT PROFILE PAGE STYLES (EditProfile.js) ------------------- */
+/* ------------------- EDIT PROFILE PAGE STYLES (EditProfile.jsx) ------------------- */
 
 .edit-title {
     font-size: 1.8em;
@@ -284,6 +284,43 @@ label {
     font-size: 1em;
     font-weight: bold;
 }
+
+/* ===== Achievement Status Badges ===== */
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Approved */
+.status-badge.approved {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+/* Pending */
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Rejected */
+.status-badge.rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* New (not yet submitted) */
+.status-badge.new {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
 
 /* --- SUBMIT BUTTON AND MESSAGE STYLES --- */
 
