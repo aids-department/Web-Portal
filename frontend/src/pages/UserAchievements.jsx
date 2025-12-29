@@ -4,7 +4,7 @@ export default function UserAchievements() {
   const [achievements, setAchievements] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/achievements/approved/recent")
+    fetch("https://web-portal-760h.onrender.com/api/achievements/approved/recent")
       .then(res => res.json())
       .then(data => setAchievements(data));
   }, []);

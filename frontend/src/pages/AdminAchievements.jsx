@@ -5,7 +5,7 @@ export default function AdminAchievements() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/achievements/pending")
+    fetch("https://web-portal-760h.onrender.com/api/achievements/pending")
       .then(res => res.json())
       .then(data => setPending(data))
       .finally(() => setLoading(false));
@@ -13,7 +13,7 @@ export default function AdminAchievements() {
 
   const approveAchievement = async (id) => {
     const res = await fetch(
-      `http://localhost:5000/api/achievements/${id}/approve`,
+      `https://web-portal-760h.onrender.com/api/achievements/${id}/approve`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -35,7 +35,7 @@ export default function AdminAchievements() {
     if (!reason) return;
 
     const res = await fetch(
-      `http://localhost:5000/api/achievements/${id}/reject`,
+      `https://web-portal-760h.onrender.com/api/achievements/${id}/reject`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

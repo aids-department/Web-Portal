@@ -32,7 +32,7 @@ export default function Profile() {
     useEffect(() => {
       if (!userId) return;
 
-      fetch(`http://localhost:5000/api/achievements/user/${userId}`)
+      fetch(`https://web-portal-760h.onrender.com/api/achievements/user/${userId}`)
         .then(res => res.json())
         .then(data => setAchievements(data))
         .catch(err => console.error(err));

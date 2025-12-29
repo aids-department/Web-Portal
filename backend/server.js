@@ -94,9 +94,16 @@ mongoose
 // ============================================
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174","https://web-portal-gold.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://web-portal-gold.vercel.app",
+      "https://web-portal-760h.onrender.com",
+    ],
+    credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/profile", profileRoutes);

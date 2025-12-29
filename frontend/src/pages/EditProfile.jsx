@@ -82,7 +82,7 @@ export default function EditProfile() {
     useEffect(() => {
       if (!userId) return;
 
-      fetch(`http://localhost:5000/api/achievements/user/${userId}?all=true`)
+      fetch(`https://web-portal-760h.onrender.com/api/achievements/user/${userId}?all=true`)
         .then(res => res.json())
         .then(data => {
           // normalize: add local flag for UI
@@ -187,7 +187,7 @@ const handleSubmit = async () => {
     for (const a of achievements) {
   if (a.localStatus !== "new" && a.localStatus !== "rejected") continue;
 
-  await fetch("http://localhost:5000/api/achievements", {
+  await fetch("https://web-portal-760h.onrender.com/api/achievements", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -201,7 +201,7 @@ const handleSubmit = async () => {
     // delete old rejected
 if (a.localStatus === "rejected" && a._id) {
   await fetch(
-    `http://localhost:5000/api/achievements/${a._id}`,
+    `https://web-portal-760h.onrender.com/api/achievements/${a._id}`,
     { method: "DELETE" }
   );
 }
@@ -209,7 +209,7 @@ if (a.localStatus === "rejected" && a._id) {
 // delete old approved (only if edited)
 if (a.editedFromApproved && a._id) {
   await fetch(
-    `http://localhost:5000/api/achievements/${a._id}`,
+    `https://web-portal-760h.onrender.com/api/achievements/${a._id}`,
     { method: "DELETE" }
   );
 }
@@ -217,7 +217,7 @@ if (a.editedFromApproved && a._id) {
 }
 
 // refresh achievements after submit
-fetch(`http://localhost:5000/api/achievements/user/${userId}?all=true`)
+fetch(`https://web-portal-760h.onrender.com/api/achievements/user/${userId}?all=true`)
   .then(res => res.json())
   .then(data => {
     setAchievements(
