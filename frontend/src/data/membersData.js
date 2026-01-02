@@ -1,5 +1,5 @@
 // frontend/src/data/membersData.js
-import dummyProfile from "../../public/assets/member.jpg";
+const dummyProfile = "/assets/member.jpg";
 
 const membersData = [
   // =======================

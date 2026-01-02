@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const DATA = {
   "Semester 1": {
@@ -73,10 +72,13 @@ export default function Syllabus() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center p-10">
-      <div className="w-full max-w-3xl text-black">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 flex justify-center p-10">
+      {/* Decorative background elements */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-yellow-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
 
-        <h2 className="text-3xl font-bold mb-6">AI & DS - Syllabus Portal</h2>
+      <div className="w-full max-w-3xl text-black relative z-10">
+        <h2 className="text-3xl font-bold mb-6 text-gray-900">AI & DS - Syllabus Portal</h2>
 
         {/* SEARCH BAR */}
         <input
@@ -118,8 +120,7 @@ export default function Syllabus() {
           const hasLab = Array.isArray(DATA[sem].lab);
 
           return (
-            <motion.div
-              layout
+            <div
               key={sem}
               className="bg-white p-5 rounded-2xl shadow mb-6"
             >
@@ -133,140 +134,113 @@ export default function Syllabus() {
                 <span>{openSem === index ? "▲" : "▼"}</span>
               </button>
 
-              <AnimatePresence>
-                {openSem === index && (
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="mt-3 overflow-hidden"
-                  >
-                    {/* THEORY / LAB BUTTONS */}
-                    <div className="flex gap-3 mb-3">
-                      <button
-                        onClick={() => {
-                          if (!hasTheory) return setOpenMessage("Content will be updated soon.");
-                          setOpenGroup({ [sem]: "theory" });
-                        }}
-                        className={`p-2 rounded-lg border w-full ${
-                          openGroup[sem] === "theory"
-                            ? "bg-blue-100 border-blue-300"
-                            : "bg-white border-gray-300"
-                        }`}
-                      >
-                        Theory
-                      </button>
+              {openSem === index && (
+                <div className="mt-3 overflow-hidden">
+                  {/* THEORY / LAB BUTTONS */}
+                  <div className="flex gap-3 mb-3">
+                    <button
+                      onClick={() => {
+                        if (!hasTheory) return setOpenMessage("Content will be updated soon.");
+                        setOpenGroup({ [sem]: "theory" });
+                      }}
+                      className={`p-2 rounded-lg border w-full ${
+                        openGroup[sem] === "theory"
+                          ? "bg-blue-100 border-blue-300"
+                          : "bg-white border-gray-300"
+                      }`}
+                    >
+                      Theory
+                    </button>
 
-                      <button
-                        onClick={() => {
-                          if (!hasLab) return setOpenMessage("Content will be updated soon.");
-                          setOpenGroup({ [sem]: "lab" });
-                        }}
-                        className={`p-2 rounded-lg border w-full ${
-                          openGroup[sem] === "lab"
-                            ? "bg-blue-100 border-blue-300"
-                            : "bg-white border-gray-300"
-                        }`}
-                      >
-                        Lab
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => {
+                        if (!hasLab) return setOpenMessage("Content will be updated soon.");
+                        setOpenGroup({ [sem]: "lab" });
+                      }}
+                      className={`p-2 rounded-lg border w-full ${
+                        openGroup[sem] === "lab"
+                          ? "bg-blue-100 border-blue-300"
+                          : "bg-white border-gray-300"
+                      }`}
+                    >
+                      Lab
+                    </button>
+                  </div>
 
-                    {/* SUBJECT LIST */}
-                    {openGroup[sem] &&
-                      Array.isArray(DATA[sem][openGroup[sem]]) &&
-                      DATA[sem][openGroup[sem]].map((subject, idx) => (
-                        <motion.div
-                          layout
-                          key={idx}
-                          className="p-3 bg-gray-100 rounded-xl flex justify-between items-center mb-2"
+                  {/* SUBJECT LIST */}
+                  {openGroup[sem] &&
+                    Array.isArray(DATA[sem][openGroup[sem]]) &&
+                    DATA[sem][openGroup[sem]].map((subject, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 bg-gray-100 rounded-xl flex justify-between items-center mb-2"
+                      >
+                        <div>{subject.title}</div>
+                        <button
+                          onClick={() => setOpenSubject(subject)}
+                          className="px-3 py-1 border rounded-lg bg-white hover:bg-gray-200"
                         >
-                          <div>{subject.title}</div>
-                          <button
-                            onClick={() => setOpenSubject(subject)}
-                            className="px-3 py-1 border rounded-lg bg-white hover:bg-gray-200"
-                          >
-                            View
-                          </button>
-                        </motion.div>
-                      ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+                          View
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
           );
         })}
 
         {/* POPUPS */}
 
         {/* INVALID SEARCH */}
-        <AnimatePresence>
-          {invalidSearch && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
-              onClick={() => setInvalidSearch(false)}
-            >
-              <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
-                Enter a valid subject name
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {invalidSearch && (
+          <div
+            className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
+            onClick={() => setInvalidSearch(false)}
+          >
+            <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
+              Enter a valid subject name
+            </div>
+          </div>
+        )}
 
         {/* ALERT MESSAGE */}
-        <AnimatePresence>
-          {openMessage && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
-              onClick={() => setOpenMessage(null)}
-            >
-              <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
-                {openMessage}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {openMessage && (
+          <div
+            className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
+            onClick={() => setOpenMessage(null)}
+          >
+            <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
+              {openMessage}
+            </div>
+          </div>
+        )}
 
         {/* PDF MODAL */}
-        <AnimatePresence>
-          {openSubject && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-[999]"
+        {openSubject && (
+          <div
+            className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-[999]"
+          >
+            <div
+              className="bg-white w-[90%] h-[90%] rounded-xl overflow-hidden shadow-xl flex flex-col"
             >
-              <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
-                className="bg-white w-[90%] h-[90%] rounded-xl overflow-hidden shadow-xl flex flex-col"
-              >
-                <div className="p-3 border-b flex justify-between">
-                  <strong>{openSubject.title}</strong>
-                  <button
-                    onClick={() => setOpenSubject(null)}
-                    className="px-3 py-1 bg-red-500 text-white rounded-lg"
-                  >
-                    Close
-                  </button>
-                </div>
+              <div className="p-3 border-b flex justify-between">
+                <strong>{openSubject.title}</strong>
+                <button
+                  onClick={() => setOpenSubject(null)}
+                  className="px-3 py-1 bg-red-500 text-white rounded-lg"
+                >
+                  Close
+                </button>
+              </div>
 
-                <iframe
-                  src={`/syllabus_first_year.pdf#page=${openSubject.pdfPage}`}
-                  className="w-full h-full"
-                />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <iframe
+                src={`https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`}
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

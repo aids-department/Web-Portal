@@ -13,6 +13,7 @@ const SignupPage = () => {
     year: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -21,6 +22,7 @@ const SignupPage = () => {
       [e.target.name]: e.target.value
     });
     setError('');
+    setSuccess('');
   };
 
   const handleSubmit = async (e) => {
@@ -44,6 +46,8 @@ const SignupPage = () => {
     }
 
     setLoading(true);
+    setError('');
+    setSuccess('');
 
     try {
       const response = await fetch('https://web-portal-760h.onrender.com/api/auth/signup', {
@@ -65,8 +69,8 @@ const SignupPage = () => {
       if (response.ok) {
         // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
-        alert('Account created successfully!');
-        navigate('/');
+        setSuccess('Account created successfully!');
+        setTimeout(() => navigate('/'), 2000);
       } else {
         setError(data.error || 'Signup failed');
       }
@@ -79,19 +83,32 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">Create Account</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join the AI & DS Association</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
             {error}
+          </div>
+        )}
+
+        {/* Success Message */}
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            {success}
           </div>
         )}
 
@@ -110,7 +127,7 @@ const SignupPage = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="Enter your full name"
               />
             </div>
@@ -128,7 +145,7 @@ const SignupPage = () => {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="Choose a username"
               />
             </div>
@@ -146,7 +163,7 @@ const SignupPage = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="your.email@example.com"
               />
             </div>
@@ -163,7 +180,7 @@ const SignupPage = () => {
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent appearance-none bg-white"
               >
                 <option value="">Select your year</option>
                 <option value="1">1st Year</option>
@@ -186,7 +203,7 @@ const SignupPage = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="Create a strong password"
               />
             </div>
@@ -204,7 +221,7 @@ const SignupPage = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="Confirm your password"
               />
             </div>
@@ -214,7 +231,7 @@ const SignupPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-900 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
@@ -224,7 +241,7 @@ const SignupPage = () => {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{' '}
-            <Link to="/login" className="text-blue-900 font-semibold hover:underline">
+            <Link to="/login" className="text-gray-900 font-semibold hover:underline">
               Login here
             </Link>
           </p>

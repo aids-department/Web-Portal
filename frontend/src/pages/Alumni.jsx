@@ -99,21 +99,37 @@ export default function Alumni() {
     );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <section className="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-        <h1 className="text-4xl font-extrabold text-blue-900 mb-4">
-          Alumni Connect - AI and Data Science Department
-        </h1>
-        <p className="text-gray-600 leading-relaxed max-w-3xl">
-          Connect with our successful alumni working in leading tech companies
-          worldwide. Explore their career paths, skills, and get inspired for
-          your journey.
-        </p>
-      </section>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-6">
+      {/* Decorative background elements */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-pink-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
+        {/* Header */}
+        <section className="relative bg-gradient-to-br from-purple-50 via-white to-pink-50 backdrop-blur-lg p-10 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+          <div className="relative z-10">
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+              Alumni Connect - AI and Data Science Department
+            </h1>
+            <p className="text-gray-600 leading-relaxed max-w-3xl">
+              Connect with our successful alumni working in leading tech companies
+              worldwide. Explore their career paths, skills, and get inspired for
+              your journey.
+            </p>
+          </div>
+        </section>
 
       {/* Search and Filters */}
-      <section className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+      <section className="relative bg-gradient-to-br from-indigo-50 via-white to-cyan-50 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+        <div className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           {/* Search Bar */}
           <div className="relative">
@@ -195,6 +211,7 @@ export default function Alumni() {
         >
           Clear Filters
         </button>
+        </div>
       </section>
 
       {/* Results Count */}
@@ -204,24 +221,46 @@ export default function Alumni() {
 
       {/* Alumni Cards Grid */}
       {filteredAlumni.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAlumni.map((alum) => (
-            <AlumniCard key={alum._id} alumni={alum} />
-          ))}
+        <div className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+          <div className="relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAlumni.map((alum) => (
+                <AlumniCard key={alum._id} alumni={alum} />
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="bg-white p-10 rounded-2xl shadow-md border border-gray-200 text-center">
-          <p className="text-lg text-gray-600">
-            No alumni found matching your filters.
-          </p>
+        <div className="relative bg-gradient-to-br from-red-50 via-white to-orange-50 backdrop-blur-lg p-10 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-red-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+          <div className="relative z-10 text-center">
+            <p className="text-lg text-gray-600">
+              No alumni found matching your filters.
+            </p>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-          Error: {error}
+        <div className="relative bg-gradient-to-br from-red-50 via-white to-pink-50 backdrop-blur-lg px-4 py-3 rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-red-200/20 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
+
+          <div className="relative z-10">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+              Error: {error}
+            </div>
+          </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -68,18 +68,26 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
   if (loading) return <p>Loading leaderboard…</p>;
 
   return (
-    <div className="leaderboard-content">
-      <div className="leaderboard-table-container">
+    <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex-1">
         {/* Sub-Navigation Buttons */}
-        <div className="leaderboard-sub-tabs">
+        <div className="flex gap-4 mb-6">
           <button
-            className={activeSubTab === "first_years" ? "active-tab" : ""}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              activeSubTab === "first_years"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
             onClick={() => setActiveSubTab("first_years")}
           >
             First Years
           </button>
           <button
-            className={activeSubTab === "non_first_years" ? "active-tab" : ""}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              activeSubTab === "non_first_years"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
             onClick={() => setActiveSubTab("non_first_years")}
           >
             Non First Years
@@ -87,44 +95,46 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
         </div>
 
         {/* Table Display */}
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Year</th>
-              <th>Score</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentLeaderboard.map((row) => (
-              <tr key={row.roll}>
-                <td>{row.rank}</td>
-                <td>{row.name}</td>
-                <td>{row.yearDisplay}</td>
-                <td>{row.score}</td>
-                <td>{row.timeDisplay}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse bg-white rounded-lg shadow-sm border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-3 text-left font-semibold text-gray-900">Rank</th>
+                <th className="p-3 text-left font-semibold text-gray-900">Name</th>
+                <th className="p-3 text-left font-semibold text-gray-900">Year</th>
+                <th className="p-3 text-left font-semibold text-gray-900">Score</th>
+                <th className="p-3 text-left font-semibold text-gray-900 hidden sm:table-cell">Time</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentLeaderboard.map((row) => (
+                <tr key={row.roll} className="border-t border-gray-200 hover:bg-gray-50">
+                  <td className="p-3 text-gray-700">{row.rank}</td>
+                  <td className="p-3 text-gray-700">{row.name}</td>
+                  <td className="p-3 text-gray-700">{row.yearDisplay}</td>
+                  <td className="p-3 text-gray-700">{row.score}</td>
+                  <td className="p-3 text-gray-700 hidden sm:table-cell">{row.timeDisplay}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="sidebar-widgets">
-        <div className="codenigma-winners-box">
-          <h3>Codenigma Winners</h3>
-          <ol style={{ listStyleType: "none", padding: 0 }}>
+      <div className="w-full lg:w-80 space-y-6">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Codenigma Winners</h3>
+          <ol className="list-decimal list-inside space-y-1 text-gray-700">
             {codenigmaWinners.map((winner, index) => (
               <li key={index}>{winner}</li>
             ))}
           </ol>
         </div>
 
-        <div className="organizers-box">
-          <h3>Organizers</h3>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Organizers</h3>
           {organizers.map((organizer, index) => (
-            <p key={index}>{organizer}</p>
+            <p key={index} className="text-gray-700">{organizer}</p>
           ))}
         </div>
       </div>
@@ -166,55 +176,57 @@ const GenesisLeaderboard = () => {
   const organizers = ["XXX (III Year)", "YYY (II Year)", "ZZZ (I Year)"];
 
   return (
-    <div className="leaderboard-content">
-      <div className="leaderboard-table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Project Name</th>
-              <th>Year</th>
-              <th>Team</th>
-              <th>Team Lead</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboardData.map((row, index) => (
-              <tr key={index}>
-                <td>{row.rank}</td>
-                <td>{row.projectName}</td>
-                <td>{row.year}</td>
-                <td>{row.team}</td>
-                <td
-                  onMouseEnter={() => setHoveredLead(row)}
-                  onMouseLeave={() => setHoveredLead(null)}
-                  className="tooltip-container"
-                >
-                  {row.lead}
-                  {hoveredLead && hoveredLead.rank === row.rank && (
-                    <div className="team-tooltip">
-                      <p>
-                        <strong>Team Members:</strong>
-                      </p>
-                      <ul>
-                        {hoveredLead.members.map((member, i) => (
-                          <li key={i}>{member}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </td>
+    <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex-1">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse bg-white rounded-lg shadow-sm border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-3 text-left font-semibold text-gray-900">Rank</th>
+                <th className="p-3 text-left font-semibold text-gray-900">Project Name</th>
+                <th className="p-3 text-left font-semibold text-gray-900">Year</th>
+                <th className="p-3 text-left font-semibold text-gray-900 hidden sm:table-cell">Team</th>
+                <th className="p-3 text-left font-semibold text-gray-900">Team Lead</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {leaderboardData.map((row, index) => (
+                <tr key={index} className="border-t border-gray-200 hover:bg-gray-50">
+                  <td className="p-3 text-gray-700">{row.rank}</td>
+                  <td className="p-3 text-gray-700">{row.projectName}</td>
+                  <td className="p-3 text-gray-700">{row.year}</td>
+                  <td className="p-3 text-gray-700 hidden sm:table-cell">{row.team}</td>
+                  <td
+                    className="p-3 text-gray-700 relative cursor-pointer"
+                    onMouseEnter={() => setHoveredLead(row)}
+                    onMouseLeave={() => setHoveredLead(null)}
+                  >
+                    {row.lead}
+                    {hoveredLead && hoveredLead.rank === row.rank && (
+                      <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10 w-48">
+                        <p className="font-semibold text-gray-900 mb-2">Team Members:</p>
+                        <ul className="space-y-1">
+                          {hoveredLead.members.map((member, i) => (
+                            <li key={i} className="text-gray-700">{member}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="organizers-box-genesis">
-        <h3>Organizers</h3>
-        {organizers.map((organizer, index) => (
-          <p key={index}>{organizer}</p>
-        ))}
+      <div className="w-full lg:w-80">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Organizers</h3>
+          {organizers.map((organizer, index) => (
+            <p key={index} className="text-gray-700">{organizer}</p>
+          ))}
+        </div>
       </div>
     </div>
   );

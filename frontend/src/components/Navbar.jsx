@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { LogIn } from "lucide-react";
+import logo from "../assets/logo.png";
 
 export default function Navbar({ toggleSidebar }) {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -34,18 +35,20 @@ export default function Navbar({ toggleSidebar }) {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-200 px-10 py-4 flex items-center justify-between shadow-sm fixed top-0 z-40">
+    <nav className="w-full bg-gray-900 border-b border-gray-700 px-10 py-4 flex items-center justify-between shadow-sm fixed top-0 z-40">
       <Link to="/">
-        <h1 className="text-2xl font-extrabold text-blue-900 cursor-pointer">
-          AI & DS Association
-        </h1>
+        <img
+          src={logo}
+          alt="AI & DS Association"
+          className="h-10 w-auto cursor-pointer"
+        />
       </Link>
 
       {/* RIGHT SIDE */}
       {!user ? (
         <Link
           to="/login"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium font-sans"
         >
           <LogIn size={18} />
           Login
@@ -55,7 +58,7 @@ export default function Navbar({ toggleSidebar }) {
           {/* Avatar */}
           <div
             ref={avatarRef}
-            className="cursor-pointer text-blue-800"
+            className="cursor-pointer text-white"
             onClick={(e) => {
               e.stopPropagation();
               setProfileMenuOpen((s) => !s);
@@ -73,7 +76,7 @@ export default function Navbar({ toggleSidebar }) {
               <ul className="py-2">
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-900 font-sans"
                     onClick={() => navigate("/profile")}
                   >
                     My Profile
@@ -81,7 +84,7 @@ export default function Navbar({ toggleSidebar }) {
                 </li>
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-900 font-sans"
                     onClick={() => navigate("/edit-profile")}
                   >
                     Edit Profile
@@ -89,7 +92,7 @@ export default function Navbar({ toggleSidebar }) {
                 </li>
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 font-sans"
                     onClick={logout}
                   >
                     Logout

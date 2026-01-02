@@ -57,15 +57,15 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-blue-900 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <div className="w-20 h-20 bg-gray-900 rounded-full mx-auto mb-4 flex items-center justify-center">
             <UserCircle className="text-white" size={48} />
           </div>
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Login to AI & DS Association</p>
         </div>
 
@@ -91,7 +91,7 @@ const LoginPage = () => {
                 name="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="Enter username or email"
               />
             </div>
@@ -109,7 +109,7 @@ const LoginPage = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 placeholder="Enter your password"
               />
             </div>
@@ -119,7 +119,7 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-900 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
@@ -129,7 +129,7 @@ const LoginPage = () => {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-900 font-semibold hover:underline">
+            <Link to="/signup" className="text-gray-900 font-semibold hover:underline">
               Sign up here
             </Link>
           </p>

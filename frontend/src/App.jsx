@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Users, BookOpen, GraduationCap, FlaskConical } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 
@@ -37,6 +38,32 @@ import UserAchievements from "./pages/UserAchievements";
 
 import "./style.css";
 
+// ScrollNumber Component
+const ScrollNumber = ({ target, suffix = "", duration = 1000 }) => {
+  const [current, setCurrent] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(true);
+
+  useEffect(() => {
+    const numTarget = parseInt(target.replace(/[^\d]/g, '')) || 0;
+    const steps = duration / 50;
+    const increment = numTarget / steps;
+    let currentValue = 0;
+    const timer = setInterval(() => {
+      currentValue += increment;
+      if (currentValue >= numTarget) {
+        setCurrent(numTarget);
+        setIsAnimating(false);
+        clearInterval(timer);
+      } else {
+        setCurrent(Math.floor(currentValue));
+      }
+    }, 50);
+    return () => clearInterval(timer);
+  }, [target, duration]);
+
+  return <span>{isAnimating ? current : target}{suffix}</span>;
+};
+
 // ============================================
 // DASHBOARD PAGE COMPONENT (From App 1)
 // ============================================
@@ -44,63 +71,108 @@ function DashboardPage() {
   return (
     <>
       {/* HEADER SECTION */}
-      <section className="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-        <h1 className="text-4xl font-extrabold text-blue-900 mb-4">
-          Welcome to the Department of AI and DS
-        </h1>
+      <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 backdrop-blur-lg p-12 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/10 to-purple-100/10 rounded-full blur-3xl"></div>
 
-        <p className="text-gray-600 leading-relaxed max-w-3xl mb-10">
-          Our mission is to foster innovation and excellence in Artificial
-          Intelligence and Data Science through cutting-edge research,
-          industry collaboration, and a dynamic learning environment.
-        </p>
+        <div className="relative z-10">
+          {/* Main heading with enhanced styling */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4 font-cursive leading-tight">
+              Welcome to the Department of AI and DS
+            </h1>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-6"></div>
+          </div>
 
-        {/* STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
-          {[
-            { label: "Ongoing Projects", value: "50+" },
-            { label: "Faculty Members", value: "12" },
-            { label: "Active Students", value: "300+" },
-            { label: "Research Lab", value: "1" },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="bg-[#eef4ff] p-6 rounded-xl shadow-sm border border-blue-100 text-center"
-            >
-              <div className="text-3xl font-bold text-blue-900">{item.value}</div>
-              <p className="text-blue-700 mt-1 text-sm">{item.label}</p>
+          {/* Mission statement with better layout */}
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <p className="text-lg text-gray-700 leading-relaxed mb-6">
+              Our mission is to foster innovation and excellence in Artificial Intelligence and Data Science through
+              <span className="font-semibold text-blue-700"> cutting-edge research</span>,
+              <span className="font-semibold text-purple-700"> industry collaboration</span>, and a
+              <span className="font-semibold text-green-700"> dynamic learning environment</span>.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+              <span className="px-3 py-1 bg-blue-100/50 rounded-full">🤖 AI Research</span>
+              <span className="px-3 py-1 bg-purple-100/50 rounded-full">📊 Data Science</span>
+              <span className="px-3 py-1 bg-green-100/50 rounded-full">🎓 Education</span>
+              <span className="px-3 py-1 bg-orange-100/50 rounded-full">🚀 Innovation</span>
             </div>
-          ))}
+          </div>
+
+          {/* STATS with icons and enhanced design */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { label: "Ongoing Projects", value: "50+", num: "50", icon: BookOpen, color: "text-blue-600" },
+              { label: "Faculty Members", value: "12", num: "12", icon: Users, color: "text-purple-600" },
+              { label: "Active Students", value: "300+", num: "300", icon: GraduationCap, color: "text-green-600" },
+              { label: "Research Lab", value: "1", num: "1", icon: FlaskConical, color: "text-orange-600" },
+            ].map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <div
+                  key={item.label}
+                  className="group bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-white/40 text-center hover:scale-105 hover:bg-white/90 hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3 ${item.color}`}>
+                      <IconComponent size={24} />
+                    </div>
+                    <div className="text-4xl font-bold text-gray-900 mb-1">
+                      <ScrollNumber target={item.num} suffix={item.value.includes('+') ? '+' : ''} />
+                    </div>
+                    <p className="text-gray-700 font-medium text-sm">{item.label}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
         </div>
       </section>
 
       {/* EVENTS */}
-      <section id="events" className="bg-white mt-12 p-8 rounded-2xl shadow-md border border-gray-200">
-        <h2 className="text-2xl font-bold mb-6 text-blue-900">Events</h2>
+      <section id="events" className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
 
-        <Dashboard_Carousel
-          slides={[
-            { img: img1, page: "/events/codenigma" },
-            { img: img2, page: "/events/genesys" },
-          ]}
-        />
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Events</h2>
+
+          <Dashboard_Carousel
+            slides={[
+              { img: img1, page: "/events/codenigma" },
+              { img: img2, page: "/events/genesys" },
+            ]}
+          />
+        </div>
       </section>
 
       {/* RECENT UPDATES */}
-      <section className="bg-white mt-12 p-8 rounded-2xl shadow-md border border-gray-200">
-        <h2 className="text-2xl font-bold mb-6 text-blue-900">Recent Updates</h2>
+      <section className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
 
-        <div className="space-y-4">
-          {[
-            { title: "Need Volunteers for Yukta2k26", time: "1 day ago" },
-            { title: "Enigma Contest results out", time: "2 days ago" },
-            { title: "50+ students placed in final year", time: "5 days ago" },
-          ].map((u) => (
-            <div key={u.title} className="pb-3 border-b">
-              <p className="text-blue-900 font-medium">{u.title}</p>
-              <p className="text-gray-500 text-sm">{u.time}</p>
-            </div>
-          ))}
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Recent Updates</h2>
+
+          <div className="space-y-4">
+            {[
+              { title: "Need Volunteers for Yukta2k26", time: "1 day ago" },
+              { title: "Enigma Contest results out", time: "2 days ago" },
+              { title: "50+ students placed in final year", time: "5 days ago" },
+            ].map((u) => (
+              <div key={u.title} className="group pb-4 border-b border-gray-200 hover:bg-white/60 transition-all duration-300 rounded-lg px-4 py-3 hover:shadow-md">
+                <p className="text-gray-900 font-medium group-hover:text-gray-800">{u.title}</p>
+                <p className="text-gray-500 text-sm group-hover:text-gray-600">{u.time}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </>
@@ -113,18 +185,30 @@ function DashboardPage() {
 
 function ConnectPage() {
   return (
-    <div className="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-      <h2 className="text-3xl font-bold text-blue-900 mb-4">Connect</h2>
-      <p className="text-gray-600">Connect content coming soon...</p>
+    <div className="relative bg-gradient-to-br from-purple-50 via-white to-pink-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+      <div className="relative z-10">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Connect</h2>
+        <p className="text-gray-600">Connect content coming soon...</p>
+      </div>
     </div>
   );
 }
 
 function ProjectsPage() {
   return (
-    <div className="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-      <h2 className="text-3xl font-bold text-blue-900 mb-4">Projects</h2>
-      <p className="text-gray-600">Projects content coming soon...</p>
+    <div className="relative bg-gradient-to-br from-indigo-50 via-white to-cyan-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+      <div className="relative z-10">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Projects</h2>
+        <p className="text-gray-600">Projects content coming soon...</p>
+      </div>
     </div>
   );
 }
@@ -134,7 +218,7 @@ function ProjectsPage() {
 // ============================================
 function MainLayout({ children, isOpen, toggleSidebar }) {
   return (
-    <div className="min-h-screen bg-[#f5f7fb] font-sans overflow-hidden flex relative">
+    <div className="min-h-screen bg-gray-50 font-sans overflow-hidden flex relative">
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`
@@ -143,8 +227,10 @@ function MainLayout({ children, isOpen, toggleSidebar }) {
         `}
       >
         <Navbar toggleSidebar={toggleSidebar} />
-        <main className="flex-1 overflow-y-auto p-10">
-          {children}
+        <main className="flex-1 overflow-y-auto p-8 bg-white shadow-inner">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
@@ -156,38 +242,32 @@ function MainLayout({ children, isOpen, toggleSidebar }) {
 // ============================================
 function AdminLayout({ children }) {
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+    <div className="min-h-screen bg-gray-50 font-sans">
       {/* ADMIN NAVBAR */}
-      <nav style={{ marginBottom: "20px", display: "flex", gap: "20px" }}>
-        <a
-          href="/adminpage"
-          style={{
-            padding: "10px 15px",
-            background: "#1e3a8a",
-            color: "white",
-            borderRadius: "6px",
-            textDecoration: "none",
-          }}
-        >
-          Manage Events
-        </a>
+      <nav className="bg-gray-900 text-white p-4 shadow-md">
+        <div className="max-w-7xl mx-auto flex gap-4">
+          <a
+            href="/adminpage"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Manage Events
+          </a>
 
-        <a
-          href="/adminpage/manage-uploads"
-          style={{
-            padding: "10px 15px",
-            background: "#1e3a8a",
-            color: "white",
-            borderRadius: "6px",
-            textDecoration: "none",
-          }}
-        >
-          Manage QP Uploads
-        </a>
+          <a
+            href="/adminpage/manage-uploads"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Manage QP Uploads
+          </a>
+        </div>
       </nav>
 
       {/* ADMIN CONTENT */}
-      {children}
+      <main className="p-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

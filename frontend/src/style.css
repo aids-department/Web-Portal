@@ -31,13 +31,13 @@ body {
 
 /* === BLUE & WHITE PALETTE (improved UI) === */
 :root {
-  --bg: #f5f7fb; /* subtle pale background */
+  --bg: #f9fafb; /* subtle pale background */
   --surface: #ffffff; /* white surfaces/cards */
-  --text: #0b2545; /* deep navy for body text */
-  --muted-text: #475569; /* secondary/muted text */
-  --primary: #1e3a8a; /* deeper navy-blue for headings/buttons */
+  --text: #111827; /* deep gray for body text */
+  --muted-text: #6b7280; /* secondary/muted text */
+  --primary: #374151; /* gray for headings/buttons */
   --primary-contrast: #ffffff; /* contrast for primary colored elements */
-  --card-shadow: 0 8px 20px rgba(30,58,138,0.08);
+  --card-shadow: 0 8px 20px rgba(55,65,81,0.08);
 }
 
 /* Global background and readable body text (no blanket !important overrides) */

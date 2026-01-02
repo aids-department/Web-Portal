@@ -19,6 +19,7 @@
     "express-validator": "^7.3.1",
     "googleapis": "^166.0.0",
     "mongoose": "^9.0.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.11"
   }
 }

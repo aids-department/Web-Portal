@@ -8,6 +8,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const menu = [
+    { name: "Dashboard", path: "/" },
     { name: "About", type: "dropdown", items: [
       { name: "Faculty Info", path: "/about/faculty" },
       { name: "Staff Info", path: "/about/staff" },
@@ -31,14 +32,16 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       {/* TOGGLE BUTTON */}
       <button
         onClick={toggleSidebar}
-        className="fixed top-1/2 -translate-y-1/2 left-0 z-50 bg-blue-900 text-white w-6 h-20 flex items-center justify-center border-r border-blue-800 shadow-md hover:bg-blue-700 transition"
+        className={`fixed top-1/2 -translate-y-1/2 z-50 bg-gray-900 text-white w-6 h-20 flex items-center justify-center border-r border-gray-700 shadow-md hover:bg-gray-800 transition-all ease-in-out duration-300 rounded-r-lg ${
+          isOpen ? 'left-64' : 'left-0'
+        }`}
       >
         {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </button>
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 p-6 pt-24 shadow-md transition-all duration-300 ${
+        className={`fixed top-0 left-0 h-full bg-gray-900 border-r border-gray-700 p-6 pt-24 shadow-md transition-all ease-in-out duration-300 ${
           isOpen ? "translate-x-0 w-64" : "-translate-x-64 w-64"
         }`}
       >
@@ -49,7 +52,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 <div key={item.name}>
                   <button
                     onClick={() => setAboutOpen(!aboutOpen)}
-                    className="w-full text-left px-4 py-2 rounded-lg text-blue-900 hover:bg-blue-100 transition flex items-center justify-between"
+                    className="w-full text-left px-4 py-2 rounded-lg text-white hover:bg-gray-800 transition flex items-center justify-between"
                   >
                     <span>{item.name}</span>
                     {aboutOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -64,8 +67,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                           onClick={() => toggleSidebar()}
                           className={`block w-full text-left px-4 py-2 text-sm rounded-lg transition ${
                             isActivePath(subItem.path)
-                              ? "bg-blue-900 text-white"
-                              : "text-blue-800 hover:bg-blue-50"
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-300 hover:bg-gray-800"
                           }`}
                         >
                           {subItem.name}
@@ -84,8 +87,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 onClick={() => toggleSidebar()}
                 className={`block w-full text-left px-4 py-2 rounded-lg font-medium transition ${
                   isActivePath(item.path)
-                    ? "bg-blue-900 text-white"
-                    : "text-blue-900 hover:bg-blue-100"
+                    ? "bg-blue-600 text-white"
+                    : "text-white hover:bg-gray-800"
                 }`}
               >
                 {item.name}

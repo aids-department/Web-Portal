@@ -19,119 +19,42 @@ export default function StaffInfo() {
   ];
 
   return (
-    <div
-      style={{
-        width: "100%",
-        minHeight: "100vh",
-        backgroundColor: "#F5F6FA",
-        padding: "40px 16px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1200px",
-          margin: "0 auto",
-          textAlign: "center",
-          marginTop: "40px",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "48px",
-            fontWeight: "800",
-            color: "#1A237E",
-            marginBottom: "48px",
-            fontFamily: "system-ui, -apple-system, sans-serif",
-          }}
-        >
-          Staff Information
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-4 sm:p-6 md:p-10">
+      {/* Decorative background elements */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-green-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
 
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "40px",
-            justifyContent: "center",
-          }}
-        >
-          {staffData.map((staff, index) => (
-            <div
-              key={index}
-              style={{
-                backgroundColor: "#ffffff",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
-                borderRadius: "16px",
-                padding: "32px",
-                width: "260px",
-                textAlign: "center",
-                transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                border: "1px solid #e5e7eb",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px) scale(1.02)";
-                e.currentTarget.style.boxShadow =
-                  "0 20px 40px rgba(0, 0, 0, 0.2)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0) scale(1)";
-                e.currentTarget.style.boxShadow =
-                  "0 10px 30px rgba(0, 0, 0, 0.15)";
-              }}
-            >
-              <div
-                style={{
-                  width: "160px",
-                  height: "192px",
-                  margin: "0 auto 24px",
-                  overflow: "hidden",
-                  borderRadius: "12px",
-                  border: "2px solid #e5e7eb",
-                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <img
-                  src={staff.img}
-                  alt={staff.name}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/160x192/4A5568/ffffff?text=No+Image";
-                  }}
-                />
+      <div className="max-w-7xl mx-auto relative z-10">
+        <h1 className="text-center text-4xl sm:text-5xl font-bold mb-12 text-gray-900 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Staff Information</h1>
+        
+        <div className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+
+          <div className="relative z-10">
+            <div className="flex justify-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+                {staffData.map((staff, index) => (
+                  <div
+                    key={index}
+                    className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer p-6 text-center"
+                  >
+                    <img
+                      src={staff.img}
+                      alt={staff.name}
+                      className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-gray-200"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/128x128/6b7280/ffffff?text=No+Image";
+                      }}
+                    />
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">{staff.name}</h2>
+                    <p className="text-sm text-gray-600">{staff.role}</p>
+                  </div>
+                ))}
               </div>
-
-              <h2
-                style={{
-                  fontSize: "24px",
-                  fontWeight: "700",
-                  color: "#1A237E",
-                  marginBottom: "8px",
-                  fontFamily: "system-ui, -apple-system, sans-serif",
-                }}
-              >
-                {staff.name}
-              </h2>
-
-              <p
-                style={{
-                  fontSize: "16px",
-                  color: "#6B7280",
-                  margin: 0,
-                  fontFamily: "system-ui, -apple-system, sans-serif",
-                }}
-              >
-                {staff.role}
-              </p>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
