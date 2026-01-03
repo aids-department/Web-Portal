@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaSearch, FaFilter } from "react-icons/fa";
+import { User, Building, Code } from "lucide-react";
 import AlumniCard from "../components/AlumniCard";
 
 export default function Alumni() {
@@ -8,6 +9,8 @@ export default function Alumni() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [filters, setFilters] = useState({
     passOutYear: "All",
     company: "",
@@ -46,6 +49,44 @@ export default function Alumni() {
 
     fetchAlumni();
   }, []);
+
+  // Generate suggestions based on search term
+  useEffect(() => {
+    if (searchTerm.trim().length > 0) {
+      const term = searchTerm.toLowerCase();
+      const suggestionMap = new Map();
+
+      alumni.forEach((alum) => {
+        // Add matching names
+        if (alum.name.toLowerCase().includes(term)) {
+          if (!suggestionMap.has(alum.name)) {
+            suggestionMap.set(alum.name, { value: alum.name, type: 'name' });
+          }
+        }
+        // Add matching companies
+        if (alum.company && alum.company.toLowerCase().includes(term)) {
+          if (!suggestionMap.has(alum.company)) {
+            suggestionMap.set(alum.company, { value: alum.company, type: 'company' });
+          }
+        }
+        // Add matching skills
+        alum.skills.forEach((skill) => {
+          if (skill.toLowerCase().includes(term)) {
+            if (!suggestionMap.has(skill)) {
+              suggestionMap.set(skill, { value: skill, type: 'skill' });
+            }
+          }
+        });
+      });
+
+      const suggestionArray = Array.from(suggestionMap.values()).slice(0, 8); // Limit to 8 suggestions
+      setSuggestions(suggestionArray);
+      setShowSuggestions(suggestionArray.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchTerm, alumni]);
 
   // Apply filters and search
   useEffect(() => {
@@ -139,8 +180,63 @@ export default function Alumni() {
               placeholder="Search alumni by name, company, or skills..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)} // Delay to allow click on suggestions
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {/* Suggestions Dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                {suggestions.map((suggestion, index) => {
+                  const getIcon = (type) => {
+                    switch (type) {
+                      case 'name':
+                        return <User className="text-blue-500" size={16} />;
+                      case 'company':
+                        return <Building className="text-green-500" size={16} />;
+                      case 'skill':
+                        return <Code className="text-purple-500" size={16} />;
+                      default:
+                        return <FaSearch className="text-gray-400" size={14} />;
+                    }
+                  };
+
+                  const getTypeLabel = (type) => {
+                    switch (type) {
+                      case 'name':
+                        return 'Name';
+                      case 'company':
+                        return 'Company';
+                      case 'skill':
+                        return 'Skill';
+                      default:
+                        return '';
+                    }
+                  };
+
+                  return (
+                    <div
+                      key={index}
+                      className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => {
+                        setSearchTerm(suggestion.value);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          {getIcon(suggestion.type)}
+                          <span className="text-gray-700 ml-2">{suggestion.value}</span>
+                        </div>
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                          {getTypeLabel(suggestion.type)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
