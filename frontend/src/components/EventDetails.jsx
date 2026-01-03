@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ArrowLeft, Calendar, MapPin, Share2, Users, Phone, Award, 
-  FileText, Briefcase, Dribbble, PenTool, Download, Clock, AlertCircle 
+  FileText, Briefcase, Dribbble, PenTool, Download, Clock, AlertCircle,
+  Check, Copy
 } from 'lucide-react';
 
 const EventDetails = ({ event, onBack }) => {
+  const [shareStatus, setShareStatus] = useState(''); // 'success', 'copied', or ''
+  
   if (!event) return null;
 
   // --- 1. HELPER FORMATTERS ---
@@ -18,6 +21,51 @@ const EventDetails = ({ event, onBack }) => {
   const formatTime = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // --- SHARE HANDLER WITH WEB SHARE API ---
+  const handleShare = async () => {
+    // Use registration link if available, otherwise fall back to current page
+    const shareUrl = event.registrationLink || window.location.href;
+    
+    // Prepare share data
+    const shareData = {
+      title: event.eventName,
+      text: `Check out ${event.eventName} - ${event.eventType} organized by ${event.organizer || event.companyName}`,
+      url: shareUrl,
+    };
+
+    // Check if Web Share API is supported
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        setShareStatus('success');
+        setTimeout(() => setShareStatus(''), 2000);
+      } catch (err) {
+        // User cancelled or error occurred
+        if (err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+          // Fallback to clipboard
+          copyToClipboard(shareUrl);
+        }
+      }
+    } else {
+      // Fallback: Copy to clipboard for browsers that don't support Web Share API
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  // Fallback: Copy link to clipboard
+  const copyToClipboard = async (url) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus(''), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      // Ultimate fallback: Show alert with URL
+      alert(`Share this link: ${url}`);
+    }
   };
 
   // --- 2. DYNAMIC CONTENT RENDERER ---
@@ -159,7 +207,30 @@ const EventDetails = ({ event, onBack }) => {
               ) : (
                  <button disabled className="flex-1 bg-gray-100 text-gray-400 font-bold py-3.5 rounded-xl cursor-not-allowed">Registration Closed</button>
               )}
-              <button className="px-5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors"><Share2 size={20}/></button>
+              
+              {/* UPDATED SHARE BUTTON WITH VISUAL FEEDBACK */}
+              <button 
+                onClick={handleShare}
+                className="px-5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-all relative group"
+                title="Share event"
+              >
+                {shareStatus === 'success' && (
+                  <Check size={20} className="text-green-600 animate-in fade-in duration-200" />
+                )}
+                {shareStatus === 'copied' && (
+                  <Check size={20} className="text-blue-600 animate-in fade-in duration-200" />
+                )}
+                {!shareStatus && (
+                  <Share2 size={20} className="group-hover:scale-110 transition-transform" />
+                )}
+                
+                {/* Tooltip */}
+                {shareStatus === 'copied' && (
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    Link copied!
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </div>

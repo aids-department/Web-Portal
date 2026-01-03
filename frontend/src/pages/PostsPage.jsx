@@ -265,9 +265,6 @@ const PostCard = ({ post, onOpen, onUpvote, currentUserId }) => {
         <button onClick={onOpen} className="flex items-center gap-2 hover:text-blue-600 font-medium">
           <MessageCircle size={20} /> {post.comments?.length || 0}
         </button>
-        <button className="flex items-center gap-2 hover:text-blue-600 font-medium">
-          <Share2 size={20} /> Share
-        </button>
       </div>
     </div>
   );
