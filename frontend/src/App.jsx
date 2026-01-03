@@ -218,15 +218,17 @@ function ProjectsPage() {
 // ============================================
 function MainLayout({ children, isOpen, toggleSidebar }) {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans overflow-hidden flex relative">
+    <div className="min-h-screen bg-gray-50 font-sans overflow-x-hidden flex relative">
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+
       <div
         className={`
-          flex-1 flex flex-col overflow-hidden transition-all duration-300 pt-20
+          flex-1 flex flex-col overflow-x-hidden transition-all duration-300 pt-20
           ${isOpen ? "ml-64" : "ml-0"}
         `}
       >
         <Navbar toggleSidebar={toggleSidebar} />
+
         <main className="flex-1 overflow-y-auto p-8 bg-white shadow-inner">
           <div className="max-w-7xl mx-auto">
             {children}
