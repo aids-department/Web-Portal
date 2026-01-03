@@ -219,11 +219,12 @@ function ProjectsPage() {
 // ============================================
 function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans overflow-hidden flex relative">
+    <div className="min-h-screen bg-gray-50 font-sans overflow-x-hidden flex relative">
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+
       <div
         className={`
-          flex-1 flex flex-col overflow-hidden transition-all duration-300 pt-20
+          flex-1 flex flex-col overflow-x-hidden transition-all duration-300 pt-20
           ${isOpen ? "ml-64" : "ml-0"}
         `}
       >
