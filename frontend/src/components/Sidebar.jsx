@@ -14,6 +14,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       { name: "Staff Info", path: "/about/staff" },
       { name: "Syllabus", path: "/about/syllabus" }
     ]},
+    { name: "Team Members", path: "/team-info" },
     { name: "Leaderboards", path: "/leaderboards" },
     { name: "Events", path: "/events" },
     { name: "Achievements", path: "/achievements" },

@@ -203,11 +203,11 @@ const GenesisLeaderboard = () => {
                   >
                     {row.lead}
                     {hoveredLead && hoveredLead.rank === row.rank && (
-                      <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10 w-48">
-                        <p className="font-semibold text-gray-900 mb-2">Team Members:</p>
+                      <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 w-44 max-h-36 overflow-y-auto text-sm">
+                        <p className="font-medium text-gray-900 mb-1">Team Members</p>
                         <ul className="space-y-1">
                           {hoveredLead.members.map((member, i) => (
-                            <li key={i} className="text-gray-700">{member}</li>
+                            <li key={i} className="text-gray-700 leading-snug">{member}</li>
                           ))}
                         </ul>
                       </div>

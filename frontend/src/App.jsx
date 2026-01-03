@@ -31,6 +31,7 @@ import Dashboard_Carousel from "./components/Dashboard_Carousel";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import AdminLeaderboards from "./pages/AdminLeaderboards";
+import TeamInfo from "./pages/TeamInfo";
 import { Toaster } from "react-hot-toast";
 import UserLeaderboards from "./pages/UserLeaderboards";
 import AdminAchievements from "./pages/AdminAchievements";
@@ -216,7 +217,7 @@ function ProjectsPage() {
 // ============================================
 // MAIN LAYOUT COMPONENT
 // ============================================
-function MainLayout({ children, isOpen, toggleSidebar }) {
+function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
   return (
     <div className="min-h-screen bg-gray-50 font-sans overflow-hidden flex relative">
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
@@ -227,10 +228,16 @@ function MainLayout({ children, isOpen, toggleSidebar }) {
         `}
       >
         <Navbar toggleSidebar={toggleSidebar} />
-        <main className="flex-1 overflow-y-auto p-8 bg-white shadow-inner">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        <main className={`flex-1 overflow-y-auto ${fullBleed ? 'p-0 bg-transparent' : 'p-8 bg-white shadow-inner'}`}>
+          {fullBleed ? (
+            <div className="w-full h-full">
+              {children}
+            </div>
+          ) : (
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
+          )}
         </main>
       </div>
     </div>
@@ -450,6 +457,16 @@ export default function App() {
           element={
             <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <ProjectsPage />
+            </MainLayout>
+          }
+        />
+
+        {/* External Team Info (embedded) */}
+        <Route
+          path="/team-info"
+          element={
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar} fullBleed={true}>
+              <TeamInfo />
             </MainLayout>
           }
         />

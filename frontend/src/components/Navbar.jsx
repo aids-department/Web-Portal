@@ -44,6 +44,8 @@ export default function Navbar({ toggleSidebar }) {
         />
       </Link>
 
+      {/* Intentionally left minimal - team navigation moved to Sidebar */}
+
       {/* RIGHT SIDE */}
       {!user ? (
         <Link
