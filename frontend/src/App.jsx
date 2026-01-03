@@ -24,8 +24,8 @@ import EventsAdminPage from "./components/EventsAdminPage";
 import ManageUploads from "./components/ManageUploads";
 
 // Images for Dashboard
-import img1 from "./assets/leetcode.png";
-import img2 from "./assets/project_expo.jpeg";
+import img1 from "./assets/enigma.png";
+import img2 from "./assets/genesys.png";
 import Dashboard_Carousel from "./components/Dashboard_Carousel";
 
 import Profile from "./pages/Profile";
