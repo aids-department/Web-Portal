@@ -22,6 +22,7 @@ import SignupPage from "./pages/SignupPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EventsAdminPage from "./components/EventsAdminPage";
 import ManageUploads from "./components/ManageUploads";
+import ManageContent from "./components/ManageContent"; 
 
 // Images for Dashboard
 import img1 from "./assets/enigma.png";
@@ -267,6 +268,11 @@ function AdminLayout({ children }) {
           >
             Manage QP Uploads
           </a>
+
+          <a href="/adminpage/manage-content" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            Manage Content
+          </a>
+
         </div>
       </nav>
 
@@ -319,6 +325,14 @@ export default function App() {
           element={
             <AdminLayout>
               <ManageUploads />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/adminpage/manage-content"
+          element={
+            <AdminLayout>
+              <ManageContent />
             </AdminLayout>
           }
         />

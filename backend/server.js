@@ -522,6 +522,67 @@ app.delete("/api/posts/:postId", async (req, res) => {
   }
 });
 
+// DELETE COMMENT OR REPLY (with proper nested handling)
+// DELETE COMMENT (including all nested replies)
+app.delete("/api/posts/:postId/comments/:commentId", async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      console.log("Post not found");
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+
+    // Recursive function to delete comment and all nested replies
+    const deleteCommentRecursive = async (commentId) => {
+      const comment = await Comment.findById(commentId);
+      
+      if (!comment) {
+        console.log(`Comment ${commentId} not found in database`);
+        return;
+      }
+
+
+      if (comment.replies && comment.replies.length > 0) {
+        for (const replyId of comment.replies) {
+          await deleteCommentRecursive(replyId);
+        }
+      }
+
+      await Comment.findByIdAndDelete(commentId);
+    };
+
+    // Remove from post's comments array
+    const originalLength = post.comments.length;
+    post.comments = post.comments.filter(
+      c => c.toString() !== commentId
+    );
+
+    if (post.comments.length < originalLength) {
+      await post.save();
+    } else {
+    }
+
+    // Delete comment and all nested replies
+    await deleteCommentRecursive(commentId);
+
+    
+    res.status(200).json({ 
+      success: true, 
+      message: "Comment deleted successfully" 
+    });
+
+  } catch (err) {
+    console.error("❌ Error deleting comment:", err);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to delete comment",
+      details: err.message 
+    });
+  }
+});
 // ============================================
 // API ROUTES – EVENTS CRUD
 // ============================================
