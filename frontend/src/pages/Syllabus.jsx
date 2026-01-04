@@ -3,16 +3,48 @@ import React, { useState, useMemo } from "react";
 const DATA = {
   "Semester 1": {
     theory: [
-      { title: "Calculus and its Applications", pdfPage: 30 },
-      { title: "C Programming", pdfPage: 31 },
-      { title: "Basics of Electrical and Electronic Systems", pdfPage: 32 },
-      { title: "English Language Proficiency", pdfPage: 33 },
-      { title: "Heritage of Tamils", pdfPage: 34 },
+      {
+        title: "Calculus and its Applications",
+        pdfPage: 30,
+        url: "https://image2url.com/r2/default/documents/1767520058712-f4856925-0238-49cc-ac18-f1d451eb6b9e.pdf",
+      },
+      {
+        title: "C Programming",
+        pdfPage: 31,
+        url: "https://image2url.com/r2/default/documents/1767520189369-89df32df-1de6-4c37-ac77-98ab55503a4c.pdf",
+      },
+      {
+        title: "Basics of Electrical and Electronic Systems",
+        pdfPage: 32,
+        url: "https://image2url.com/r2/default/documents/1767520223915-e4638064-fa8e-40cf-9ec9-d090ec4e16bb.pdf",
+      },
+      {
+        title: "English Language Proficiency",
+        pdfPage: 33,
+        url: "https://image2url.com/r2/default/documents/1767520260658-f8caab9d-7d67-4186-85ce-32ec6ea9a2cb.pdf",
+      },
+      {
+        title: "Heritage of Tamils",
+        pdfPage: 34,
+        url: "https://image2url.com/r2/default/documents/1767520283550-b5db0557-1f30-472d-8d6a-b44f072caee3.pdf",
+      },
     ],
     lab: [
-      { title: "C Programming Laboratory", pdfPage: 36 },
-      { title: "Engineering Skills Laboratory", pdfPage: 37 },
-      { title: "Design Thinking for Innovation", pdfPage: 40 },
+      {
+        title: "C Programming Laboratory",
+        pdfPage: 36,
+        url: "https://image2url.com/r2/default/documents/1767521624009-aa0cca59-a76a-4a37-9664-4fadcbd0ff46.pdf",
+      },
+      {
+        title: "Engineering Skills Laboratory",
+        pdfPage: 37,
+        url: "https://image2url.com/r2/default/documents/1767520350635-15662c81-5638-42f9-ae8c-4d219ac545d0.pdf",
+      },
+      {
+        title: "Design Thinking for Innovation",
+        pdfPage: 40,
+        url: "https://image2url.com/r2/default/documents/1767520373238-cb46e845-3cda-4851-848e-8cda69e5970d.pdf",
+      },
     ],
   },
 
@@ -235,7 +267,11 @@ export default function Syllabus() {
               </div>
 
               <iframe
-                src={`https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`}
+                src={
+                  openSubject.url
+                    ? `${openSubject.url}#page=${openSubject.pdfPage || 1}`
+                    : `https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`
+                }
                 className="w-full h-full"
               />
             </div>
