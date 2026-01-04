@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import SYLLABUS from "../data/syllabus.json";
 
 const DATA = {
   "Semester 1": {
@@ -66,6 +67,16 @@ export default function Syllabus() {
     return list;
   }, []);
 
+  const getPdfUrl = (sem, title, group) => {
+    if (!SYLLABUS || !Array.isArray(SYLLABUS.semesters)) return null;
+    const s = SYLLABUS.semesters.find((x) => x.semester === sem);
+    if (!s) return null;
+    const arr = Array.isArray(s[group]) ? s[group] : null;
+    if (!arr) return null;
+    const item = arr.find((it) => (it.title || "").toLowerCase() === (title || "").toLowerCase());
+    return item ? item.pdfUrl || null : null;
+  };
+
   const normalize = (s) => s.toLowerCase().replace(/\s+/g, "");
   const filteredSubjects = allSubjects.filter((s) =>
     normalize(s.title).includes(normalize(q))
@@ -97,15 +108,16 @@ export default function Syllabus() {
           <div className="mb-4">
             <strong>Results:</strong>
             <div className="mt-2 space-y-2">
-              {filteredSubjects.map((s, idx) => (
+                  {filteredSubjects.map((s, idx) => (
                 <div
                   key={idx}
                   className="p-3 bg-white rounded-lg shadow cursor-pointer hover:bg-gray-50"
-                  onClick={() => {
-                    setOpenSem(semesters.indexOf(s.sem));
-                    setOpenGroup({ [s.sem]: s.group });
-                    setOpenSubject(s);
-                  }}
+                      onClick={() => {
+                        setOpenSem(semesters.indexOf(s.sem));
+                        setOpenGroup({ [s.sem]: s.group });
+                        const pdfUrl = getPdfUrl(s.sem, s.title, s.group);
+                        setOpenSubject({ ...s, pdfUrl });
+                      }}
                 >
                   {s.sem} → {s.group} → <b>{s.title}</b>
                 </div>
@@ -177,7 +189,10 @@ export default function Syllabus() {
                       >
                         <div>{subject.title}</div>
                         <button
-                          onClick={() => setOpenSubject(subject)}
+                          onClick={() => {
+                            const pdfUrl = getPdfUrl(sem, subject.title, openGroup[sem] || "theory");
+                            setOpenSubject({ ...subject, pdfUrl });
+                          }}
                           className="px-3 py-1 border rounded-lg bg-white hover:bg-gray-200"
                         >
                           View
@@ -234,10 +249,22 @@ export default function Syllabus() {
                 </button>
               </div>
 
-              <iframe
-                src={`https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`}
-                className="w-full h-full"
-              />
+              <div className="w-full h-full relative">
+                <iframe
+                  src={openSubject.pdfUrl ? openSubject.pdfUrl : `https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`}
+                  className="w-full h-full"
+                />
+                <div className="absolute top-3 right-3 bg-white/90 p-2 rounded">
+                  <a
+                    href={openSubject.pdfUrl ? openSubject.pdfUrl : `https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm underline"
+                  >
+                    Open PDF in new tab
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         )}

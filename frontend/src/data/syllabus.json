@@ -3,11 +3,16 @@
     {
       "semester": "Semester 1",
       "theory": [
-        { "code": "CS101", "title": "Introduction to Programming" },
-        { "code": "MA101", "title": "Calculus" }
+        { "title": "Calculus and its Applications", "pdfUrl": "https://image2url.com/r2/default/documents/1767520058712-f4856925-0238-49cc-ac18-f1d451eb6b9e.pdf" },
+        { "title": "C Programming", "pdfUrl": "https://image2url.com/r2/default/documents/1767520189369-89df32df-1de6-4c37-ac77-98ab55503a4c.pdf" },
+        { "title": "Basics of Electrical and Electronic Systems", "pdfUrl": "https://image2url.com/r2/default/documents/1767520223915-e4638064-fa8e-40cf-9ec9-d090ec4e16bb.pdf" },
+        { "title": "English Language Proficiency", "pdfUrl": "https://image2url.com/r2/default/documents/1767520260658-f8caab9d-7d67-4186-85ce-32ec6ea9a2cb.pdf" },
+        { "title": "Heritage of Tamils", "pdfUrl": "https://image2url.com/r2/default/documents/1767520283550-b5db0557-1f30-472d-8d6a-b44f072caee3.pdf" }
       ],
       "lab": [
-        { "code": "CS101L", "title": "Intro Programming Lab" }
+        { "title": "C Programming Laboratory", "pdfUrl": "https://image2url.com/r2/default/documents/1767521624009-aa0cca59-a76a-4a37-9664-4fadcbd0ff46.pdf" },
+        { "title": "Engineering Skills Laboratory", "pdfUrl": "https://image2url.com/r2/default/documents/1767520350635-15662c81-5638-42f9-ae8c-4d219ac545d0.pdf" },
+        { "title": "Design Thinking for Innovation", "pdfUrl": "https://image2url.com/r2/default/documents/1767520373238-cb46e845-3cda-4851-848e-8cda69e5970d.pdf" }
       ]
     },
     {
