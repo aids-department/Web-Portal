@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Upload, Search, FileText, Download, Eye, BookOpen, FileQuestion, X, CheckCircle, AlertCircle, Filter, ChevronDown, CheckSquare, Square } from "lucide-react";
+import { Upload, Search, FileText, Download, Eye, BookOpen, FileQuestion, X, CheckCircle, AlertCircle, Filter, ChevronDown, CheckSquare, Square, User } from "lucide-react";
 
 /* =====================================================
-   ANNA UNIVERSITY R2021 — AI & DS SUBJECT LIST
+   ANNA UNIVERSITY R2021 – AI & DS SUBJECT LIST
 ====================================================== */
 const SUBJECTS = {
   1: [
@@ -62,7 +62,6 @@ export default function QuestionBank() {
 
   const [searchQuery, setSearchQuery] = useState("");
   
-  // ✅ NEW: Multi-Select Filter State
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -91,31 +90,28 @@ export default function QuestionBank() {
     try {
       const res = await fetch(`https://web-portal-760h.onrender.com/api/qp?search=${searchQuery}`);
       const data = await res.json();
+      console.log("📄 Fetched papers:", data); // Debug log
       setUploads(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch papers:", err);
     }
   };
 
-  // ✅ TOGGLE FILTER FUNCTION
   const toggleFilter = (option) => {
     setSelectedFilters((prev) => 
       prev.includes(option)
-        ? prev.filter((item) => item !== option) // Remove if exists
-        : [...prev, option] // Add if not exists
+        ? prev.filter((item) => item !== option)
+        : [...prev, option]
     );
   };
 
-  // ✅ SORTING & FILTERING LOGIC
   const processedUploads = useMemo(() => {
     let data = [...uploads];
 
-    // 1. FILTER (Multi-Select)
     if (selectedFilters.length > 0) {
       data = data.filter((u) => selectedFilters.includes(u.examType));
     }
 
-    // 2. SORT (Hierarchy: Semester -> Int 1 -> Int 2 -> QB)
     const typeOrder = { 
       "Semester": 1, 
       "Internal 1": 2, 
@@ -174,19 +170,17 @@ export default function QuestionBank() {
       
       const result = await res.json();
 
-      if (res.ok && result.success) { // Check res.ok (status 200-299)
+      if (res.ok && result.success) {
         showToast("Uploaded successfully!", "success");
         setTab("search");
         fetchPapers();
         
-        // Reset Form
         setSemester("");
         setSelectedSubject({});
         setManualSubjectName("");
         setManualSubjectCode("");
         fileInput.value = "";
       } else {
-        // This will now show "File too large. Maximum limit is 10MB."
         showToast(result.error || "Upload failed", "error");
       }
     } catch (err) {
@@ -287,7 +281,7 @@ export default function QuestionBank() {
                 <option value="">-- Choose from List --</option>
                 {SUBJECTS[semester] && SUBJECTS[semester].map((sub) => (
                   <option key={sub.code} value={sub.code}>
-                    {sub.code} — {sub.name}
+                    {sub.code} – {sub.name}
                   </option>
                 ))}
               </select>
@@ -387,10 +381,9 @@ export default function QuestionBank() {
               />
             </div>
 
-            {/* ✅ NEW: MULTI-SELECT FILTER DROPDOWN */}
+            {/* MULTI-SELECT FILTER DROPDOWN */}
             <div className="relative min-w-[220px]">
               
-              {/* Filter Button */}
               <button
                 onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
                 className={`w-full flex items-center justify-between pl-12 pr-4 py-3 border rounded-xl shadow-sm transition-all ${
@@ -404,7 +397,6 @@ export default function QuestionBank() {
                 <ChevronDown size={16} className={`transition-transform ${isFilterOpen ? "rotate-180" : ""}`} />
               </button>
 
-              {/* Dropdown Menu */}
               {isFilterOpen && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                   <div className="p-2 space-y-1">
@@ -428,7 +420,6 @@ export default function QuestionBank() {
                       );
                     })}
                   </div>
-                  {/* Clear Button */}
                   {selectedFilters.length > 0 && (
                     <div 
                       onClick={() => setSelectedFilters([])}
@@ -456,41 +447,63 @@ export default function QuestionBank() {
                 const isBank = u.examType === "Question Bank";
                 
                 return (
-                  <div key={u._id} className="group bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className={`p-3 rounded-lg shrink-0 ${isBank ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
-                        {isBank ? <BookOpen size={24} /> : <FileText size={24} />}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-800 leading-tight">
-                          {u.subjectName}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                           <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                            {u.subjectCode}
-                           </span>
-                           <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
-                             isBank ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
-                           }`}>
-                             {u.examType}
-                           </span>
-                           <span className="text-xs text-gray-500 font-medium">
-                             Semester {u.semester}
-                           </span>
+                  <div key={u._id} className="group bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    
+                    {/* Main Content Row */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-3">
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-lg shrink-0 ${isBank ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
+                          {isBank ? <BookOpen size={24} /> : <FileText size={24} />}
                         </div>
-                        <p className="text-xs text-gray-400 mt-1.5">
-                          Added {new Date(u.uploadedAt).toLocaleDateString()}
-                        </p>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-800 leading-tight">
+                            {u.subjectName}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                             <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                              {u.subjectCode}
+                             </span>
+                             <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
+                               isBank ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
+                             }`}>
+                               {u.examType}
+                             </span>
+                             <span className="text-xs text-gray-500 font-medium">
+                               Semester {u.semester}
+                             </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1.5">
+                            Added {new Date(u.uploadedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
+                        <a href={u.fileUrl} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition">
+                          <Eye size={16} /> View
+                        </a>
+                        <a href={getDownloadUrl(u.fileUrl, niceName)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-900 hover:bg-blue-800 transition shadow-sm cursor-pointer">
+                          <Download size={16} /> Download
+                        </a>
                       </div>
                     </div>
 
-                    <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
-                      <a href={u.fileUrl} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition">
-                        <Eye size={16} /> View
-                      </a>
-                      <a href={getDownloadUrl(u.fileUrl, niceName)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-900 hover:bg-blue-800 transition shadow-sm cursor-pointer">
-                        <Download size={16} /> Download
-                      </a>
+                    {/* ✅ Uploader Info Section - With Debugging */}
+                    <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                      {u.author ? (
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <User size={14} className="text-gray-400" />
+                          <span className="font-medium">Uploaded by:</span>
+                          <span className="font-semibold text-gray-700">
+                            {u.author.fullName || u.author.username || "Unknown"}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                          <User size={14} className="text-gray-300" />
+                          <span className="font-medium">Uploader information not available</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

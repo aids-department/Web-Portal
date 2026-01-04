@@ -657,9 +657,12 @@ app.delete("/api/events/:id", async (req, res) => {
 // QUESTION PAPER ROUTES (PDFs)
 // ============================================
 
-// 1. UPLOAD PDF (With Error Handling for Large Files)
+
+// 1. UPLOAD PDF (FIXED - Properly validates and saves author reference)
+// The issue is how the ID is being converted!
+// Let me show you what's probably happening:
+
 app.post("/api/qp", (req, res, next) => {
-  // Wrap upload in a function to catch Multer errors
   upload.single("pdfFile")(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
@@ -669,22 +672,63 @@ app.post("/api/qp", (req, res, next) => {
     } else if (err) {
       return res.status(400).json({ error: err.message });
     }
-    // If no error, proceed to the main logic
     next();
   });
 }, async (req, res) => {
+  console.log("\n========== NEW UPLOAD REQUEST ==========");
+  
   try {
     const { semester, subjectCode, subjectName, examType, authorId } = req.body;
     
-    if (!req.file) return res.status(400).json({ error: "PDF file is required" });
-    if (!authorId) return res.status(400).json({ error: "Author ID is required" });
+    console.log("📥 Received authorId:", authorId);
+    console.log("📥 Type:", typeof authorId);
+    
+    // Validation
+    if (!req.file) {
+      return res.status(400).json({ error: "PDF file is required" });
+    }
+    if (!authorId) {
+      return res.status(400).json({ error: "Author ID is required" });
+    }
 
-    // Sanitize Filename
+    // ✅ KEY FIX: Convert string ID to ObjectId
+    let authorObjectId;
+    try {
+      authorObjectId = new mongoose.Types.ObjectId(authorId);
+      console.log("✅ Converted to ObjectId:", authorObjectId);
+    } catch (err) {
+      console.log("❌ Invalid ObjectId format:", authorId);
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({ 
+        error: "Invalid user ID format",
+        received: authorId
+      });
+    }
+
+    // ✅ Verify author exists using the ObjectId
+    const authorExists = await User.findById(authorObjectId);
+    
+    if (!authorExists) {
+      console.log("❌ User not found with ID:", authorObjectId);
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({ 
+        error: "User does not exist",
+        authorId: authorId
+      });
+    }
+
+    console.log("✅ Author found:", authorExists.username);
+
+    // Upload to Cloudinary
     const cleanExamType = examType.trim().replace(/\s+/g, "_"); 
     const cleanCode = subjectCode.trim().replace(/\s+/g, "_");
     const publicId = `${cleanCode}_${cleanExamType}_${Date.now()}.pdf`;
 
-    // Upload to Cloudinary
+    console.log("☁️ Uploading to Cloudinary...");
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "question_papers",
       resource_type: "raw", 
@@ -692,7 +736,9 @@ app.post("/api/qp", (req, res, next) => {
       use_filename: true,
       unique_filename: false
     });
+    console.log("✅ Cloudinary upload successful");
 
+    // ✅ Create document with ObjectId (not string!)
     const newQP = new QuestionPaper({
       semester,
       subjectCode,
@@ -701,18 +747,34 @@ app.post("/api/qp", (req, res, next) => {
       fileName: req.file.originalname,
       fileUrl: result.secure_url,
       publicId: result.public_id,
-      author: authorId,
+      author: authorObjectId, // ✅ Use the ObjectId, not the string!
     });
 
+    console.log("💾 Saving with author:", authorObjectId);
     await newQP.save();
+    console.log("✅ Saved successfully");
+
+    // Clean up temp file
     fs.unlinkSync(req.file.path);
 
-    const populatedQP = await QuestionPaper.findById(newQP._id).populate("author", "username fullName");
+    // Populate and return
+    const populatedQP = await QuestionPaper.findById(newQP._id)
+      .populate("author", "username fullName email");
+
+    if (populatedQP.author) {
+      console.log("✅ Author populated:", populatedQP.author.username);
+    } else {
+      console.log("⚠️ Author did NOT populate!");
+    }
+
+    console.log("========== UPLOAD COMPLETE ==========\n");
     res.json({ success: true, data: populatedQP });
 
   } catch (err) {
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    console.error("QP Upload Error:", err);
+    console.error("❌ Upload Error:", err);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     res.status(500).json({ error: "Server Error: " + err.message });
   }
 });

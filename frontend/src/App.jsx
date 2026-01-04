@@ -485,16 +485,6 @@ export default function App() {
             </MainLayout>
           }
         />
-
-        {/* Question Bank - PUBLIC */}
-        <Route
-          path="/question-bank"
-          element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
-              <QuestionBank />
-            </MainLayout>
-          }
-        />
         
         {/* Association Members - PUBLIC */}
         <Route
@@ -518,6 +508,17 @@ export default function App() {
             <ProtectedRoute>
               <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
                 <PostsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/question-bank"
+          element={
+            <ProtectedRoute>
+              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+                <QuestionBank />
               </MainLayout>
             </ProtectedRoute>
           }
