@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Upload, Search, FileText, Download, Eye, BookOpen, FileQuestion, X, CheckCircle, AlertCircle, Filter, ChevronDown, CheckSquare, Square, User } from "lucide-react";
+import { Upload, Search, FileText, Download, Eye, BookOpen, FileQuestion, X, CheckCircle, AlertCircle, Filter, ChevronDown, CheckSquare, Square, User, NotebookPen } from "lucide-react";
 
 /* =====================================================
    ANNA UNIVERSITY R2021 – AI & DS SUBJECT LIST
@@ -48,7 +48,7 @@ const SUBJECTS = {
   ],
 };
 
-const FILTER_OPTIONS = ["Semester", "Internal 1", "Internal 2", "Question Bank"];
+const FILTER_OPTIONS = ["Semester", "Internal 1", "Internal 2", "Question Bank", "Notes"];
 
 export default function QuestionBank() {
   const [tab, setTab] = useState("upload");
@@ -90,7 +90,7 @@ export default function QuestionBank() {
     try {
       const res = await fetch(`https://web-portal-760h.onrender.com/api/qp?search=${searchQuery}`);
       const data = await res.json();
-      console.log("📄 Fetched papers:", data); // Debug log
+      console.log("📄 Fetched papers:", data);
       setUploads(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch papers:", err);
@@ -116,7 +116,8 @@ export default function QuestionBank() {
       "Semester": 1, 
       "Internal 1": 2, 
       "Internal 2": 3, 
-      "Question Bank": 4 
+      "Question Bank": 4,
+      "Notes": 5
     };
 
     data.sort((a, b) => {
@@ -146,14 +147,23 @@ export default function QuestionBank() {
 
     const finalName = manualSubjectName || (selectedSubject && selectedSubject.name);
     const finalCode = manualSubjectCode || (selectedSubject && selectedSubject.code);
-    const finalExamType = resourceType === "bank" ? "Question Bank" : examSelection;
+    
+    // Determine final exam type based on resource selection
+    let finalExamType;
+    if (resourceType === "bank") {
+      finalExamType = "Question Bank";
+    } else if (resourceType === "notes") {
+      finalExamType = "Notes";
+    } else {
+      finalExamType = examSelection;
+    }
 
     if (!finalName || !finalCode) {
       showToast("Please select or enter subject details.", "error");
       return;
     }
 
-   setLoading(true);
+    setLoading(true);
     const formData = new FormData();
     formData.append("pdfFile", fileInput.files[0]);
     formData.append("semester", semester);
@@ -213,7 +223,7 @@ export default function QuestionBank() {
       {/* HEADER */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Resource Repository</h1>
-        <p className="text-gray-500">Access previous year question papers and question banks</p>
+        <p className="text-gray-500">Access previous year question papers, question banks, and study notes</p>
       </div>
 
       {/* TABS */}
@@ -314,25 +324,35 @@ export default function QuestionBank() {
             <form onSubmit={handleUpload} className="animate-in fade-in slide-in-from-top-4 duration-500">
               
               <label className="block text-sm font-semibold text-gray-700 mb-2">Resource Type</label>
-              <div className="flex gap-4 mb-4">
+              <div className="grid grid-cols-3 gap-3 mb-4">
                 <label 
-                  className={`flex-1 cursor-pointer border rounded-xl p-3 flex items-center justify-center gap-2 transition-all ${
-                    resourceType === 'paper' ? 'bg-blue-50 border-blue-500 text-blue-700 ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:bg-gray-50'
+                  className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${
+                    resourceType === 'paper' ? 'bg-blue-50 border-blue-500 text-blue-700 ring-2 ring-blue-500' : 'bg-white border-gray-200 hover:bg-gray-50'
                   }`}
                   onClick={() => setResourceType('paper')}
                 >
-                  <FileQuestion size={18} />
-                  <span className="font-medium">Question Paper</span>
+                  <FileQuestion size={20} />
+                  <span className="font-medium text-sm">Question Paper</span>
                 </label>
 
                 <label 
-                  className={`flex-1 cursor-pointer border rounded-xl p-3 flex items-center justify-center gap-2 transition-all ${
-                    resourceType === 'bank' ? 'bg-purple-50 border-purple-500 text-purple-700 ring-1 ring-purple-500' : 'bg-white border-gray-200 hover:bg-gray-50'
+                  className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${
+                    resourceType === 'bank' ? 'bg-purple-50 border-purple-500 text-purple-700 ring-2 ring-purple-500' : 'bg-white border-gray-200 hover:bg-gray-50'
                   }`}
                   onClick={() => setResourceType('bank')}
                 >
-                  <BookOpen size={18} />
-                  <span className="font-medium">Question Bank</span>
+                  <BookOpen size={20} />
+                  <span className="font-medium text-sm">Question Bank</span>
+                </label>
+
+                <label 
+                  className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${
+                    resourceType === 'notes' ? 'bg-green-50 border-green-500 text-green-700 ring-2 ring-green-500' : 'bg-white border-gray-200 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setResourceType('notes')}
+                >
+                  <NotebookPen size={20} />
+                  <span className="font-medium text-sm">Notes</span>
                 </label>
               </div>
 
@@ -445,6 +465,34 @@ export default function QuestionBank() {
               {processedUploads.map((u) => {
                 const niceName = `${u.subjectCode}_${u.examType}_Sem${u.semester}`;
                 const isBank = u.examType === "Question Bank";
+                const isNotes = u.examType === "Notes";
+                
+                // Determine color scheme based on resource type
+                let colorScheme = {
+                  bgColor: 'bg-blue-100',
+                  textColor: 'text-blue-600',
+                  badgeBg: 'bg-blue-50',
+                  badgeText: 'text-blue-700'
+                };
+                
+                if (isBank) {
+                  colorScheme = {
+                    bgColor: 'bg-purple-100',
+                    textColor: 'text-purple-600',
+                    badgeBg: 'bg-purple-50',
+                    badgeText: 'text-purple-700'
+                  };
+                } else if (isNotes) {
+                  colorScheme = {
+                    bgColor: 'bg-green-100',
+                    textColor: 'text-green-600',
+                    badgeBg: 'bg-green-50',
+                    badgeText: 'text-green-700'
+                  };
+                }
+                
+                // Choose icon based on type
+                const IconComponent = isNotes ? NotebookPen : (isBank ? BookOpen : FileText);
                 
                 return (
                   <div key={u._id} className="group bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
@@ -452,8 +500,8 @@ export default function QuestionBank() {
                     {/* Main Content Row */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-3">
                       <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-lg shrink-0 ${isBank ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
-                          {isBank ? <BookOpen size={24} /> : <FileText size={24} />}
+                        <div className={`p-3 rounded-lg shrink-0 ${colorScheme.bgColor} ${colorScheme.textColor}`}>
+                          <IconComponent size={24} />
                         </div>
                         <div>
                           <h3 className="font-bold text-lg text-gray-800 leading-tight">
@@ -463,9 +511,7 @@ export default function QuestionBank() {
                              <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                               {u.subjectCode}
                              </span>
-                             <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
-                               isBank ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
-                             }`}>
+                             <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${colorScheme.badgeBg} ${colorScheme.badgeText}`}>
                                {u.examType}
                              </span>
                              <span className="text-xs text-gray-500 font-medium">
@@ -488,7 +534,7 @@ export default function QuestionBank() {
                       </div>
                     </div>
 
-                    {/* ✅ Uploader Info Section - With Debugging */}
+                    {/* Uploader Info Section */}
                     <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                       {u.author ? (
                         <div className="flex items-center gap-2 text-xs text-gray-500">
