@@ -50,18 +50,63 @@ const DATA = {
 
   "Semester 2": {
     theory: [
-      { title: "Transforms and Applications", pdfPage: 42 },
-      { title: "Discrete Mathematics", pdfPage: 43 },
-      { title: "Applied Chemistry", pdfPage: 44 },
-      { title: "Python Programming", pdfPage: 45 },
-      { title: "Digital Principles & Computer Organization", pdfPage: 46 },
+      {
+        title: "Transforms and Applications",
+        pdfPage: 42,
+        url: "https://image2url.com/r2/default/documents/1767526938604-76511f19-4338-43a2-b562-d1139daa0f1e.pdf",
+      },
+      {
+        title: "Discrete Mathematics",
+        pdfPage: 43,
+        url: "https://image2url.com/r2/default/documents/1767526961443-b2ab66d8-66a5-441f-9c67-70c36eb12372.pdf",
+      },
+      {
+        title: "Applied Chemistry",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767526982386-3f3ef03a-72ea-4fa6-9d3f-1bfe7097e5a5.pdf",
+      },
+      {
+        title: "Python Programming",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767526998126-2387d445-96a1-47a0-83cd-e9abf0f3f7c9.pdf",
+      },
+      {
+        title: "Digital Principles & Computer Organization",
+        pdfPage: 46,
+        url: "https://image2url.com/r2/default/documents/1767527548961-aab56bce-d11b-4f69-8503-0da59a8d7fa8.pdf",
+      },
+      {
+        title: "Tamils and Technology",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767527030369-ab02264a-c055-40eb-ac1a-acb38d9e8f38.pdf",
+      },
     ],
     lab: [
-      { title: "Python Programming Laboratory", pdfPage: 50 },
-      { title: "Chemistry Laboratory", pdfPage: 50 },
-      { title: "Engineering Graphics", pdfPage: 51 },
-      { title: "Language Elective", pdfPage: 52 },
-      { title: "Workplace Communication Skills", pdfPage: 50 },
+      {
+        title: "Python Programming Laboratory",
+        pdfPage: 50,
+        url: "https://image2url.com/r2/default/documents/1767527047449-caadff02-407b-4a32-b055-bf99f566e77d.pdf",
+      },
+      {
+        title: "Chemistry Laboratory",
+        pdfPage: 50,
+        url: "https://image2url.com/r2/default/documents/1767527066026-5d181f42-9107-40a8-9efb-31bb099a6550.pdf",
+      },
+      {
+        title: "Engineering Graphics",
+        pdfPage: 51,
+        url: "https://image2url.com/r2/default/documents/1767527084014-858c4bda-a0c4-4c69-b8a8-b7546079e70b.pdf",
+      },
+      {
+        title: "Language Electives",
+        pdfPage: 52,
+        url: "https://image2url.com/r2/default/documents/1767527107441-b343e468-0db9-45b8-be02-937a5f1aaf59.pdf",
+      },
+      {
+        title: "Workplace Communication Skills",
+        pdfPage: 50,
+        url: "https://image2url.com/r2/default/documents/1767527122505-90b4015c-8463-4774-ad0f-33094dc73607.pdf",
+      },
     ],
   },
 
