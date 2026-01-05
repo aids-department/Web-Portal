@@ -162,7 +162,57 @@ const DATA = {
       },
     ],
   },
-  "Semester 4": { theory: null, lab: null },
+  "Semester 4": { 
+    theory: [
+      {
+        title: "Probability and Statistics",
+        pdfPage: 42,
+        url: "https://image2url.com/r2/default/documents/1767621758441-51e5c4e4-ee01-4f00-bad1-9fabb9b2696a.pdf",
+      },
+      {
+        title: "Operating Systems:",
+        pdfPage: 43,
+        url: "https://image2url.com/r2/default/documents/1767621797703-763286e5-5fca-4ee6-a10f-9f0bd9b11ebd.pdf",
+      },
+      {
+        title: "Machine Learning",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767621832011-69a21808-061c-4cc8-b750-1e5e16da3aa8.pdf",
+      },
+      {
+        title: "Fundamentals of Data Science and Analytics",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767621847005-cfdc9852-393d-45cf-a408-c1eb60c19d75.pdf",
+      },
+      {
+        title: "Computer Networks",
+        pdfPage: 46,
+        url: "https://image2url.com/r2/default/documents/1767621885168-9d98dbe0-0234-4833-ab7b-f2540c66b872.pdf",
+      },
+      {
+        title: "Environmental Sciences and Sustainability",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621899900-486c275e-6b4d-4adf-855c-f185c832ba64.pdf",
+      },
+      {
+        title: "NCC Credit Course Level 2",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621929822-6f42ffdc-e9c8-4eeb-ac64-41359da9b286.pdf",
+      },
+    ],
+      lab: [
+        {
+        title: "Data Science and Analytics Laboratory",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621949046-5774cd96-288e-40ec-add7-a863718ac586.pdf",
+      },
+      {
+        title: "Machine Learning Laboratory",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621986810-eafeedff-524f-465f-8223-0d40bf4e061d.pdf",
+      },
+        ],
+  },
   "Semester 5": { theory: null, lab: null },
   "Semester 6": { theory: null, lab: null },
   "Semester 7": { theory: null, lab: null },
