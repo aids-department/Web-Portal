@@ -123,7 +123,7 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767581496040-c48f7de4-7d77-4cb7-bff1-99126ebf371e.pdf",
       },
       {
-        title: "Database Design Management",
+        title: "Database Design and Management",
         pdfPage: 44,
         url: "https://image2url.com/r2/default/documents/1767581474518-e22b8df9-6581-494e-8298-17cb18448c86.pdf",
       },
@@ -143,10 +143,131 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767581553278-3128de84-a365-4d34-bc0f-226a0be1716c.pdf",
       },
       ],
-          lab: null },
-  "Semester 4": { theory: null, lab: null },
-  "Semester 5": { theory: null, lab: null },
-  "Semester 6": { theory: null, lab: null },
+          lab:
+            [
+              {
+        title: "Artificial Intelligence Laboratory",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767584698430-03706bc9-1b03-4494-adba-0565732f2384.pdf",
+      },
+      {
+        title: "Database Design and Management Laboratory",
+        pdfPage: 46,
+        url: "https://image2url.com/r2/default/documents/1767584714136-ccceb17a-dfcc-47da-846d-1c92f603fb79.pdf",
+      },
+      {
+        title: "Professional Development",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767584729855-3ea8693e-d6ef-4025-a961-0ff1ba17c447.pdf",
+      },
+    ],
+  },
+  "Semester 4": { 
+    theory: [
+      {
+        title: "Probability and Statistics",
+        pdfPage: 42,
+        url: "https://image2url.com/r2/default/documents/1767621758441-51e5c4e4-ee01-4f00-bad1-9fabb9b2696a.pdf",
+      },
+      {
+        title: "Operating Systems",
+        pdfPage: 43,
+        url: "https://image2url.com/r2/default/documents/1767621797703-763286e5-5fca-4ee6-a10f-9f0bd9b11ebd.pdf",
+      },
+      {
+        title: "Machine Learning",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767621832011-69a21808-061c-4cc8-b750-1e5e16da3aa8.pdf",
+      },
+      {
+        title: "Fundamentals of Data Science and Analytics",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767621847005-cfdc9852-393d-45cf-a408-c1eb60c19d75.pdf",
+      },
+      {
+        title: "Computer Networks",
+        pdfPage: 46,
+        url: "https://image2url.com/r2/default/documents/1767621885168-9d98dbe0-0234-4833-ab7b-f2540c66b872.pdf",
+      },
+      {
+        title: "Environmental Sciences and Sustainability",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621899900-486c275e-6b4d-4adf-855c-f185c832ba64.pdf",
+      },
+      {
+        title: "NCC Credit Course Level 2",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621929822-6f42ffdc-e9c8-4eeb-ac64-41359da9b286.pdf",
+      },
+    ],
+      lab: [
+        {
+        title: "Data Science and Analytics Laboratory",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621949046-5774cd96-288e-40ec-add7-a863718ac586.pdf",
+      },
+      {
+        title: "Machine Learning Laboratory",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767621986810-eafeedff-524f-465f-8223-0d40bf4e061d.pdf",
+      },
+        ],
+  },
+  "Semester 5": 
+  { 
+    theory: 
+      [
+      {
+        title: "Deep Learning",
+        pdfPage: 42,
+        url: "https://image2url.com/r2/default/documents/1767623968255-92e976ee-74bf-48fe-9474-dd5dd14bd6d7.pdf",
+      },
+      {
+        title: "Data and Information Security",
+        pdfPage: 43,
+        url: "https://image2url.com/r2/default/documents/1767623860768-c8d08cf7-e358-4481-89fa-307a53000d89.pdf",
+      },
+      {
+        title: "Distributed Computing",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767623886774-22614d14-51e0-4e84-b6ef-552da1699ba0.pdf",
+      },
+      {
+        title: "Big Data Analytics",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767623836728-1b4b6549-b316-4aac-918b-34d7507a6eab.pdf",
+      },
+    ],
+  lab:
+    [
+      {
+        title: "Deep Learning Laboratory",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767624025337-41f70fa7-a8b8-4ee7-8c0e-4ab8ad5a6912.pdf",
+      },
+      {
+        title: "Summer Internship",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767626242087-d5b1811b-6aa1-4760-8eb8-af06cf16283e.pdf",
+      },
+      ],
+  },
+  "Semester 6": 
+  { 
+    theory:
+    [
+    {
+        title: "Embedded Systems and IoT",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767626987911-62e78fa9-b840-4971-9c65-d005c5c5b110.pdf",
+      },
+      {
+        title: "NCC Credit Course Level 3",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767627017061-aa9c2f10-6d27-40ef-b712-43fdadb7b1a6.pdf",
+      },
+    ],
+  lab: null },
   "Semester 7": { theory: null, lab: null },
   "Semester 8": { theory: null, lab: null },
 };
