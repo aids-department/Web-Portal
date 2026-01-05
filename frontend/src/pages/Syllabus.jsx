@@ -170,7 +170,7 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767621758441-51e5c4e4-ee01-4f00-bad1-9fabb9b2696a.pdf",
       },
       {
-        title: "Operating Systems:",
+        title: "Operating Systems",
         pdfPage: 43,
         url: "https://image2url.com/r2/default/documents/1767621797703-763286e5-5fca-4ee6-a10f-9f0bd9b11ebd.pdf",
       },
@@ -213,7 +213,40 @@ const DATA = {
       },
         ],
   },
-  "Semester 5": { theory: null, lab: null },
+  "Semester 5": 
+  { 
+    theory: 
+      [
+      {
+        title: "Deep Learning",
+        pdfPage: 42,
+        url: "https://image2url.com/r2/default/documents/1767623968255-92e976ee-74bf-48fe-9474-dd5dd14bd6d7.pdf",
+      },
+      {
+        title: "Data and Information Security",
+        pdfPage: 43,
+        url: "e358-4481-89fa-307a53000d89.pdf",
+      },
+      {
+        title: "Distributed Computing",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767623886774-22614d14-51e0-4e84-b6ef-552da1699ba0.pdf",
+      },
+      {
+        title: "Big Data Analytics",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767623836728-1b4b6549-b316-4aac-918b-34d7507a6eab.pdf",
+      },
+    ],
+  lab:
+    [
+      {
+        title: "Deep Learning Laboratory",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767624025337-41f70fa7-a8b8-4ee7-8c0e-4ab8ad5a6912.pdf",
+      },
+      ],
+  },
   "Semester 6": { theory: null, lab: null },
   "Semester 7": { theory: null, lab: null },
   "Semester 8": { theory: null, lab: null },
