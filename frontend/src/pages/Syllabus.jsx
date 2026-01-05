@@ -225,7 +225,7 @@ const DATA = {
       {
         title: "Data and Information Security",
         pdfPage: 43,
-        url: "e358-4481-89fa-307a53000d89.pdf",
+        url: "https://image2url.com/r2/default/documents/1767623860768-c8d08cf7-e358-4481-89fa-307a53000d89.pdf",
       },
       {
         title: "Distributed Computing",
@@ -245,9 +245,29 @@ const DATA = {
         pdfPage: 45,
         url: "https://image2url.com/r2/default/documents/1767624025337-41f70fa7-a8b8-4ee7-8c0e-4ab8ad5a6912.pdf",
       },
+      {
+        title: "Summer Internship",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767626242087-d5b1811b-6aa1-4760-8eb8-af06cf16283e.pdf",
+      },
       ],
   },
-  "Semester 6": { theory: null, lab: null },
+  "Semester 6": 
+  { 
+    theory:
+    {
+        title: "Embedded Systems and IoT",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767626987911-62e78fa9-b840-4971-9c65-d005c5c5b110.pdf",
+      },
+      {
+        title: "NCC Credit Course Level 3",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767627017061-aa9c2f10-6d27-40ef-b712-43fdadb7b1a6.pdf",
+      },
+    ],
+  },
+  lab: null },
   "Semester 7": { theory: null, lab: null },
   "Semester 8": { theory: null, lab: null },
 };
