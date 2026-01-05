@@ -268,7 +268,17 @@ const DATA = {
       },
     ],
   lab: null },
-  "Semester 7": { theory: null, lab: null },
+  "Semester 7": 
+  {  
+    theory:
+    [
+    {
+        title: "Human Values and Ethics",
+        pdfPage: 44,
+        url: "https://image2url.com/r2/default/documents/1767631557269-c13d082d-3712-47ce-8cab-f46eeb798b95.pdf",
+      },
+      ],
+    lab: null },
   "Semester 8": { theory: null, 
      lab:
      [
