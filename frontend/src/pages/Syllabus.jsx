@@ -123,7 +123,7 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767581496040-c48f7de4-7d77-4cb7-bff1-99126ebf371e.pdf",
       },
       {
-        title: "Database Design Management",
+        title: "Database Design and Management",
         pdfPage: 44,
         url: "https://image2url.com/r2/default/documents/1767581474518-e22b8df9-6581-494e-8298-17cb18448c86.pdf",
       },
@@ -143,7 +143,25 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767581553278-3128de84-a365-4d34-bc0f-226a0be1716c.pdf",
       },
       ],
-          lab: null },
+          lab:
+            [
+              {
+        title: "Artificial Intelligence Laboratory",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767584698430-03706bc9-1b03-4494-adba-0565732f2384.pdf",
+      },
+      {
+        title: "Database Design and Management Laboratory",
+        pdfPage: 46,
+        url: "https://image2url.com/r2/default/documents/1767584714136-ccceb17a-dfcc-47da-846d-1c92f603fb79.pdf",
+      },
+      {
+        title: "Professional Development",
+        pdfPage: null,
+        url: "https://image2url.com/r2/default/documents/1767584729855-3ea8693e-d6ef-4025-a961-0ff1ba17c447.pdf",
+      },
+    ],
+  },
   "Semester 4": { theory: null, lab: null },
   "Semester 5": { theory: null, lab: null },
   "Semester 6": { theory: null, lab: null },
