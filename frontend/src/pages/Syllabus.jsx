@@ -255,7 +255,7 @@ const DATA = {
   "Semester 6": 
   { 
     theory:
-      [
+    [
     {
         title: "Embedded Systems and IoT",
         pdfPage: 44,
@@ -267,7 +267,6 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767627017061-aa9c2f10-6d27-40ef-b712-43fdadb7b1a6.pdf",
       },
     ],
-  },
   lab: null },
   "Semester 7": { theory: null, lab: null },
   "Semester 8": { theory: null, lab: null },
