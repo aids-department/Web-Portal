@@ -284,7 +284,19 @@ export default function EventsAdminPage() {
                   <input name="endDate" type="date" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.endDate} />
                   <input name="startTime" type="time" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.startTime} />
                   <input name="endTime" type="time" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.endTime} />
-                  <input name="deadlines" placeholder="Registration Deadline" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.deadlines} />
+                  <div className="flex flex-col gap-1">
+  <label className="text-sm font-semibold text-gray-700">
+    Registration Deadline
+  </label>
+  <input
+    name="deadlines"
+    type="date"
+    className="p-4 border rounded-xl"
+    onChange={handleEventChange}
+    value={eventData.deadlines}
+  />
+</div>
+
                   <input name="registrationLink" placeholder="Registration Link" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.registrationLink} />
                   <input name="contact" placeholder="Contact Info" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.contact} />
                   <div className="col-span-2">
