@@ -270,14 +270,15 @@ const DATA = {
   lab: null },
   "Semester 7": { theory: null, lab: null },
   "Semester 8": { theory: null, 
-                  lab:
-                    [
-                      {
-                      title: "Project Work/Internship",
-                      pdfPage: 45,
-                      url: "https://image2url.com/r2/default/documents/1767630502465-b9ab6e18-fe60-424b-ba88-963b9d8a24b0.pdf",
-                      },
-                    ],
+     lab:
+     [
+     {
+          title: "Project Work/Internship",
+          pdfPage: 45,
+          url: "https://image2url.com/r2/default/documents/1767630502465-b9ab6e18-fe60-424b-ba88-963b9d8a24b0.pdf",
+      },
+      ],
+  },
 };
 
 export default function Syllabus() {
