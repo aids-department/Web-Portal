@@ -255,6 +255,7 @@ const DATA = {
   "Semester 6": 
   { 
     theory:
+      [
     {
         title: "Embedded Systems and IoT",
         pdfPage: 44,
