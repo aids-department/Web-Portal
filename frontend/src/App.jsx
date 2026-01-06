@@ -1,3 +1,7 @@
+
+import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
+
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Users, BookOpen, GraduationCap, FlaskConical } from "lucide-react";
@@ -23,12 +27,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import EventsAdminPage from "./components/EventsAdminPage";
 import ManageUploads from "./components/ManageUploads";
 import ManageContent from "./components/ManageContent"; 
-
+import UpdateContent from "./components/ManageContentupdates.jsx";
 // Images for Dashboard
 import img1 from "./assets/enigma.png";
 import img2 from "./assets/genesys.png";
 import Dashboard_Carousel from "./components/Dashboard_Carousel";
-
+import AchievementsCarousel from "./components/AchievementsCarousel";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import AdminLeaderboards from "./pages/AdminLeaderboards";
@@ -39,6 +43,7 @@ import AdminAchievements from "./pages/AdminAchievements";
 import UserAchievements from "./pages/UserAchievements";
 
 import "./style.css";
+
 
 // ScrollNumber Component
 const ScrollNumber = ({ target, suffix = "", duration = 1000 }) => {
@@ -70,117 +75,139 @@ const ScrollNumber = ({ target, suffix = "", duration = 1000 }) => {
 // DASHBOARD PAGE COMPONENT (From App 1)
 // ============================================
 function DashboardPage() {
-  return (
-    <>
-      {/* HEADER SECTION */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 backdrop-blur-lg p-12 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/10 to-purple-100/10 rounded-full blur-3xl"></div>
+    const [updates, setUpdates] = useState([]);
+    const [achievements, setAchievements] = useState([]);
+    // Fetch updates from the dedicated MongoDB server on port 5001
+    useEffect(() => {
+        const fetchUpdates = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/api/updates");
+                setUpdates(res.data);
+            } catch (err) {
+                console.error("Failed to fetch updates:", err);
+            }
+        };
+        // Fetch achievements from the Render API
+        const fetchAchievements = async () => {
+            try {
+                const res = await fetch("https://web-portal-760h.onrender.com/api/achievements/approved/recent");
+                const data = await res.json();
+                setAchievements(data);
+            } catch (err) {
+                console.error("Failed to fetch achievements:", err);
+            }
+        };
+        fetchUpdates();
+        fetchAchievements();
+    }, []);
 
-        <div className="relative z-10">
-          {/* Main heading with enhanced styling */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4 font-cursive leading-tight">
-              Welcome to the Department of AI and DS
-            </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-6"></div>
-          </div>
+    return (
+        <>
+            {/* HEADER SECTION - Kept exactly the same */}
+            <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 backdrop-blur-lg p-12 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/10 to-purple-100/10 rounded-full blur-3xl"></div>
 
-          {/* Mission statement with better layout */}
-          <div className="max-w-4xl mx-auto text-center mb-12">
-            <p className="text-lg text-gray-700 leading-relaxed mb-6">
-              Our mission is to foster innovation and excellence in Artificial Intelligence and Data Science through
-              <span className="font-semibold text-blue-700"> cutting-edge research</span>,
-              <span className="font-semibold text-purple-700"> industry collaboration</span>, and a
-              <span className="font-semibold text-green-700"> dynamic learning environment</span>.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-              <span className="px-3 py-1 bg-blue-100/50 rounded-full">🤖 AI Research</span>
-              <span className="px-3 py-1 bg-purple-100/50 rounded-full">📊 Data Science</span>
-              <span className="px-3 py-1 bg-green-100/50 rounded-full">🎓 Education</span>
-              <span className="px-3 py-1 bg-orange-100/50 rounded-full">🚀 Innovation</span>
-            </div>
-          </div>
-
-          {/* STATS with icons and enhanced design */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { label: "Ongoing Projects", value: "50+", num: "50", icon: BookOpen, color: "text-blue-600" },
-              { label: "Faculty Members", value: "12", num: "12", icon: Users, color: "text-purple-600" },
-              { label: "Active Students", value: "300+", num: "300", icon: GraduationCap, color: "text-green-600" },
-              { label: "Research Lab", value: "1", num: "1", icon: FlaskConical, color: "text-orange-600" },
-            ].map((item) => {
-              const IconComponent = item.icon;
-              return (
-                <div
-                  key={item.label}
-                  className="group bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-white/40 text-center hover:scale-105 hover:bg-white/90 hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative z-10">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3 ${item.color}`}>
-                      <IconComponent size={24} />
+                <div className="relative z-10">
+                    <div className="text-center mb-8">
+                        <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4 font-cursive leading-tight">
+                            Welcome to the Department of AI and DS
+                        </h1>
+                        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-6"></div>
                     </div>
-                    <div className="text-4xl font-bold text-gray-900 mb-1">
-                      <ScrollNumber target={item.num} suffix={item.value.includes('+') ? '+' : ''} />
+
+                    <div className="max-w-4xl mx-auto text-center mb-12">
+                        <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                            Our mission is to foster innovation and excellence in Artificial Intelligence and Data Science through
+                            <span className="font-semibold text-blue-700"> cutting-edge research</span>,
+                            <span className="font-semibold text-purple-700"> industry collaboration</span>, and a
+                            <span className="font-semibold text-green-700"> dynamic learning environment</span>.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+                            <span className="px-3 py-1 bg-blue-100/50 rounded-full">🤖 AI Research</span>
+                            <span className="px-3 py-1 bg-purple-100/50 rounded-full">📊 Data Science</span>
+                            <span className="px-3 py-1 bg-green-100/50 rounded-full">🎓 Education</span>
+                            <span className="px-3 py-1 bg-orange-100/50 rounded-full">🚀 Innovation</span>
+                        </div>
                     </div>
-                    <p className="text-gray-700 font-medium text-sm">{item.label}</p>
-                  </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[
+                            { label: "Ongoing Projects", value: "50+", num: "50", icon: BookOpen, color: "text-blue-600" },
+                            { label: "Faculty Members", value: "12", num: "12", icon: Users, color: "text-purple-600" },
+                            { label: "Active Students", value: "300+", num: "300", icon: GraduationCap, color: "text-green-600" },
+                            { label: "Research Lab", value: "1", num: "1", icon: FlaskConical, color: "text-orange-600" },
+                        ].map((item) => {
+                            const IconComponent = item.icon;
+                            return (
+                                <div
+                                    key={item.label}
+                                    className="group bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-white/40 text-center hover:scale-105 hover:bg-white/90 hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div className="relative z-10">
+                                        <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3 ${item.color}`}>
+                                            <IconComponent size={24} />
+                                        </div>
+                                        <div className="text-4xl font-bold text-gray-900 mb-1">
+                                            <ScrollNumber target={item.num} suffix={item.value.includes('+') ? '+' : ''} />
+                                        </div>
+                                        <p className="text-gray-700 font-medium text-sm">{item.label}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-              );
-            })}
-          </div>
+            </section>
 
-        </div>
-      </section>
+            {/* EVENTS - Kept exactly the same */}
+            <section id="events" className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
 
-      {/* EVENTS */}
-      <section id="events" className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+                <div className="relative z-10">
+                    <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Events</h2>
+                    <Dashboard_Carousel
+                        slides={[
+                            { img: img1, page: "/events/codenigma" },
+                            { img: img2, page: "/events/genesys" },
+                        ]}
+                    />
+                </div>
+            </section>
+            {/* 3. NEW: RECENT ACHIEVEMENTS SECTION (Between Events and Updates) */}
+            <section className="mb-8">
+                <AchievementsCarousel />
+            </section>
+            {/* RECENT UPDATES - Now Dynamic from MongoDB */}
+            <section className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
 
-        <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Events</h2>
+                <div className="relative z-10">
+                    <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Recent Updates</h2>
 
-          <Dashboard_Carousel
-            slides={[
-              { img: img1, page: "/events/codenigma" },
-              { img: img2, page: "/events/genesys" },
-            ]}
-          />
-        </div>
-      </section>
-
-      {/* RECENT UPDATES */}
-      <section className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-        <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Recent Updates</h2>
-
-          <div className="space-y-4">
-            {[
-              { title: "Need Volunteers for Yukta2k26", time: "1 day ago" },
-              { title: "Enigma Contest results out", time: "2 days ago" },
-              { title: "50+ students placed in final year", time: "5 days ago" },
-            ].map((u) => (
-              <div key={u.title} className="group pb-4 border-b border-gray-200 hover:bg-white/60 transition-all duration-300 rounded-lg px-4 py-3 hover:shadow-md">
-                <p className="text-gray-900 font-medium group-hover:text-gray-800">{u.title}</p>
-                <p className="text-gray-500 text-sm group-hover:text-gray-600">{u.time}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
-  );
+                    <div className="space-y-4">
+                        {updates.length > 0 ? (
+                            updates.map((u) => (
+                                <div key={u._id} className="group pb-4 border-b border-gray-200 hover:bg-white/60 transition-all duration-300 rounded-lg px-4 py-3 hover:shadow-md">
+                                    <p className="text-gray-900 font-medium group-hover:text-gray-800">{u.title}</p>
+                                    <p className="text-gray-500 text-sm group-hover:text-gray-600">
+                                        {formatDistanceToNow(new Date(u.createdAt), { addSuffix: true })}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 italic">No updates available at the moment.</p>
+                        )}
+                    </div>
+                </div>
+            </section>
+        </>
+    );
 }
-
 // ============================================
 // PLACEHOLDER PAGES (From App 2)
 // ============================================
@@ -268,7 +295,12 @@ function AdminLayout({ children }) {
           >
             Manage QP Uploads
           </a>
-
+            <a
+                href="/adminpage/manage-content-updates"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+                Recent Updates
+            </a>
           <a href="/adminpage/manage-content" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
             Manage Content
           </a>
@@ -336,7 +368,14 @@ export default function App() {
             </AdminLayout>
           }
         />
-
+          <Route
+              path="/adminpage/manage-content-updates"
+              element={
+                  <AdminLayout>
+                      <UpdateContent />
+                  </AdminLayout>
+              }
+          />
         {/* 
           ============================================
           MAIN APPLICATION ROUTES

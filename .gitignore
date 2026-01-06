@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment variables (Crucial for security)
+.env
+
+# IDE files
+.idea/
+.vscode/
+
+# Build folders
+dist/
+build/

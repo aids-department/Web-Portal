@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 
 // Skill tag with remove
 const RemovableSkillTag = ({ skill, onRemove }) => (
-  <span className="skill-tag removable-tag">
+    <span className="skill-tag removable-tag">
     {skill}
-    <span
-      className="remove-btn"
-      onClick={() => onRemove(skill)}
-    >
+        <span
+            className="remove-btn"
+            onClick={() => onRemove(skill)}
+        >
       ×
     </span>
   </span>
@@ -16,474 +16,322 @@ const RemovableSkillTag = ({ skill, onRemove }) => (
 
 // Component for Profile Picture Editing
 const ProfilePicturePage = ({ onBackToEditForm }) => (
-  <div className="profile-picture-page">
-    <h3>Edit Profile Picture</h3>
-
-    <p>
-      This is the dedicated page for uploading and managing your profile image.
-    </p>
-
-    <div className="current-image-preview">
-      Current Picture
+    <div className="profile-picture-page">
+        <h3>Edit Profile Picture</h3>
+        <p>This is the dedicated page for uploading and managing your profile image.</p>
+        <div className="current-image-preview">Current Picture</div>
+        <input type="file" accept="image/*" />
+        <button className="submit-profile-btn" style={{ maxWidth: "200px", marginTop: "20px" }}>
+            Upload & Save
+        </button>
+        <button className="back-btn" onClick={onBackToEditForm}>
+            ← Back to Edit Profile
+        </button>
     </div>
-
-    <input
-      type="file"
-      accept="image/*"
-    />
-
-    <button
-      className="submit-profile-btn"
-      style={{
-        maxWidth: "200px",
-        marginTop: "20px",
-      }}
-    >
-      Upload & Save
-    </button>
-
-    <button
-      className="back-btn"
-      onClick={onBackToEditForm}
-    >
-      ← Back to Edit Profile
-    </button>
-  </div>
 );
 
 export default function EditProfile() {
-  const [name, setName] = useState("");
-  const [year, setYear] = useState("");
-  const [bio, setBio] = useState("");
-  const [skills, setSkills] = useState([]);
-  const [newSkill, setNewSkill] = useState("");
-  const [achievements, setAchievements] = useState([]);
-  const [isProfileUpdated, setIsProfileUpdated] = useState(false);
-  const [isEditingPicture, setIsEditingPicture] = useState(false);
+    const [name, setName] = useState("");
+    const [year, setYear] = useState("");
+    const [bio, setBio] = useState("");
+    const [skills, setSkills] = useState([]);
+    const [newSkill, setNewSkill] = useState("");
+    const [achievements, setAchievements] = useState([]);
+    const [isProfileUpdated, setIsProfileUpdated] = useState(false);
+    const [isEditingPicture, setIsEditingPicture] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?.id;
+    /* --- MODAL STATE --- */
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalDesc, setModalDesc] = useState("");
 
-  /* ---------------- LOAD PROFILE ---------------- */
-  useEffect(() => {
-    if (!userId) {
-      // window.location.href = "/login";
-      return;
-    }
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?.id;
 
-    fetch(
-      `https://web-portal-760h.onrender.com/api/profile/${userId}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data) {
-          // 🔥 IMPORTANT: clear old user's data
-          setName("");
-          setYear("");
-          setBio("");
-          setSkills([]);
-          setAchievements([]);
-          return;
-        }
+    /* ---------------- LOAD PROFILE ---------------- */
+    useEffect(() => {
+        if (!userId) return;
+        fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (!data) {
+                    setName(""); setYear(""); setBio(""); setSkills([]); setAchievements([]);
+                    return;
+                }
+                setName(data.name || "");
+                setYear(data.year || "");
+                setBio(data.bio || "");
+                setSkills(data.skills || []);
+            })
+            .catch((err) => console.error("Load profile error", err));
+    }, [userId]);
 
-        setName(data.name || "");
-        setYear(data.year || "");
-        setBio(data.bio || "");
-        setSkills(data.skills || []);
-      })
-      .catch((err) =>
-        console.error("Load profile error", err)
-      );
-  }, [userId]);
+    useEffect(() => {
+        if (!userId) return;
+        fetch(`https://web-portal-760h.onrender.com/api/achievements/user/${userId}?all=true`)
+            .then((res) => res.json())
+            .then((data) => {
+                const withLocalStatus = data.map((a) => ({
+                    ...a,
+                    localStatus: a.status,
+                }));
+                setAchievements(withLocalStatus);
+            })
+            .catch((err) => console.error("Load achievements error", err));
+    }, [userId]);
 
-  useEffect(() => {
-    if (!userId) return;
-
-    fetch(
-      `https://web-portal-760h.onrender.com/api/achievements/user/${userId}?all=true`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        // normalize: add local flag for UI
-        const withLocalStatus = data.map((a) => ({
-          ...a,
-          localStatus: a.status, // approved | pending | rejected
-        }));
-
-        setAchievements(withLocalStatus);
-      })
-      .catch((err) =>
-        console.error("Load achievements error", err)
-      );
-  }, [userId]);
-
-  /* ---------------- SKILLS ---------------- */
-  const handleRemoveSkill = (skillToRemove) => {
-    setSkills(
-      skills.filter((s) => s !== skillToRemove)
-    );
-  };
-
-  const handleAddSkill = (e) => {
-    if (
-      e.key === "Enter" &&
-      newSkill.trim() &&
-      !skills.includes(newSkill.trim())
-    ) {
-      setSkills([
-        ...skills,
-        newSkill.trim(),
-      ]);
-      setNewSkill("");
-    }
-  };
-
-  /* ---------------- ACHIEVEMENTS ---------------- */
-  const handleDeleteAchievement = (index) => {
-    const updated = [...achievements];
-
-    updated[index] = {
-      ...updated[index],
-      markedForDeletion: true,
+    /* ---------------- SKILLS ---------------- */
+    const handleRemoveSkill = (skillToRemove) => {
+        setSkills(skills.filter((s) => s !== skillToRemove));
     };
 
-    setAchievements(updated);
-  };
-
-  const handleEditAchievement = (index) => {
-    const old = achievements[index];
-
-    const newTitle = prompt(
-      "Edit achievement title",
-      old.title
-    );
-    if (newTitle === null) return;
-
-    const newDesc = prompt(
-      "Edit achievement description",
-      old.description
-    );
-    if (newDesc === null) return;
-
-    const updated = [...achievements];
-    updated[index] = {
-      ...old,
-      title: newTitle,
-      description: newDesc,
-      localStatus:
-        old.localStatus === "approved"
-          ? "new"
-          : "rejected",
-      editedFromApproved:
-        old.localStatus === "approved", // ✅ THIS LINE
+    const handleAddSkill = (e) => {
+        if (e.key === "Enter" && newSkill.trim() && !skills.includes(newSkill.trim())) {
+            setSkills([...skills, newSkill.trim()]);
+            setNewSkill("");
+        }
     };
 
-    setAchievements(updated);
-  };
+    /* ---------------- ACHIEVEMENTS ---------------- */
+    const handleDeleteAchievement = (index) => {
+        const updated = [...achievements];
+        updated[index] = { ...updated[index], markedForDeletion: true };
+        setAchievements(updated);
+    };
 
-  const handleAddAchievement = () => {
-    const title = prompt("Achievement title");
-    const description = prompt(
-      "Achievement description"
-    );
+    const handleEditAchievement = (index) => {
+        const old = achievements[index];
+        const newTitle = prompt("Edit achievement title", old.title);
+        if (newTitle === null) return;
+        const newDesc = prompt("Edit achievement description", old.description);
+        if (newDesc === null) return;
 
-    if (title && description) {
-      setAchievements([
-        ...achievements,
-        {
-          title,
-          description,
-          localStatus: "new", // 🔥 important
-        },
-      ]);
+        const updated = [...achievements];
+        updated[index] = {
+            ...old,
+            title: newTitle,
+            description: newDesc,
+            localStatus: old.localStatus === "approved" ? "new" : "rejected",
+            editedFromApproved: old.localStatus === "approved",
+        };
+        setAchievements(updated);
+    };
+
+    /* --- MODAL SAVE LOGIC --- */
+    const handleSaveNewAchievement = () => {
+        if (modalTitle && modalDesc) {
+            setAchievements([
+                ...achievements,
+                { title: modalTitle, description: modalDesc, localStatus: "new" },
+            ]);
+            setModalTitle("");
+            setModalDesc("");
+            setShowAddModal(false);
+        }
+    };
+
+    /* ---------------- SAVE PROFILE ---------------- */
+    const handleSubmit = async () => {
+        try {
+            const profilePayload = { name, year, bio, skills };
+            const res = await fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(profilePayload),
+            });
+            if (!res.ok) throw new Error("Profile save failed");
+
+            for (const a of achievements) {
+                if (a.markedForDeletion || (a.localStatus !== "new" && a.localStatus !== "rejected")) continue;
+                await fetch("https://web-portal-760h.onrender.com/api/achievements", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId, title: a.title, description: a.description }),
+                });
+                if (a.localStatus === "rejected" && a._id) {
+                    await fetch(`https://web-portal-760h.onrender.com/api/achievements/${a._id}`, { method: "DELETE" });
+                }
+                if (a.editedFromApproved && a._id) {
+                    await fetch(`https://web-portal-760h.onrender.com/api/achievements/${a._id}`, { method: "DELETE" });
+                }
+            }
+
+            for (const a of achievements) {
+                if (a.markedForDeletion && a._id) {
+                    await fetch(`https://web-portal-760h.onrender.com/api/achievements/${a._id}`, { method: "DELETE" });
+                }
+            }
+
+            fetch(`https://web-portal-760h.onrender.com/api/achievements/user/${userId}?all=true`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setAchievements(data.map((a) => ({ ...a, localStatus: a.status })));
+                });
+
+            setIsProfileUpdated(true);
+            setTimeout(() => setIsProfileUpdated(false), 3000);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save profile");
+        }
+    };
+
+    if (isEditingPicture) {
+        return <ProfilePicturePage onBackToEditForm={() => setIsEditingPicture(false)} />;
     }
-  };
 
-  /* ---------------- SAVE PROFILE ---------------- */
-  const handleSubmit = async () => {
-    try {
-      // 1️⃣ Save profile info ONLY
-      const profilePayload = {
-        name,
-        year,
-        bio,
-        skills,
-      };
-
-      const res = await fetch(
-        `https://web-portal-760h.onrender.com/api/profile/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(profilePayload),
-        }
-      );
-
-      if (!res.ok)
-        throw new Error("Profile save failed");
-
-      // 2️⃣ Submit achievements separately (pending)
-      for (const a of achievements) {
-        if (
-          a.markedForDeletion ||
-          (a.localStatus !== "new" &&
-            a.localStatus !== "rejected")
-        ) {
-          continue;
-        }
-
-        await fetch(
-          "https://web-portal-760h.onrender.com/api/achievements",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId,
-              title: a.title,
-              description: a.description,
-            }),
-          }
-        );
-
-        // delete old achievement if it was edited (rejected OR approved)
-        // delete old rejected
-        if (
-          a.localStatus === "rejected" &&
-          a._id
-        ) {
-          await fetch(
-            `https://web-portal-760h.onrender.com/api/achievements/${a._id}`,
-            { method: "DELETE" }
-          );
-        }
-
-        // delete old approved (only if edited)
-        if (
-          a.editedFromApproved &&
-          a._id
-        ) {
-          await fetch(
-            `https://web-portal-760h.onrender.com/api/achievements/${a._id}`,
-            { method: "DELETE" }
-          );
-        }
-      }
-
-      // delete achievements marked for deletion
-      for (const a of achievements) {
-        if (
-          a.markedForDeletion &&
-          a._id
-        ) {
-          await fetch(
-            `https://web-portal-760h.onrender.com/api/achievements/${a._id}`,
-            { method: "DELETE" }
-          );
-        }
-      }
-
-      // refresh achievements after submit
-      fetch(
-        `https://web-portal-760h.onrender.com/api/achievements/user/${userId}?all=true`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          setAchievements(
-            data.map((a) => ({
-              ...a,
-              localStatus: a.status,
-            }))
-          );
-        });
-
-      setIsProfileUpdated(true);
-      setTimeout(
-        () => setIsProfileUpdated(false),
-        3000
-      );
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save profile");
-    }
-  };
-
-  if (isEditingPicture) {
     return (
-      <ProfilePicturePage
-        onBackToEditForm={() =>
-          setIsEditingPicture(false)
-        }
-      />
-    );
-  }
+        <div className="profile-edit-container">
+            {/* INLINE CSS */}
+            <style>{`
+                .modal-overlay {
+                    position: fixed;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 2000;
+                }
+                .achievement-modal {
+                    background: #fff;
+                    padding: 24px;
+                    border-radius: 16px;
+                    width: 90%;
+                    max-width: 500px;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                }
+                .modal-title {
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-bottom: 24px;
+                    color: #000;
+                }
+                .modal-field {
+                    margin-bottom: 20px;
+                }
+                .modal-field label {
+                    display: block;
+                    font-weight: 600;
+                    margin-bottom: 8px;
+                    color: #333;
+                }
+                .modal-field input, .modal-field textarea {
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    outline: none;
+                }
+                .modal-field input:focus, .modal-field textarea:focus {
+                    border-color: #4285f4;
+                }
+                .modal-footer {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                    margin-top: 24px;
+                }
+                .modal-cancel-btn {
+                    background: #f0f0f0;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                }
+                .modal-save-btn {
+                    background: #4285f4;
+                    color: #fff;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                }
+            `}</style>
 
-  /* ---------------- UI ---------------- */
-  return (
-    <div className="profile-edit-container">
-      <h2 className="edit-title">
-        Edit Profile
-      </h2>
+            <h2 className="edit-title">Edit Profile</h2>
+            <p className="edit-subtitle">Keep your profile updated</p>
 
-      <p className="edit-subtitle">
-        Keep your profile updated
-      </p>
-
-      {/* Profile Info */}
-      <div className="edit-card profile-info-card-edit">
-        <div
-          className="profile-icon-edit clickable-icon"
-          onClick={() =>
-            setIsEditingPicture(true)
-          }
-          title="Click to edit profile picture"
-        >
-          <img
-            src="user-icon.png"
-            alt="Profile"
-          />
-        </div>
-
-        <div className="profile-fields">
-          <input
-            type="text"
-            className="name-input"
-            value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
-            placeholder="Full Name"
-          />
-
-          <input
-            type="text"
-            className="year-input"
-            value={year}
-            onChange={(e) =>
-              setYear(e.target.value)
-            }
-            placeholder="Year (e.g., 3rd Year)"
-          />
-        </div>
-      </div>
-
-      {/* Bio & Skills */}
-      <div className="edit-card profile-bio-skills-card">
-        <h3 className="section-title">
-          Bio and Top Skills
-        </h3>
-
-        <h4 className="sub-section-title">
-          Bio
-        </h4>
-
-        <textarea
-          rows="4"
-          className="bio-textarea"
-          value={bio}
-          onChange={(e) =>
-            setBio(e.target.value)
-          }
-          placeholder="Write a short bio about yourself..."
-        />
-
-        <h4 className="sub-section-title">
-          Skills
-        </h4>
-
-        <div className="skills-input-container">
-          {skills.map((skill) => (
-            <RemovableSkillTag
-              key={skill}
-              skill={skill}
-              onRemove={handleRemoveSkill}
-            />
-          ))}
-
-          <input
-            type="text"
-            placeholder="Add more skills..."
-            className="add-skill-input"
-            value={newSkill}
-            onChange={(e) =>
-              setNewSkill(e.target.value)
-            }
-            onKeyDown={handleAddSkill}
-          />
-        </div>
-      </div>
-
-      {/* Achievements */}
-      <div className="edit-card profile-achievements-card">
-        <h3 className="section-title">
-          Achievements
-        </h3>
-
-        {achievements
-          .filter((a) => !a.markedForDeletion)
-          .map((a, index) => (
-            <div
-              key={a._id || index}
-              className="achievement-item-edit"
-            >
-              <h4>{a.title}</h4>
-              <p>{a.description}</p>
-
-              <span
-                className={`status-badge ${a.localStatus}`}
-              >
-                {a.localStatus.toUpperCase()}
-              </span>
-
-              {(a.localStatus === "rejected" ||
-                a.localStatus === "new" ||
-                a.localStatus === "approved") && (
-                <div className="achievement-actions">
-                  <button
-                    className="action-btn edit-btn"
-                    onClick={() =>
-                      handleEditAchievement(index)
-                    }
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="action-btn delete-btn"
-                    onClick={() =>
-                      handleDeleteAchievement(index)
-                    }
-                  >
-                    Delete
-                  </button>
+            <div className="edit-card profile-info-card-edit">
+                <div className="profile-icon-edit clickable-icon" onClick={() => setIsEditingPicture(true)} title="Click to edit profile picture">
+                    <img src="user-icon.png" alt="Profile" />
                 </div>
-              )}
+                <div className="profile-fields">
+                    <input type="text" className="name-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name" />
+                    <input type="text" className="year-input" value={year} onChange={(e) => setYear(e.target.value)} placeholder="Year (e.g., 3rd Year)" />
+                </div>
             </div>
-          ))}
 
-        <button
-          className="add-more-btn"
-          onClick={handleAddAchievement}
-        >
-          Add More
-        </button>
-      </div>
+            <div className="edit-card profile-bio-skills-card">
+                <h3 className="section-title">Bio and Top Skills</h3>
+                <h4 className="sub-section-title">Bio</h4>
+                <textarea rows="4" className="bio-textarea" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Write a short bio about yourself..." />
+                <h4 className="sub-section-title">Skills</h4>
+                <div className="skills-input-container">
+                    {skills.map((skill) => (
+                        <RemovableSkillTag key={skill} skill={skill} onRemove={handleRemoveSkill} />
+                    ))}
+                    <input type="text" placeholder="Add more skills..." className="add-skill-input" value={newSkill} onChange={(e) => setNewSkill(e.target.value)} onKeyDown={handleAddSkill} />
+                </div>
+            </div>
 
-      <button
-        className="submit-profile-btn"
-        onClick={handleSubmit}
-      >
-        Submit Profile
-      </button>
+            <div className="edit-card profile-achievements-card">
+                <h3 className="section-title">Achievements</h3>
+                {achievements
+                    .filter((a) => !a.markedForDeletion)
+                    .map((a, index) => (
+                        <div key={a._id || index} className="achievement-item-edit">
+                            <h4>{a.title}</h4>
+                            <p>{a.description}</p>
+                            <span className={`status-badge ${a.localStatus}`}>{a.localStatus.toUpperCase()}</span>
+                            {(a.localStatus === "rejected" || a.localStatus === "new" || a.localStatus === "approved") && (
+                                <div className="achievement-actions">
+                                    <button className="action-btn edit-btn" onClick={() => handleEditAchievement(index)}>Edit</button>
+                                    <button className="action-btn delete-btn" onClick={() => handleDeleteAchievement(index)}>Delete</button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                <button className="add-more-btn" onClick={() => setShowAddModal(true)}>Add More</button>
+            </div>
 
-      {isProfileUpdated && (
-        <div className="profile-updated-message">
-          Profile Updated Successfully!
+            {/* --- ACHIEVEMENT MODAL UI --- */}
+            {showAddModal && (
+                <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+                    <div className="achievement-modal" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="modal-title">Add Achievement</h3>
+                        <div className="modal-field">
+                            <label>Title</label>
+                            <input
+                                type="text"
+                                placeholder="e.g. Winner at GDG In Campus"
+                                value={modalTitle}
+                                onChange={(e) => setModalTitle(e.target.value)}
+                            />
+                        </div>
+                        <div className="modal-field">
+                            <label>Description</label>
+                            <textarea
+                                placeholder="Describe your achievement..."
+                                rows="4"
+                                value={modalDesc}
+                                onChange={(e) => setModalDesc(e.target.value)}
+                            />
+                        </div>
+                        <div className="modal-footer">
+                            <button className="modal-cancel-btn" onClick={() => setShowAddModal(false)}>Cancel</button>
+                            <button className="modal-save-btn" onClick={handleSaveNewAchievement}>Save</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <button className="submit-profile-btn" onClick={handleSubmit}>Submit Profile</button>
+            {isProfileUpdated && <div className="profile-updated-message">Profile Updated Successfully!</div>}
         </div>
-      )}
-    </div>
-  );
+    );
 }
