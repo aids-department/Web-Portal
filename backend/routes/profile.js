@@ -2,6 +2,32 @@ const express = require("express");
 const router = express.Router();
 const Profile = require("../models/Profile");
 
+router.get("/", async (req, res) => {
+  try {
+    const q = req.query.q || "";
+
+    if (!q.trim()) return res.json([]);
+
+    const profiles = await Profile.find(
+      {
+        name: {
+          $exists: true,
+          $type: "string",
+          $regex: q,
+          $options: "i",
+        },
+      },
+      { name: 1, year: 1, userId: 1, _id: 0 }
+    ).limit(10);
+
+    res.json(profiles);
+  } catch (err) {
+    console.error("Profile search error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 /**
  * GET profile by userId
  */

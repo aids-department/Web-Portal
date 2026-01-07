@@ -522,67 +522,6 @@ app.delete("/api/posts/:postId", async (req, res) => {
   }
 });
 
-// DELETE COMMENT OR REPLY (with proper nested handling)
-// DELETE COMMENT (including all nested replies)
-app.delete("/api/posts/:postId/comments/:commentId", async (req, res) => {
-  try {
-    const { postId, commentId } = req.params;
-
-    const post = await Post.findById(postId);
-    if (!post) {
-      console.log("Post not found");
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-
-    // Recursive function to delete comment and all nested replies
-    const deleteCommentRecursive = async (commentId) => {
-      const comment = await Comment.findById(commentId);
-      
-      if (!comment) {
-        console.log(`Comment ${commentId} not found in database`);
-        return;
-      }
-
-
-      if (comment.replies && comment.replies.length > 0) {
-        for (const replyId of comment.replies) {
-          await deleteCommentRecursive(replyId);
-        }
-      }
-
-      await Comment.findByIdAndDelete(commentId);
-    };
-
-    // Remove from post's comments array
-    const originalLength = post.comments.length;
-    post.comments = post.comments.filter(
-      c => c.toString() !== commentId
-    );
-
-    if (post.comments.length < originalLength) {
-      await post.save();
-    } else {
-    }
-
-    // Delete comment and all nested replies
-    await deleteCommentRecursive(commentId);
-
-    
-    res.status(200).json({ 
-      success: true, 
-      message: "Comment deleted successfully" 
-    });
-
-  } catch (err) {
-    console.error("❌ Error deleting comment:", err);
-    res.status(500).json({ 
-      success: false,
-      error: "Failed to delete comment",
-      details: err.message 
-    });
-  }
-});
 // ============================================
 // API ROUTES – EVENTS CRUD
 // ============================================
@@ -657,12 +596,9 @@ app.delete("/api/events/:id", async (req, res) => {
 // QUESTION PAPER ROUTES (PDFs)
 // ============================================
 
-
-// 1. UPLOAD PDF (FIXED - Properly validates and saves author reference)
-// The issue is how the ID is being converted!
-// Let me show you what's probably happening:
-
+// 1. UPLOAD PDF (With Error Handling for Large Files)
 app.post("/api/qp", (req, res, next) => {
+  // Wrap upload in a function to catch Multer errors
   upload.single("pdfFile")(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
@@ -672,63 +608,22 @@ app.post("/api/qp", (req, res, next) => {
     } else if (err) {
       return res.status(400).json({ error: err.message });
     }
+    // If no error, proceed to the main logic
     next();
   });
 }, async (req, res) => {
-  console.log("\n========== NEW UPLOAD REQUEST ==========");
-  
   try {
     const { semester, subjectCode, subjectName, examType, authorId } = req.body;
     
-    console.log("📥 Received authorId:", authorId);
-    console.log("📥 Type:", typeof authorId);
-    
-    // Validation
-    if (!req.file) {
-      return res.status(400).json({ error: "PDF file is required" });
-    }
-    if (!authorId) {
-      return res.status(400).json({ error: "Author ID is required" });
-    }
+    if (!req.file) return res.status(400).json({ error: "PDF file is required" });
+    if (!authorId) return res.status(400).json({ error: "Author ID is required" });
 
-    // ✅ KEY FIX: Convert string ID to ObjectId
-    let authorObjectId;
-    try {
-      authorObjectId = new mongoose.Types.ObjectId(authorId);
-      console.log("✅ Converted to ObjectId:", authorObjectId);
-    } catch (err) {
-      console.log("❌ Invalid ObjectId format:", authorId);
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json({ 
-        error: "Invalid user ID format",
-        received: authorId
-      });
-    }
-
-    // ✅ Verify author exists using the ObjectId
-    const authorExists = await User.findById(authorObjectId);
-    
-    if (!authorExists) {
-      console.log("❌ User not found with ID:", authorObjectId);
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json({ 
-        error: "User does not exist",
-        authorId: authorId
-      });
-    }
-
-    console.log("✅ Author found:", authorExists.username);
-
-    // Upload to Cloudinary
+    // Sanitize Filename
     const cleanExamType = examType.trim().replace(/\s+/g, "_"); 
     const cleanCode = subjectCode.trim().replace(/\s+/g, "_");
     const publicId = `${cleanCode}_${cleanExamType}_${Date.now()}.pdf`;
 
-    console.log("☁️ Uploading to Cloudinary...");
+    // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "question_papers",
       resource_type: "raw", 
@@ -736,9 +631,7 @@ app.post("/api/qp", (req, res, next) => {
       use_filename: true,
       unique_filename: false
     });
-    console.log("✅ Cloudinary upload successful");
 
-    // ✅ Create document with ObjectId (not string!)
     const newQP = new QuestionPaper({
       semester,
       subjectCode,
@@ -747,34 +640,18 @@ app.post("/api/qp", (req, res, next) => {
       fileName: req.file.originalname,
       fileUrl: result.secure_url,
       publicId: result.public_id,
-      author: authorObjectId, // ✅ Use the ObjectId, not the string!
+      author: authorId,
     });
 
-    console.log("💾 Saving with author:", authorObjectId);
     await newQP.save();
-    console.log("✅ Saved successfully");
-
-    // Clean up temp file
     fs.unlinkSync(req.file.path);
 
-    // Populate and return
-    const populatedQP = await QuestionPaper.findById(newQP._id)
-      .populate("author", "username fullName email");
-
-    if (populatedQP.author) {
-      console.log("✅ Author populated:", populatedQP.author.username);
-    } else {
-      console.log("⚠️ Author did NOT populate!");
-    }
-
-    console.log("========== UPLOAD COMPLETE ==========\n");
+    const populatedQP = await QuestionPaper.findById(newQP._id).populate("author", "username fullName");
     res.json({ success: true, data: populatedQP });
 
   } catch (err) {
-    console.error("❌ Upload Error:", err);
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    console.error("QP Upload Error:", err);
     res.status(500).json({ error: "Server Error: " + err.message });
   }
 });

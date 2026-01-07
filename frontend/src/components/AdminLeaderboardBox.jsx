@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { studentsDB } from "../data/students";
 
 export default function LeaderboardBox({ title, count }) {
   const category = title;
@@ -70,34 +69,59 @@ export default function LeaderboardBox({ title, count }) {
   }, [category, count]);
 
   /* ---------------- TYPING (UNCHANGED) ---------------- */
-  const handleTyping = (index, value) => {
+  const handleTyping = async (index, value) => {
     setActiveIndex(index);
 
-    const filtered = studentsDB.filter((s) => {
-      const matches = s.name.toLowerCase().includes(value.toLowerCase());
-      const alreadySelected = selected.some(
-        (sel, idx) => idx !== index && sel.roll === s.roll
-      );
-      return matches && !alreadySelected;
-    });
+    if (!value.trim()) {
+      setSuggestions([]);
+    } else {
+      try {
+        const res = await fetch(
+          `https://web-portal-760h.onrender.com/api/profile?q=${value}`
+        );
+        const profiles = await res.json();
 
-    setSuggestions(filtered);
+        const filtered = profiles.filter((p) => {
+          const alreadySelected = selected.some(
+            (sel, idx) => idx !== index && sel.roll === p.userId
+          );
+          return !alreadySelected;
+        });
+
+        setSuggestions(
+          filtered.map((p) => ({
+            name: p.name,
+            roll: p.userId, // IMPORTANT: maps to existing logic
+            year: p.year,
+          }))
+        );
+      } catch (err) {
+        console.error("profile search failed", err);
+        setSuggestions([]);
+      }
+    }
 
     const copy = [...selected];
     copy[index] = { ...copy[index], name: value };
     setSelected(copy);
   };
 
+
   /* ---------------- SELECT (UNCHANGED) ---------------- */
   const handleSelect = (student) => {
     if (activeIndex === null) return;
+
+    const normalizeYear = (year) => {
+      const match = String(year).match(/\d+/);
+      return match ? Number(match[0]) : null;
+    };
 
     const updated = [...selected];
     updated[activeIndex] = {
       ...updated[activeIndex],
       name: student.name,
       roll: student.roll,
-      year: student.year,
+      year: normalizeYear(student.year),
     };
 
     setSelected(updated);
@@ -109,9 +133,8 @@ export default function LeaderboardBox({ title, count }) {
   const handleBlurClear = (index) => {
     setTimeout(() => {
       const typed = selected[index];
-      const match = studentsDB.find((s) => s.name === typed.name);
 
-      if (!match && typed.name.trim() !== "") {
+      if (!typed.roll && typed.name.trim() !== "") {
         const copy = [...selected];
         copy[index] = { name: "", roll: "", year: "", score: "", time: "" };
         setSelected(copy);
@@ -124,6 +147,7 @@ export default function LeaderboardBox({ title, count }) {
     }, 180);
   };
 
+
   /* ---------------- FIELD CHANGE (UNCHANGED) ---------------- */
   const handleFieldChange = (index, field, value) => {
     const copy = [...selected];
@@ -133,72 +157,80 @@ export default function LeaderboardBox({ title, count }) {
 
   /* ---------------- SUBMIT (MINIMAL CHANGE) ---------------- */
   const handleSubmit = async () => {
-    if (isEnigma) {
-      const invalid = selected.some(
+  // ---------- VALIDATION ----------
+  const invalid = isEnigma
+    ? selected.some(
         (s) =>
           !s.name ||
           !s.roll ||
+          !Number.isInteger(s.year) ||
           s.score === "" ||
           s.time === "" ||
           Number.isNaN(Number(s.score)) ||
           Number.isNaN(Number(s.time))
+      )
+    : selected.some(
+        (s) => !s.name || !s.roll || !Number.isInteger(s.year)
       );
 
-      if (invalid) {
-        toast.error("All rows must have a valid student, score and time.", {
-          duration: 2500,
-        });
-        return;
-      }
-    } else {
-      const invalid = selected.some((s) => !s.name || !s.roll);
-      if (invalid) {
-        toast.error("Please select valid students for all slots.", {
-          duration: 2000,
-        });
-        return;
-      }
-    }
+  if (invalid) {
+    toast.error(
+      isEnigma
+        ? "All rows must have a valid student, year, score and time."
+        : "Please select valid students for all slots.",
+      { duration: 2500 }
+    );
+    return;
+  }
 
-    let toSave = [...selected];
+  // ---------- PREPARE DATA ----------
+  let toSave = [...selected];
 
-    if (isEnigma) {
-      toSave = toSave
-        .map((s) => ({
-          ...s,
-          score: Number(s.score),
-          time: Number(s.time),
-        }))
-        .sort((a, b) => {
-          if (b.score !== a.score) return b.score - a.score;
-          return a.time - b.time;
-        });
-    }
+  if (isEnigma) {
+    toSave = toSave
+      .map((s) => ({
+        ...s,
+        score: Number(s.score),
+        time: Number(s.time),
+      }))
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.time - b.time;
+      });
+  }
 
-    try {
-      for (const r of toSave) {
-        await fetch("https://web-portal-760h.onrender.com/api/leaderboard", {
+  try {
+    // ---------- 🔥 STEP 1: DELETE OLD LEADERBOARD ----------
+    await fetch(`https://web-portal-760h.onrender.com/api/leaderboard/${category}`, {
+      method: "DELETE",
+    });
+
+    // ---------- 🔥 STEP 2: INSERT NEW LEADERBOARD ----------
+    await Promise.all(
+      toSave.map((r) =>
+        fetch("https://web-portal-760h.onrender.com/api/leaderboard", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             category,
             name: r.name,
             roll: r.roll,
-            year: r.year,
+            year: r.year,   // already normalized
             score: r.score,
             time: r.time,
           }),
-        });
-      }
+        })
+      )
+    );
 
-      setLastSavedAt(new Date().toISOString());
-      toast.success(`${title} saved successfully!`);
-      setSelected(toSave);
-    } catch (err) {
-      console.error("save failed", err);
-      toast.error("Save failed. See console.");
-    }
-  };
+    setSelected(toSave);
+    setLastSavedAt(new Date().toISOString());
+    toast.success(`${title} saved successfully!`);
+  } catch (err) {
+    console.error("save failed", err);
+    toast.error("Save failed. See console.");
+  }
+};
 
   const rowGrid = isEnigma ? "2fr 0.8fr 0.8fr" : "1fr";
 
@@ -237,7 +269,7 @@ export default function LeaderboardBox({ title, count }) {
                       onMouseDown={() => handleSelect(s)}
                       style={styles.suggestion}
                     >
-                      {s.name} — {s.roll}
+                      {s.name} — Year {s.year}
                     </div>
                   ))}
                 </div>

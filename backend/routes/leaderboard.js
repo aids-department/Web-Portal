@@ -18,7 +18,7 @@ router.get("/:category", async (req, res) => {
   }
 });
 
-// ADD / UPDATE leaderboard row (admin)
+// ADD / UPDATE leaderboard row (admin) — UPSERT ✅
 router.post("/", async (req, res) => {
   try {
     const { category, name, roll, year, score, time } = req.body;
@@ -33,6 +33,20 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save leaderboard row" });
+  }
+});
+
+// DELETE leaderboard by category (ADMIN)
+router.delete("/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    await LeaderboardRow.deleteMany({ category }); // ✅ FIX
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Delete leaderboard failed:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
