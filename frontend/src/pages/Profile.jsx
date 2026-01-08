@@ -41,13 +41,16 @@ export default function Profile() {
 
   if (loading) return <p>Loading profile…</p>;
   if (!profile) return <p>No profile found.</p>;
-
   return (
     <div className="profile-page-container">
       {/* Profile Info */}
       <div className="profile-info-card">
         <div className="profile-icon-large">
-          <img src="user-icon.png" alt="Profile" />
+          <img
+            src={profile.profileImage?.url || "/user-icon.jpg"}
+            alt="Profile"
+            className="profile-image-circle"
+          />
         </div>
         <h2>{profile.name}</h2>
         <p>{profile.year}</p>
@@ -77,6 +80,15 @@ export default function Profile() {
             <div key={i} className="achievement-item">
               <h4>{a.title}</h4>
               <p>{a.description}</p>
+              {a.certificate?.url && (
+                <a
+                  href={a.certificate.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Certificate (PDF)
+                </a>
+              )}
             </div>
           ))
         )}

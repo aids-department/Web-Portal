@@ -154,10 +154,6 @@ label {
     justify-content: center;
     overflow: hidden;
 }
-.profile-icon-edit img {
-    width: 60%;
-    height: 60%;
-}
 
 .profile-fields input {
     display: block;
@@ -375,20 +371,6 @@ label {
     gap: 15px;
 }
 
-.current-image-preview {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background-color: #f0f0f0;
-    border: 3px dashed #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.9em;
-    color: #888;
-    margin-bottom: 20px;
-}
-
 .back-btn {
     background: none;
     border: none;
@@ -521,8 +503,7 @@ body {
     justify-content: center;
 }
 .profile-icon-large img {
-    width: 60%;
-    height: 60%;
+    border-radius: 50%;
 }
 
 .profile-info-card h2 {
@@ -621,31 +602,6 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-
-/* Makes the profile icon clickable and changes cursor */
-.profile-icon-edit.clickable-icon {
-    cursor: pointer;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Subtle blue highlight on interaction */
-    transition: transform 0.1s;
-}
-.profile-icon-edit.clickable-icon:hover {
-    transform: scale(1.02);
-}
-
-.profile-icon-edit {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-.profile-icon-edit img {
-    width: 60%;
-    height: 60%;
 }
 
 .profile-fields input {

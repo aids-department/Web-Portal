@@ -22,6 +22,17 @@ const AchievementSchema = new mongoose.Schema(
       maxlength: 1000,
     },
 
+    certificate: {
+      url: {
+        type: String,
+        default: null,
+      },
+      publicId: {
+        type: String,
+        default: null,
+      },
+    },
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

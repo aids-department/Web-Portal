@@ -1,8 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const Achievement = require("../models/Achievement");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 
-router.post("/", async (req, res) => {
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") cb(null, true);
+    else cb(new Error("Only PDF files allowed"));
+  },
+});
+
+
+router.post("/", upload.single("certificate"), async (req, res) => {
+  let uploadedCert = null;
+
   try {
     const { userId, title, description } = req.body;
 
@@ -10,11 +25,36 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // ----- Upload certificate to Cloudinary (if exists) -----
+    if (req.file) {
+      const originalName = req.file.originalname
+        .replace(/\s+/g, "_")
+        .replace(/\.pdf$/i, "");
+
+      const publicId = `cert_${originalName}_${Date.now()}.pdf`;
+
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "certificates",
+        resource_type: "raw",
+        public_id: publicId,
+        use_filename: true,
+        unique_filename: false,
+      });
+
+      uploadedCert = {
+        url: result.secure_url,
+        publicId: result.public_id,
+      };
+
+      fs.unlinkSync(req.file.path); // cleanup temp file
+    }
+
     const achievement = new Achievement({
       userId,
       title,
       description,
       status: "pending",
+      certificate: uploadedCert,
     });
 
     await achievement.save();
@@ -110,10 +150,26 @@ router.get("/approved/recent", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const achievement = await Achievement.findById(req.params.id);
+
+    if (!achievement) {
+      return res.status(404).json({ error: "Achievement not found" });
+    }
+
+    // 🔥 Delete certificate from Cloudinary (if exists)
+    if (achievement.certificate?.publicId) {
+      await cloudinary.uploader.destroy(
+        achievement.certificate.publicId,
+        { resource_type: "raw" } // IMPORTANT for PDFs
+      );
+    }
+
+    // Delete achievement from DB
     await Achievement.findByIdAndDelete(req.params.id);
+
     res.json({ message: "Achievement deleted" });
   } catch (err) {
-    console.error(err);
+    console.error("Achievement delete failed:", err);
     res.status(500).json({ error: "Delete failed" });
   }
 });

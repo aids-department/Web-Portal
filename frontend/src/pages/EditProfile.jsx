@@ -15,20 +15,102 @@ const RemovableSkillTag = ({ skill, onRemove }) => (
 );
 
 // Component for Profile Picture Editing
-const ProfilePicturePage = ({ onBackToEditForm }) => (
+const ProfilePicturePage = ({ onBackToEditForm }) => {
+  const [file, setFile] = useState(null);
+  const [currentImage, setCurrentImage] = useState(null);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
+
+  /* --- LOAD CURRENT PROFILE IMAGE --- */
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.profileImage?.url) {
+          setCurrentImage(data.profileImage.url);
+        }
+      })
+      .catch((err) => console.error("Load profile image error", err));
+  }, [userId]);
+
+  /* --- UPLOAD NEW IMAGE --- */
+  const handleUpload = async () => {
+    if (!file) return alert("Please select an image");
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(
+        `https://web-portal-760h.onrender.com/api/profile/${userId}/image`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const uploaded = await res.json();
+      setCurrentImage(uploaded.url); // update preview instantly
+      setFile(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload profile image");
+    }
+  };
+
+  return (
     <div className="profile-picture-page">
-        <h3>Edit Profile Picture</h3>
-        <p>This is the dedicated page for uploading and managing your profile image.</p>
-        <div className="current-image-preview">Current Picture</div>
-        <input type="file" accept="image/*" />
-        <button className="submit-profile-btn" style={{ maxWidth: "200px", marginTop: "20px" }}>
-            Upload & Save
-        </button>
-        <button className="back-btn" onClick={onBackToEditForm}>
-            ← Back to Edit Profile
-        </button>
+        <style>{`
+        .profile-image-preview {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            }
+
+        .profile-image-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            }
+        `}</style>
+      <h3>Edit Profile Picture</h3>
+
+      {/* --- CURRENT IMAGE PREVIEW --- */}
+      <div className="profile-image-preview">
+        <img
+          src={currentImage || "user-icon.jpg"}
+          alt="Profile"
+          className="profile-image-circle"
+        />
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+
+      <button
+        className="submit-profile-btn"
+        style={{ maxWidth: "200px", marginTop: "20px" }}
+        onClick={handleUpload}
+      >
+        Upload & Save
+      </button>
+
+      <button className="back-btn" onClick={onBackToEditForm}>
+        ← Back to Edit Profile
+      </button>
     </div>
-);
+  );
+};
 
 export default function EditProfile() {
     const [name, setName] = useState("");
@@ -39,11 +121,13 @@ export default function EditProfile() {
     const [achievements, setAchievements] = useState([]);
     const [isProfileUpdated, setIsProfileUpdated] = useState(false);
     const [isEditingPicture, setIsEditingPicture] = useState(false);
+    const [profileImage, setProfileImage] = useState(null);
 
     /* --- MODAL STATE --- */
     const [showAddModal, setShowAddModal] = useState(false);
     const [modalTitle, setModalTitle] = useState("");
     const [modalDesc, setModalDesc] = useState("");
+    const [certificateFile, setCertificateFile] = useState(null);
 
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?.id;
@@ -62,6 +146,7 @@ export default function EditProfile() {
                 setYear(data.year || "");
                 setBio(data.bio || "");
                 setSkills(data.skills || []);
+                setProfileImage(data.profileImage || null);
             })
             .catch((err) => console.error("Load profile error", err));
     }, [userId]);
@@ -119,16 +204,24 @@ export default function EditProfile() {
 
     /* --- MODAL SAVE LOGIC --- */
     const handleSaveNewAchievement = () => {
-        if (modalTitle && modalDesc) {
-            setAchievements([
-                ...achievements,
-                { title: modalTitle, description: modalDesc, localStatus: "new" },
-            ]);
-            setModalTitle("");
-            setModalDesc("");
-            setShowAddModal(false);
-        }
+        if (!modalTitle) return;
+
+        setAchievements([
+            ...achievements,
+            {
+            title: modalTitle,
+            description: modalDesc,
+            localStatus: "new",
+            certificateFile, // store file locally
+            },
+        ]);
+
+        setModalTitle("");
+        setModalDesc("");
+        setCertificateFile(null);
+        setShowAddModal(false);
     };
+
 
     /* ---------------- SAVE PROFILE ---------------- */
     const handleSubmit = async () => {
@@ -143,11 +236,28 @@ export default function EditProfile() {
 
             for (const a of achievements) {
                 if (a.markedForDeletion || (a.localStatus !== "new" && a.localStatus !== "rejected")) continue;
-                await fetch("https://web-portal-760h.onrender.com/api/achievements", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ userId, title: a.title, description: a.description }),
-                });
+                if (a.certificateFile) {
+                    const formData = new FormData();
+                    formData.append("userId", userId);
+                    formData.append("title", a.title);
+                    formData.append("description", a.description);
+                    formData.append("certificate", a.certificateFile);
+
+                    await fetch("https://web-portal-760h.onrender.com/api/achievements", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    } else {
+                    await fetch("https://web-portal-760h.onrender.com/api/achievements", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                        userId,
+                        title: a.title,
+                        description: a.description,
+                        }),
+                    });
+                }
                 if (a.localStatus === "rejected" && a._id) {
                     await fetch(`https://web-portal-760h.onrender.com/api/achievements/${a._id}`, { method: "DELETE" });
                 }
@@ -251,14 +361,27 @@ export default function EditProfile() {
                     cursor: pointer;
                     font-weight: 600;
                 }
+                .profile-image-preview {
+                    display: flex;
+                    justify-content: center;
+                    margin: 20px 0;
+                    }
+                .profile-image-circle {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #ddd;
+                    }
             `}</style>
 
             <h2 className="edit-title">Edit Profile</h2>
             <p className="edit-subtitle">Keep your profile updated</p>
 
-            <div className="edit-card profile-info-card-edit">
+            <div className="edit-card profile-info-card-edit profile-image-preview">
                 <div className="profile-icon-edit clickable-icon" onClick={() => setIsEditingPicture(true)} title="Click to edit profile picture">
-                    <img src="user-icon.png" alt="Profile" />
+                    <img src={profileImage?.url || "user-icon.jpg"} alt="Profile" className="profile-image-circle"/>
+
                 </div>
                 <div className="profile-fields">
                     <input type="text" className="name-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name" />
@@ -320,6 +443,14 @@ export default function EditProfile() {
                                 rows="4"
                                 value={modalDesc}
                                 onChange={(e) => setModalDesc(e.target.value)}
+                            />
+                        </div>
+                        <div className="modal-field">
+                            <label>Certificate (PDF – optional)</label>
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => setCertificateFile(e.target.files[0])}
                             />
                         </div>
                         <div className="modal-footer">

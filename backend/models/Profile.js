@@ -12,7 +12,10 @@ const ProfileSchema = new mongoose.Schema(
     year: String,
     bio: String,
     skills: [String],
-    profileImage: String,
+    profileImage: {
+      url: String,
+      publicId: String,
+    },
   },
   { timestamps: true }
 );
