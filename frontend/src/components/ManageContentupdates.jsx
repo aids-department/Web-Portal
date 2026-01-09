@@ -10,7 +10,7 @@ export default function UpdateContent() {
     // Fetch existing updates on component load
     const fetchUpdates = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/updates");
+            const res = await axios.get("https://web-portal-760h.onrender.com/api/updates");
             setUpdates(res.data);
         } catch (err) {
             console.error("Failed to fetch updates:", err);
@@ -25,7 +25,7 @@ export default function UpdateContent() {
         e.preventDefault();
         try {
             // Post to the dedicated updates server
-            await axios.post("http://localhost:5000/api/updates", { title: updateText });
+            await axios.post("https://web-portal-760h.onrender.com/api/updates", { title: updateText });
             toast.success("Dashboard update published!");
             setUpdateText("");
             fetchUpdates(); // Refresh the list
@@ -39,7 +39,7 @@ export default function UpdateContent() {
         if (window.confirm("Are you sure you want to delete this update?")) {
             try {
                 // You will need to add this DELETE route to your recent_updates_server.js
-                await axios.delete(`http://localhost:5000/api/updates/${id}`);
+                await axios.delete(`https://web-portal-760h.onrender.com/api/updates/${id}`);
                 toast.success("Update deleted");
                 fetchUpdates(); // Refresh the list
             } catch (err) {

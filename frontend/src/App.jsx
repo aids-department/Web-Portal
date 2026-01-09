@@ -41,6 +41,8 @@ import { Toaster } from "react-hot-toast";
 import UserLeaderboards from "./pages/UserLeaderboards";
 import AdminAchievements from "./pages/AdminAchievements";
 import UserAchievements from "./pages/UserAchievements";
+import AdminLogin from "./pages/AdminLogin";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 import "./style.css";
 
@@ -81,7 +83,7 @@ function DashboardPage() {
     useEffect(() => {
         const fetchUpdates = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/updates");
+                const res = await axios.get("https://web-portal-760h.onrender.com/api/updates");
                 setUpdates(res.data);
             } catch (err) {
                 console.error("Failed to fetch updates:", err);
@@ -278,40 +280,62 @@ function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
 // ============================================
 function AdminLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 font-sans">
       {/* ADMIN NAVBAR */}
-      <nav className="bg-gray-900 text-white p-4 shadow-md">
-        <div className="max-w-7xl mx-auto flex gap-4">
-          <a
-            href="/adminpage"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Manage Events
-          </a>
-
-          <a
-            href="/adminpage/manage-uploads"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Manage QP Uploads
-          </a>
+      <nav className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white p-6 shadow-2xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">Admin Dashboard</h1>
+          <div className="flex flex-wrap gap-3">
             <a
-                href="/adminpage/manage-content-updates"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              href="/adminpage"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-                Recent Updates
+              📅 Manage Events
             </a>
-          <a href="/adminpage/manage-content" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            Manage Content
-          </a>
-
+            <a
+              href="/adminpage/manage-uploads"
+              className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              📁 Manage QP Uploads
+            </a>
+            <a
+              href="/adminpage/manage-content-updates"
+              className="px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              📢 Recent Updates
+            </a>
+            <a 
+              href="/adminpage/manage-content" 
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              ✏️ Manage Content
+            </a>
+            <a 
+              href="/adminpage/leaderboard" 
+              className="px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              🏆 Manage Leaderboard
+            </a>
+            <a 
+              href="/adminpage/achievements" 
+              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              🎖️ Manage Achievements
+            </a>
+          </div>
         </div>
       </nav>
 
       {/* ADMIN CONTENT */}
-      <main className="p-8 bg-white">
+      <main className="p-8">
         <div className="max-w-7xl mx-auto">
-          {children}
+          <div className="relative bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+            <div className="relative z-10">
+              {children}
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -339,6 +363,9 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
+        {/* Admin Login */}
+        <Route path="/admin-login" element={<AdminLogin />} />
+
         {/* 
           ============================================
           ADMIN ROUTES - Separate Layout
@@ -347,35 +374,63 @@ export default function App() {
         <Route
           path="/adminpage"
           element={
-            <AdminLayout>
-              <EventsAdminPage />
-            </AdminLayout>
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <EventsAdminPage />
+              </AdminLayout>
+            </AdminProtectedRoute>
           }
         />
         <Route
           path="/adminpage/manage-uploads"
           element={
-            <AdminLayout>
-              <ManageUploads />
-            </AdminLayout>
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <ManageUploads />
+              </AdminLayout>
+            </AdminProtectedRoute>
           }
         />
         <Route
           path="/adminpage/manage-content"
           element={
-            <AdminLayout>
-              <ManageContent />
-            </AdminLayout>
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <ManageContent />
+              </AdminLayout>
+            </AdminProtectedRoute>
           }
         />
           <Route
               path="/adminpage/manage-content-updates"
               element={
+                <AdminProtectedRoute>
                   <AdminLayout>
                       <UpdateContent />
                   </AdminLayout>
+                </AdminProtectedRoute>
               }
           />
+        <Route
+          path="/adminpage/leaderboard"
+          element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminLeaderboards />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          }
+        />
+        <Route
+          path="/adminpage/achievements"
+          element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminAchievements />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          }
+        />
         {/* 
           ============================================
           MAIN APPLICATION ROUTES
@@ -563,23 +618,7 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/admin/leaderboard"
-          element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
-              <AdminLeaderboards />
-            </MainLayout>
-          }
-        />
 
-        <Route
-          path="/admin/achievements"
-          element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
-              <AdminAchievements />
-            </MainLayout>
-          }
-        />
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
