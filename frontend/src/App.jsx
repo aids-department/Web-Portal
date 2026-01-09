@@ -1,12 +1,12 @@
-
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Users, BookOpen, GraduationCap, FlaskConical } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
+import BrickBreakerGame from "./components/BrickBreakerGame";
 
 // Pages from App 1
 import Codenigma from "./pages/Codenigma";
@@ -219,13 +219,21 @@ function DashboardPage() {
 function ConnectPage() {
   return (
     <div className="relative bg-gradient-to-br from-purple-50 via-white to-pink-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-      {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
 
       <div className="relative z-10">
         <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Connect</h2>
-        <p className="text-gray-600">Connect content coming soon...</p>
+        <div className="text-center mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800 font-medium">🚧 Connect features are coming soon!</p>
+            <p className="text-blue-600 text-sm mt-1">We're working on exciting ways to help you connect with peers and faculty.</p>
+          </div>
+        </div>
+        <div className="text-center mb-4">
+          <p className="text-gray-600 text-sm">Meanwhile, enjoy a quick game to pass the time:</p>
+        </div>
+        <BrickBreakerGame />
       </div>
     </div>
   );
@@ -240,7 +248,8 @@ function ProjectsPage() {
 
       <div className="relative z-10">
         <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Projects</h2>
-        <p className="text-gray-600">Projects content coming soon...</p>
+        <p className="text-gray-600 mb-4">Projects content coming soon...</p>
+        <BrickBreakerGame />
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export default function LeaderboardBox({ title, count }) {
     title.toLowerCase().includes("enigma") &&
     !title.toLowerCase().includes("codenigma");
 
-  /* ---------------- LOAD DATA (MINIMAL CHANGE) ---------------- */
+  /* ---------------- LOAD DATA ---------------- */
   useEffect(() => {
     let mounted = true;
 
@@ -68,57 +68,56 @@ export default function LeaderboardBox({ title, count }) {
     };
   }, [category, count]);
 
-  /* ---------------- TYPING (UNCHANGED) ---------------- */
-  const handleTyping = async (index, value) => {
-    setActiveIndex(index);
-
-    if (!value.trim()) {
-      setSuggestions([]);
-    } else {
-      try {
-        const res = await fetch(
-          `https://web-portal-760h.onrender.com/api/profile?q=${value}`
-        );
-        const profiles = await res.json();
-
-        const filtered = profiles.filter((p) => {
-          const alreadySelected = selected.some(
-            (sel, idx) => idx !== index && sel.roll === p.userId
-          );
-          return !alreadySelected;
-        });
-
-        setSuggestions(
-          filtered.map((p) => ({
-            name: p.name,
-            roll: p.userId, // IMPORTANT: maps to existing logic
-            year: p.year,
-          }))
-        );
-      } catch (err) {
-        console.error("profile search failed", err);
-        setSuggestions([]);
-      }
-    }
-
+  /* ---------------- TYPING ---------------- */
+  const handleTyping = (index, value) => {
     const copy = [...selected];
     copy[index] = { ...copy[index], name: value };
     setSelected(copy);
+
+    if (value.length >= 2) {
+      searchProfiles(value, index);
+    } else {
+      setSuggestions([]);
+    }
   };
 
+  const searchProfiles = async (query, index) => {
+    try {
+      const res = await fetch(
+        `https://web-portal-760h.onrender.com/api/profile?q=${query}`
+      );
+      const profiles = await res.json();
 
-  /* ---------------- SELECT (UNCHANGED) ---------------- */
-  const handleSelect = (student) => {
-    if (activeIndex === null) return;
+      const filtered = profiles.filter((p) => {
+        const alreadySelected = selected.some(
+          (sel, idx) => idx !== index && sel.roll === p.userId
+        );
+        return !alreadySelected;
+      });
 
+      setSuggestions(
+        filtered.map((p) => ({
+          name: p.name,
+          roll: p.userId,
+          year: p.year,
+        }))
+      );
+    } catch (err) {
+      console.error("profile search failed", err);
+      setSuggestions([]);
+    }
+  };
+
+  /* ---------------- SELECT ---------------- */
+  const handleSelect = (student, index) => {
     const normalizeYear = (year) => {
       const match = String(year).match(/\d+/);
       return match ? Number(match[0]) : null;
     };
 
     const updated = [...selected];
-    updated[activeIndex] = {
-      ...updated[activeIndex],
+    updated[index] = {
+      ...updated[index],
       name: student.name,
       roll: student.roll,
       year: normalizeYear(student.year),
@@ -129,108 +128,85 @@ export default function LeaderboardBox({ title, count }) {
     setActiveIndex(null);
   };
 
-  /* ---------------- BLUR CLEAR (UNCHANGED) ---------------- */
-  const handleBlurClear = (index) => {
-    setTimeout(() => {
-      const typed = selected[index];
-
-      if (!typed.roll && typed.name.trim() !== "") {
-        const copy = [...selected];
-        copy[index] = { name: "", roll: "", year: "", score: "", time: "" };
-        setSelected(copy);
-        toast.error("Please select a valid student from the list", {
-          duration: 2000,
-        });
-      }
-
-      setSuggestions([]);
-    }, 180);
-  };
-
-
-  /* ---------------- FIELD CHANGE (UNCHANGED) ---------------- */
+  /* ---------------- FIELD CHANGE ---------------- */
   const handleFieldChange = (index, field, value) => {
     const copy = [...selected];
     copy[index] = { ...copy[index], [field]: value };
     setSelected(copy);
   };
 
-  /* ---------------- SUBMIT (MINIMAL CHANGE) ---------------- */
+  /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async () => {
-  // ---------- VALIDATION ----------
-  const invalid = isEnigma
-    ? selected.some(
-        (s) =>
-          !s.name ||
-          !s.roll ||
-          !Number.isInteger(s.year) ||
-          s.score === "" ||
-          s.time === "" ||
-          Number.isNaN(Number(s.score)) ||
-          Number.isNaN(Number(s.time))
-      )
-    : selected.some(
-        (s) => !s.name || !s.roll || !Number.isInteger(s.year)
+    const invalid = isEnigma
+      ? selected.some(
+          (s) =>
+            !s.name ||
+            !s.roll ||
+            !Number.isInteger(s.year) ||
+            s.score === "" ||
+            s.time === "" ||
+            Number.isNaN(Number(s.score)) ||
+            Number.isNaN(Number(s.time))
+        )
+      : selected.some(
+          (s) => !s.name || !s.roll || !Number.isInteger(s.year)
+        );
+
+    if (invalid) {
+      toast.error(
+        isEnigma
+          ? "All rows must have a valid student, year, score and time."
+          : "Please select valid students for all slots.",
+        { duration: 2500 }
+      );
+      return;
+    }
+
+    let toSave = [...selected];
+
+    if (isEnigma) {
+      toSave = toSave
+        .map((s) => ({
+          ...s,
+          score: Number(s.score),
+          time: Number(s.time),
+        }))
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.time - b.time;
+        });
+    }
+
+    try {
+      await fetch(`https://web-portal-760h.onrender.com/api/leaderboard/${category}`, {
+        method: "DELETE",
+      });
+
+      await Promise.all(
+        toSave.map((r) =>
+          fetch("https://web-portal-760h.onrender.com/api/leaderboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category,
+              name: r.name,
+              roll: r.roll,
+              year: r.year,
+              score: r.score,
+              time: r.time,
+            }),
+          })
+        )
       );
 
-  if (invalid) {
-    toast.error(
-      isEnigma
-        ? "All rows must have a valid student, year, score and time."
-        : "Please select valid students for all slots.",
-      { duration: 2500 }
-    );
-    return;
-  }
-
-  // ---------- PREPARE DATA ----------
-  let toSave = [...selected];
-
-  if (isEnigma) {
-    toSave = toSave
-      .map((s) => ({
-        ...s,
-        score: Number(s.score),
-        time: Number(s.time),
-      }))
-      .sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return a.time - b.time;
-      });
-  }
-
-  try {
-    // ---------- 🔥 STEP 1: DELETE OLD LEADERBOARD ----------
-    await fetch(`https://web-portal-760h.onrender.com/api/leaderboard/${category}`, {
-      method: "DELETE",
-    });
-
-    // ---------- 🔥 STEP 2: INSERT NEW LEADERBOARD ----------
-    await Promise.all(
-      toSave.map((r) =>
-        fetch("https://web-portal-760h.onrender.com/api/leaderboard", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            category,
-            name: r.name,
-            roll: r.roll,
-            year: r.year,   // already normalized
-            score: r.score,
-            time: r.time,
-          }),
-        })
-      )
-    );
-
-    setSelected(toSave);
-    setLastSavedAt(new Date().toISOString());
-    toast.success(`${title} saved successfully!`);
-  } catch (err) {
-    console.error("save failed", err);
-    toast.error("Save failed. See console.");
-  }
-};
+      setSelected(toSave);
+      setLastSavedAt(new Date().toISOString());
+      toast.success(`${title} saved successfully!`);
+    } catch (err) {
+      console.error("save failed", err);
+      toast.error("Save failed. See console.");
+    }
+  };
 
   const rowGrid = isEnigma ? "2fr 0.8fr 0.8fr" : "1fr";
 
@@ -253,11 +229,13 @@ export default function LeaderboardBox({ title, count }) {
                 placeholder="Select student"
                 value={student.name}
                 onChange={(e) => handleTyping(index, e.target.value)}
-                onFocus={() => {
-                  setActiveIndex(index);
-                  setSuggestions([]);
+                onFocus={() => setActiveIndex(index)}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setSuggestions([]);
+                    setActiveIndex(null);
+                  }, 200);
                 }}
-                onBlur={() => handleBlurClear(index)}
                 style={styles.input}
               />
 
@@ -266,7 +244,7 @@ export default function LeaderboardBox({ title, count }) {
                   {suggestions.map((s) => (
                     <div
                       key={s.roll}
-                      onMouseDown={() => handleSelect(s)}
+                      onMouseDown={() => handleSelect(s, index)}
                       style={styles.suggestion}
                     >
                       {s.name} — Year {s.year}
@@ -322,7 +300,6 @@ export default function LeaderboardBox({ title, count }) {
   );
 }
 
-/* ---------------- STYLES (100% UNCHANGED) ---------------- */
 const styles = {
   container: {
     width: "30%",
@@ -342,7 +319,7 @@ const styles = {
     boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
   },
   headerRow: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  heading: { margin: 0, fontSize: "18px", fontWeight: 600 , marginBottom: 20},
+  heading: { margin: 0, fontSize: "18px", fontWeight: 600, marginBottom: 20 },
   loading: { fontSize: 12, color: "#666" },
   row: {
     display: "grid",
@@ -357,32 +334,35 @@ const styles = {
     padding: "8px 10px",
     fontSize: 14,
     boxSizing: "border-box",
-    borderRadius: 4
+    borderRadius: 4,
+    border: "1px solid #ccc",
   },
   inputNumber: {
     width: "100%",
     padding: "8px 10px",
     fontSize: 14,
     boxSizing: "border-box",
-    borderRadius: 4
+    borderRadius: 4,
+    border: "1px solid #ccc",
   },
   dropdown: {
     position: "absolute",
     background: "#fff",
     border: "1px solid #ddd",
     width: "100%",
-    minWidth: "220px",
     maxHeight: "200px",
     overflowY: "auto",
     borderRadius: 6,
-    zIndex: 40,
+    zIndex: 1000,
     boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-    marginTop: 4,
+    top: "100%",
+    left: 0,
   },
   suggestion: {
     padding: "8px 10px",
     cursor: "pointer",
     borderBottom: "1px solid #f0f0f0",
+    fontSize: 14,
   },
   footer: {
     display: "flex",
