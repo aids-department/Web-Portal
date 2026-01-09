@@ -25,6 +25,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EventsAdminPage from "./components/EventsAdminPage";
+import AdminDashboard from "./components/AdminDashboard";
+import ProfessionalAdminLayout from "./components/ProfessionalAdminLayout";
 import ManageUploads from "./components/ManageUploads";
 import ManageContent from "./components/ManageContent"; 
 import UpdateContent from "./components/ManageContentupdates.jsx";
@@ -280,61 +282,117 @@ function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
 // ============================================
 function AdminLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 font-sans relative overflow-hidden">
+      {/* Professional background pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(59,130,246,0.08)_1px,transparent_0)] bg-[length:24px_24px]"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/20 to-transparent rounded-full -translate-y-48 translate-x-48"></div>
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-100/20 to-transparent rounded-full translate-y-40 -translate-x-40"></div>
       {/* ADMIN NAVBAR */}
-      <nav className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white p-6 shadow-2xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">Admin Dashboard</h1>
-          <div className="flex flex-wrap gap-3">
+      <nav className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white shadow-2xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                  Admin Portal
+                </h1>
+                <p className="text-blue-200 text-xs">Management Dashboard</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => {
+                localStorage.removeItem('adminAuth');
+                localStorage.removeItem('adminData');
+                window.location.href = '/admin-login';
+              }}
+              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg transition-all duration-300 text-red-200 hover:text-white text-sm"
+            >
+              Logout
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <a
               href="/adminpage"
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
             >
-              📅 Manage Events
+              <div className="w-8 h-8 bg-gradient-to-r from-indigo-400 to-indigo-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">📊</span>
+              </div>
+              <span className="text-xs font-medium text-center">Dashboard</span>
             </a>
+            
+            <a
+              href="/adminpage/events"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
+            >
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">📅</span>
+              </div>
+              <span className="text-xs font-medium text-center">Events</span>
+            </a>
+            
             <a
               href="/adminpage/manage-uploads"
-              className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
             >
-              📁 Manage QP Uploads
+              <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">📁</span>
+              </div>
+              <span className="text-xs font-medium text-center">Uploads</span>
             </a>
+            
             <a
               href="/adminpage/manage-content-updates"
-              className="px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
             >
-              📢 Recent Updates
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">📢</span>
+              </div>
+              <span className="text-xs font-medium text-center">Updates</span>
             </a>
+            
             <a 
               href="/adminpage/manage-content" 
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
             >
-              ✏️ Manage Content
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">✏️</span>
+              </div>
+              <span className="text-xs font-medium text-center">Content</span>
             </a>
+            
             <a 
               href="/adminpage/leaderboard" 
-              className="px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
             >
-              🏆 Manage Leaderboard
+              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">🏆</span>
+              </div>
+              <span className="text-xs font-medium text-center">Leaderboard</span>
             </a>
+            
             <a 
               href="/adminpage/achievements" 
-              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20 md:col-span-3 lg:col-span-1"
             >
-              🎖️ Manage Achievements
+              <div className="w-8 h-8 bg-gradient-to-r from-red-400 to-red-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span className="text-white text-sm">🎖️</span>
+              </div>
+              <span className="text-xs font-medium text-center">Achievements</span>
             </a>
           </div>
         </div>
       </nav>
 
       {/* ADMIN CONTENT */}
-      <main className="p-8">
+      <main className="relative z-10 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="relative bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
-            <div className="relative z-10">
-              {children}
-            </div>
+          <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 p-8 min-h-[calc(100vh-200px)]">
+            {children}
           </div>
         </div>
       </main>
@@ -375,9 +433,19 @@ export default function App() {
           path="/adminpage"
           element={
             <AdminProtectedRoute>
-              <AdminLayout>
+              <ProfessionalAdminLayout>
+                <AdminDashboard />
+              </ProfessionalAdminLayout>
+            </AdminProtectedRoute>
+          }
+        />
+        <Route
+          path="/adminpage/events"
+          element={
+            <AdminProtectedRoute>
+              <ProfessionalAdminLayout>
                 <EventsAdminPage />
-              </AdminLayout>
+              </ProfessionalAdminLayout>
             </AdminProtectedRoute>
           }
         />
@@ -385,9 +453,9 @@ export default function App() {
           path="/adminpage/manage-uploads"
           element={
             <AdminProtectedRoute>
-              <AdminLayout>
+              <ProfessionalAdminLayout>
                 <ManageUploads />
-              </AdminLayout>
+              </ProfessionalAdminLayout>
             </AdminProtectedRoute>
           }
         />
@@ -395,9 +463,9 @@ export default function App() {
           path="/adminpage/manage-content"
           element={
             <AdminProtectedRoute>
-              <AdminLayout>
+              <ProfessionalAdminLayout>
                 <ManageContent />
-              </AdminLayout>
+              </ProfessionalAdminLayout>
             </AdminProtectedRoute>
           }
         />
@@ -405,9 +473,9 @@ export default function App() {
               path="/adminpage/manage-content-updates"
               element={
                 <AdminProtectedRoute>
-                  <AdminLayout>
+                  <ProfessionalAdminLayout>
                       <UpdateContent />
-                  </AdminLayout>
+                  </ProfessionalAdminLayout>
                 </AdminProtectedRoute>
               }
           />
@@ -415,9 +483,9 @@ export default function App() {
           path="/adminpage/leaderboard"
           element={
             <AdminProtectedRoute>
-              <AdminLayout>
+              <ProfessionalAdminLayout>
                 <AdminLeaderboards />
-              </AdminLayout>
+              </ProfessionalAdminLayout>
             </AdminProtectedRoute>
           }
         />
@@ -425,9 +493,9 @@ export default function App() {
           path="/adminpage/achievements"
           element={
             <AdminProtectedRoute>
-              <AdminLayout>
+              <ProfessionalAdminLayout>
                 <AdminAchievements />
-              </AdminLayout>
+              </ProfessionalAdminLayout>
             </AdminProtectedRoute>
           }
         />

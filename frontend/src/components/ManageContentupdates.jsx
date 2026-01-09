@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { Trash2 } from "lucide-react"; // Make sure lucide-react is installed
+import { Trash2, Plus, MessageSquare } from "lucide-react";
 
 export default function UpdateContent() {
     const [updateText, setUpdateText] = useState("");
@@ -49,13 +49,16 @@ export default function UpdateContent() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-8 flex flex-col gap-8">
+        <div className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
             {/* Post Update Form */}
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-3xl font-bold mb-6 text-gray-800 font-cursive">Post Recent Update</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <Plus className="w-5 h-5 text-blue-600" />
+                    <h2 className="text-xl font-bold text-gray-800">Post Recent Update</h2>
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-3">
                     <textarea
-                        className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all min-h-[150px]"
+                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all min-h-[120px]"
                         placeholder="Enter update message (e.g., Results are out!)..."
                         value={updateText}
                         onChange={(e) => setUpdateText(e.target.value)}
@@ -63,7 +66,7 @@ export default function UpdateContent() {
                     />
                     <button
                         type="submit"
-                        className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:opacity-90 transition-all shadow-lg"
+                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 transition-all shadow-md"
                     >
                         Publish Update
                     </button>
@@ -71,14 +74,17 @@ export default function UpdateContent() {
             </div>
 
             {/* Existing Updates List */}
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">Current Updates</h2>
-                <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <MessageSquare className="w-5 h-5 text-gray-600" />
+                    <h2 className="text-lg font-bold text-gray-800">Current Updates</h2>
+                </div>
+                <div className="space-y-3">
                     {updates.length > 0 ? (
                         updates.map((u) => (
-                            <div key={u._id} className="flex justify-between items-center p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
+                            <div key={u._id} className="flex justify-between items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
                                 <div>
-                                    <p className="text-gray-900 font-medium">{u.title}</p>
+                                    <p className="text-gray-900 font-medium text-sm">{u.title}</p>
                                     <p className="text-gray-400 text-xs">ID: {u._id}</p>
                                 </div>
                                 <button
@@ -86,12 +92,12 @@ export default function UpdateContent() {
                                     className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                     title="Delete update"
                                 >
-                                    <Trash2 size={20} />
+                                    <Trash2 size={16} />
                                 </button>
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500 italic text-center">No updates found in database.</p>
+                        <p className="text-gray-500 italic text-center text-sm">No updates found in database.</p>
                     )}
                 </div>
             </div>

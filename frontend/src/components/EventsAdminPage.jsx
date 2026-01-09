@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Calendar, Plus, Clock, MapPin, Users, Trophy, ArrowRight, ArrowLeft, Save, Upload, CheckCircle } from "lucide-react";
 
 export default function EventsAdminPage() {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -214,44 +215,49 @@ export default function EventsAdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-10 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-6 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-10">Events Admin Panel</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Events Admin Panel</h1>
 
         {/* Tabs */}
-        <div className="flex justify-center gap-4 mb-10">
+        <div className="flex justify-center gap-3 mb-6">
           <button
             onClick={() => setActiveTab("upcoming")}
-            className={`px-8 py-3 rounded-xl font-semibold transition-all ${
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
               activeTab === "upcoming"
                 ? "bg-blue-600 text-white shadow-lg"
                 : "bg-white text-gray-700 shadow-md hover:shadow-lg"
             }`}
           >
+            <Plus className="w-4 h-4" />
             Add Upcoming Event
           </button>
           <button
             onClick={() => setActiveTab("past")}
-            className={`px-8 py-3 rounded-xl font-semibold transition-all ${
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
               activeTab === "past"
                 ? "bg-purple-600 text-white shadow-lg"
                 : "bg-white text-gray-700 shadow-md hover:shadow-lg"
             }`}
           >
+            <Trophy className="w-4 h-4" />
             Add Past Event Results
           </button>
         </div>
 
         {/* UPCOMING SECTION */}
         {activeTab === "upcoming" && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-xl shadow-lg p-6">
             {step === "category" ? (
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-800 mb-8">Select Event Category</h2>
+                <div className="flex justify-center mb-4">
+                  <Calendar className="w-12 h-12 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800 mb-6">Select Event Category</h2>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full max-w-md mx-auto p-4 border-2 border-gray-300 rounded-xl text-lg focus:border-blue-500 focus:outline-none"
+                  className="w-full max-w-md mx-auto p-3 border-2 border-gray-300 rounded-lg text-base focus:border-blue-500 focus:outline-none"
                 >
                   <option value="">Choose category...</option>
                   {categories.map(cat => (
@@ -261,61 +267,63 @@ export default function EventsAdminPage() {
                 <button
                   onClick={() => selectedCategory && setStep("form")}
                   disabled={!selectedCategory}
-                  className="mt-8 px-10 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition"
+                  className="mt-6 px-8 py-3 bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition flex items-center gap-2 mx-auto"
                 >
                   Next
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleUpcomingSubmit} className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">
+              <form onSubmit={handleUpcomingSubmit} className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-800 text-center mb-6">
                   {selectedCategory} Details
                 </h2>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <input name="name" placeholder="Event Name *" required className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.name} />
-                  <select name="mode" required className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.mode}>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input name="name" placeholder="Event Name *" required className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.name} />
+                  <select name="mode" required className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.mode}>
                     <option value="">Mode *</option>
                     <option>Online</option><option>Offline</option>
                   </select>
-                  <input name="venue" placeholder="Venue / Platform" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.venue} />
-                  <input name="organizer" placeholder="Organizer" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.organizer} />
-                  <input name="startDate" type="date" required className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.startDate} />
-                  <input name="endDate" type="date" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.endDate} />
-                  <input name="startTime" type="time" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.startTime} />
-                  <input name="endTime" type="time" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.endTime} />
+                  <input name="venue" placeholder="Venue / Platform" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.venue} />
+                  <input name="organizer" placeholder="Organizer" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.organizer} />
+                  <input name="startDate" type="date" required className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.startDate} />
+                  <input name="endDate" type="date" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.endDate} />
+                  <input name="startTime" type="time" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.startTime} />
+                  <input name="endTime" type="time" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.endTime} />
                   <div className="flex flex-col gap-1">
-  <label className="text-sm font-semibold text-gray-700">
+  <label className="text-sm font-medium text-gray-700">
     Registration Deadline
   </label>
   <input
     name="deadlines"
     type="date"
-    className="p-4 border rounded-xl"
+    className="p-3 border rounded-lg"
     onChange={handleEventChange}
     value={eventData.deadlines}
   />
 </div>
 
-                  <input name="registrationLink" placeholder="Registration Link" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.registrationLink} />
-                  <input name="contact" placeholder="Contact Info" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.contact} />
+                  <input name="registrationLink" placeholder="Registration Link" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.registrationLink} />
+                  <input name="contact" placeholder="Contact Info" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.contact} />
                   <div className="col-span-2">
-                    <textarea name="description" placeholder="Description" rows={4} className="w-full p-4 border rounded-xl" onChange={handleEventChange} value={eventData.description}></textarea>
+                    <textarea name="description" placeholder="Description" rows={3} className="w-full p-3 border rounded-lg" onChange={handleEventChange} value={eventData.description}></textarea>
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Event Poster / Image
                     </label>
                     <input 
                       type="file" 
                       name="poster" 
                       accept="image/*" 
-                      className="w-full p-4 border rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
+                      className="w-full p-3 border rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
                       onChange={handleEventChange} 
                     />
                     {eventData.poster && (
-                      <p className="mt-2 text-sm text-green-600">
-                        ✓ Selected: {eventData.poster.name}
+                      <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" />
+                        Selected: {eventData.poster.name}
                       </p>
                     )}
                   </div>
@@ -323,34 +331,45 @@ export default function EventsAdminPage() {
 
                 {/* Category-specific fields */}
                 {hackathonCategories.includes(selectedCategory) && (
-                  <div className="grid md:grid-cols-2 gap-6 mt-6 bg-gray-50 p-6 rounded-xl">
-                    <h3 className="col-span-2 font-bold text-lg text-gray-700">Hackathon Details</h3>
-                    <textarea name="hackProblemStatements" placeholder="Problem Statements" rows={3} className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.hackProblemStatements}></textarea>
-                    <input name="hackTechStack" placeholder="Tech Stack" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.hackTechStack} />
-                    <textarea name="hackJudgingCriteria" placeholder="Judging Criteria" rows={3} className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.hackJudgingCriteria}></textarea>
-                    <input name="hackPrizes" placeholder="Prizes" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.hackPrizes} />
-                    <input name="hackMentors" placeholder="Mentors" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.hackMentors} />
-                    <input name="theme" placeholder="Theme" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.theme} />
-                    <input name="teamSize" placeholder="Team Size" className="p-4 border rounded-xl" onChange={handleEventChange} value={eventData.teamSize} />
-                    <textarea name="hackRules" placeholder="Rules" rows={3} className="col-span-2 p-4 border rounded-xl" onChange={handleEventChange} value={eventData.hackRules}></textarea>
+                  <div className="grid md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-lg">
+                    <h3 className="col-span-2 font-bold text-base text-gray-700">Hackathon Details</h3>
+                    <textarea name="hackProblemStatements" placeholder="Problem Statements" rows={2} className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackProblemStatements}></textarea>
+                    <input name="hackTechStack" placeholder="Tech Stack" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackTechStack} />
+                    <textarea name="hackJudgingCriteria" placeholder="Judging Criteria" rows={2} className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackJudgingCriteria}></textarea>
+                    <input name="hackPrizes" placeholder="Prizes" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackPrizes} />
+                    <input name="hackMentors" placeholder="Mentors" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackMentors} />
+                    <input name="theme" placeholder="Theme" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.theme} />
+                    <input name="teamSize" placeholder="Team Size" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.teamSize} />
+                    <textarea name="hackRules" placeholder="Rules" rows={2} className="col-span-2 p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackRules}></textarea>
                   </div>
                 )}
 
-                <div className="flex justify-between mt-10">
+                <div className="flex justify-between mt-6">
                   <button 
                     type="button" 
                     onClick={() => setStep("category")} 
-                    className="px-8 py-4 bg-gray-500 text-white rounded-xl font-bold"
+                    className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition"
                     disabled={isUploading}
                   >
+                    <ArrowLeft className="w-4 h-4" />
                     Back
                   </button>
                   <button 
                     type="submit" 
-                    className="px-10 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isUploading}
                   >
-                    {isUploading ? "Uploading..." : "Save Upcoming Event"}
+                    {isUploading ? (
+                      <>
+                        <Upload className="w-4 h-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Save Event
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
@@ -360,14 +379,17 @@ export default function EventsAdminPage() {
 
         {/* PAST SECTION - Unchanged */}
         {activeTab === "past" && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-xl shadow-lg p-6">
             {pastStep === "category" ? (
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-800 mb-8">Select Past Event Category</h2>
+                <div className="flex justify-center mb-4">
+                  <Trophy className="w-12 h-12 text-purple-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800 mb-6">Select Past Event Category</h2>
                 <select
                   value={pastSelectedCategory}
                   onChange={(e) => setPastSelectedCategory(e.target.value)}
-                  className="w-full max-w-md mx-auto p-4 border-2 border-gray-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none"
+                  className="w-full max-w-md mx-auto p-3 border-2 border-gray-300 rounded-lg text-base focus:border-purple-500 focus:outline-none"
                 >
                   <option value="">Choose category...</option>
                   {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -375,41 +397,44 @@ export default function EventsAdminPage() {
                 <button
                   onClick={() => pastSelectedCategory && setPastStep("form")}
                   disabled={!pastSelectedCategory}
-                  className="mt-8 px-10 py-4 bg-purple-600 text-white rounded-xl font-bold text-lg disabled:opacity-50 hover:bg-purple-700 transition"
+                  className="mt-6 px-8 py-3 bg-purple-600 text-white rounded-lg font-medium disabled:opacity-50 hover:bg-purple-700 transition flex items-center gap-2 mx-auto"
                 >
                   Next
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <form onSubmit={handlePastSubmit} className="space-y-6">
-                <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+              <form onSubmit={handlePastSubmit} className="space-y-4">
+                <h2 className="text-xl font-bold text-center text-gray-800 mb-6">
                   {pastSelectedCategory} Results
                 </h2>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <input name="eventName" placeholder="Event Name *" required className="p-4 border rounded-xl" onChange={handlePastChange} value={pastData.eventName} />
-                  <input name="date" type="date" required className="p-4 border rounded-xl" onChange={handlePastChange} value={pastData.date} />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input name="eventName" placeholder="Event Name *" required className="p-3 border rounded-lg" onChange={handlePastChange} value={pastData.eventName} />
+                  <input name="date" type="date" required className="p-3 border rounded-lg" onChange={handlePastChange} value={pastData.date} />
                 </div>
 
                 {hackathonCategories.includes(pastSelectedCategory) && (
-                  <div className="bg-orange-50 p-6 rounded-xl space-y-4">
-                    <h3 className="font-bold text-lg text-gray-700">Winners & Results</h3>
-                    <input name="hackWinningTeam" placeholder="Winning Team Name" className="w-full p-4 border rounded-xl" onChange={handlePastChange} value={pastData.hackWinningTeam} />
-                    <input name="hackWinningMembers" placeholder="Winning Team Members" className="w-full p-4 border rounded-xl" onChange={handlePastChange} value={pastData.hackWinningMembers} />
-                    <input name="hackPrizeAmount" placeholder="Prize Amount" className="w-full p-4 border rounded-xl" onChange={handlePastChange} value={pastData.hackPrizeAmount} />
-                    <input name="hackRunnerUp" placeholder="Runner-up Team" className="w-full p-4 border rounded-xl" onChange={handlePastChange} value={pastData.hackRunnerUp} />
-                    <input name="hackBestInnovation" placeholder="Best Innovation Award" className="w-full p-4 border rounded-xl" onChange={handlePastChange} value={pastData.hackBestInnovation} />
+                  <div className="bg-orange-50 p-4 rounded-lg space-y-3">
+                    <h3 className="font-bold text-base text-gray-700">Winners & Results</h3>
+                    <input name="hackWinningTeam" placeholder="Winning Team Name" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackWinningTeam} />
+                    <input name="hackWinningMembers" placeholder="Winning Team Members" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackWinningMembers} />
+                    <input name="hackPrizeAmount" placeholder="Prize Amount" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackPrizeAmount} />
+                    <input name="hackRunnerUp" placeholder="Runner-up Team" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackRunnerUp} />
+                    <input name="hackBestInnovation" placeholder="Best Innovation Award" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackBestInnovation} />
                   </div>
                 )}
 
-                <textarea name="summary" placeholder="Overall Summary / Key Takeaways" rows={5} className="w-full p-4 border rounded-xl" onChange={handlePastChange} value={pastData.summary}></textarea>
+                <textarea name="summary" placeholder="Overall Summary / Key Takeaways" rows={4} className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.summary}></textarea>
 
-                <div className="flex justify-between mt-10">
-                  <button type="button" onClick={() => setPastStep("category")} className="px-8 py-4 bg-gray-500 text-white rounded-xl font-bold">
+                <div className="flex justify-between mt-6">
+                  <button type="button" onClick={() => setPastStep("category")} className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition">
+                    <ArrowLeft className="w-4 h-4" />
                     Back
                   </button>
-                  <button type="submit" className="px-10 py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition">
-                    Save Past Event Results
+                  <button type="submit" className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition">
+                    <CheckCircle className="w-4 h-4" />
+                    Save Results
                   </button>
                 </div>
               </form>
