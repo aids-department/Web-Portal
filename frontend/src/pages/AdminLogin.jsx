@@ -3,15 +3,36 @@ import { useNavigate } from "react-router-dom";
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({ username: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (credentials.username === "admin" && credentials.password === "admin123") {
-      localStorage.setItem("adminAuth", "true");
-      navigate("/adminpage");
-    } else {
-      alert("Invalid credentials");
+    setLoading(true);
+
+    try {
+      const response = await fetch("https://web-portal-760h.onrender.com/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(credentials)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem("adminAuth", "true");
+        localStorage.setItem("adminData", JSON.stringify(data.admin));
+        navigate("/adminpage");
+      } else {
+        alert(data.error || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,9 +73,10 @@ export default function AdminLogin() {
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-lg"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Access Dashboard
+              {loading ? "Authenticating..." : "Access Dashboard"}
             </button>
           </form>
           
