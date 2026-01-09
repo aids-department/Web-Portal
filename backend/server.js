@@ -19,8 +19,16 @@ const alumniRoutes = require("./routes/alumni");
 // Import Models
 const Event = require("./models/Event");
 const User = require("./models/User");
+const Admin = require("./models/Admin");
 const { Post, Comment } = require("./models/Post");
 const QuestionPaper = require("./models/QuestionPaper");
+
+// Updates Schema
+const updateSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+const Update = mongoose.model('RecentUpdate', updateSchema);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -199,6 +207,42 @@ async function createCalendarEvent(payload) {
 
   return response.data;
 }
+
+// ============================================
+// ADMIN AUTHENTICATION ROUTES
+// ============================================
+
+// ADMIN LOGIN
+app.post("/api/admin/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required" });
+    }
+
+    const admin = await Admin.findOne({ username });
+    
+    if (!admin || admin.password !== password) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    console.log("✓ Admin logged in:", admin.username);
+    res.json({
+      success: true,
+      message: "Admin login successful",
+      admin: {
+        id: admin._id,
+        username: admin.username,
+        role: admin.role
+      }
+    });
+
+  } catch (err) {
+    console.error("Admin login error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ============================================
 // AUTHENTICATION ROUTES
@@ -703,13 +747,43 @@ app.delete("/api/qp/:id", async (req, res) => {
 });
 
 // ============================================
+// UPDATES ROUTES
+// ============================================
+
+app.get("/api/updates", async (req, res) => {
+  try {
+    const updates = await Update.find().sort({ createdAt: -1 }).limit(10);
+    res.json(updates);
+  } catch (err) {
+    res.status(500).json({ error: "Fetch failed" });
+  }
+});
+
+app.post("/api/updates", async (req, res) => {
+  try {
+    const newUpdate = new Update({ title: req.body.title });
+    await newUpdate.save();
+    res.status(201).json(newUpdate);
+  } catch (err) {
+    res.status(500).json({ error: "Save failed" });
+  }
+});
+
+app.delete("/api/updates/:id", async (req, res) => {
+  try {
+    await Update.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Delete failed" });
+  }
+});
+
+// ============================================
 // ALUMNI ROUTES
 // ============================================
 app.use("/api/alumni", alumniRoutes);
 
-// ============================================
-// HEALTH CHECK
-// ============================================
+
 app.get("/health", (req, res) => {
   res.json({ message: "Backend is running" });
 });
