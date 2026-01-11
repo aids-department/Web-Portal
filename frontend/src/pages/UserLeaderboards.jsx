@@ -1,62 +1,62 @@
-import React, { useState } from 'react';
-import { EnigmaLeaderboard, GenesisLeaderboard } from '../components/UserLeaderboardBox';
+import React, { useState } from "react";
+import { EnigmaLeaderboard, GenesisLeaderboard } from "../components/UserLeaderboardBox";
 
 function UserLeaderboards() {
-    const [activeLeaderboard, setActiveLeaderboard] = useState('enigma');
-    const [activeEnigmaTab, setActiveEnigmaTab] = useState('first_years');
+  const [activeLeaderboard, setActiveLeaderboard] = useState("enigma");
+  const [activeEnigmaTab, setActiveEnigmaTab] = useState("first_years");
 
-    const renderLeaderboardContent = () => {
-        if (activeLeaderboard === 'enigma') {
-            // Pass the sub-state and setter down to EnigmaLeaderboard
-            return (
-                <EnigmaLeaderboard
-                    activeSubTab={activeEnigmaTab}
-                    setActiveSubTab={setActiveEnigmaTab}
-                />
-            );
-        }
-        return <GenesisLeaderboard />;
-    };
+  return (
+    <div className="min-h-screen relative bg-white p-6 sm:p-8 md:p-12">
 
-    return (
-        <div className="min-h-screen bg-white p-6 sm:p-8 md:p-12">
-            <div className="max-w-7xl mx-auto">
-                <h1 className="text-center text-4xl sm:text-5xl font-bold mb-12 text-gray-900 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Leaderboard</h1>
+      {/* Soft background accents */}
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-100/20 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-100/20 rounded-full blur-3xl"></div>
 
-                <div className="bg-white/10 backdrop-blur-md rounded-3xl shadow-xl border border-white/20 p-8">
-                    <header className="mb-8">
-                        <div className="flex justify-center gap-4">
-                            {/* Main Tabs */}
-                            <button
-                                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                                    activeLeaderboard === 'enigma'
-                                        ? 'bg-blue-600 text-white shadow-lg'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                                onClick={() => setActiveLeaderboard('enigma')}
-                            >
-                                Enigma
-                            </button>
-                            <button
-                                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                                    activeLeaderboard === 'genesis'
-                                        ? 'bg-blue-600 text-white shadow-lg'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                                onClick={() => setActiveLeaderboard('genesis')}
-                            >
-                                Genesis
-                            </button>
-                        </div>
-                    </header>
+      <div className="relative z-10 max-w-7xl mx-auto">
 
-                    <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
-                        {renderLeaderboardContent()}
-                    </div>
-                </div>
-            </div>
+        {/* MAIN GLASS CONTAINER */}
+        <div className="bg-blue-50/60 backdrop-blur-md rounded-3xl shadow-xl border border-gray-200/60 p-8 ">
+
+          {/* HEADER — SUBTLE BLUE SHADE */}
+          <div className="mb-10  px-6 py-8 text-center">
+            <h1 className="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
+              Leaderboard
+            </h1>
+          </div>
+
+          {/* MAIN TABS */}
+          <div className="flex justify-center gap-4 mb-10">
+            {["enigma", "genesis"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveLeaderboard(tab)}
+                className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  activeLeaderboard === tab
+                    ? "bg-white shadow-md text-blue-700 border border-gray-200"
+                    : "bg-white/60 text-gray-600 hover:bg-white hover:text-gray-800 border border-transparent"
+                }`}
+              >
+                {tab === "enigma" ? "Enigma" : "Genesis"}
+              </button>
+            ))}
+          </div>
+
+          {/* CONTENT */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200/60 p-6">
+            {activeLeaderboard === "enigma" ? (
+              <EnigmaLeaderboard
+                activeSubTab={activeEnigmaTab}
+                setActiveSubTab={setActiveEnigmaTab}
+              />
+            ) : (
+              <GenesisLeaderboard />
+            )}
+          </div>
+
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default UserLeaderboards;
