@@ -150,7 +150,7 @@ const GenesisLeaderboard = () => {
   const [hoveredLead, setHoveredLead] = useState(null);
 
   const leaderboardData = [
-    { rank: 1, projectName: "", year: "III", team: "--", lead: "Anirudh S", members: ["Devanidharsan K", "Varsha G", "Archana K M"] },
+    { rank: 1, projectName: "FinBuild", year: "III", team: "The Archons", lead: "Anirudh S", members: ["Devanidharsan K", "Varsha G", "Archana K M"] },
     { rank: 2, projectName: "Atlas Protocol", year: "III", team: "Team Atlas", lead: "Risheekesh K G", members: ["Harikrishna S", "Hariharan V", "Balamurugan M"] },
     { rank: 3, projectName: "Smart Autonomous Trolley", year: "III", team: "CTRL Freaks", lead: "Nija Priya S", members: ["Rithanya S", "Santhiya V", "Yaazhini S"] },
   ];
