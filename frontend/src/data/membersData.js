@@ -1,6 +1,3 @@
-// frontend/src/data/membersData.js
-const dummyProfile = "/assets/member.jpg";
-
 const membersData = [
   // =======================
   // FINAL YEAR (IV)
@@ -12,7 +9,7 @@ const membersData = [
     year: "IV",
     position: "President",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/Adarsh_Shiv_R.jpg",
   },
   {
     id: 2,
@@ -21,7 +18,7 @@ const membersData = [
     year: "IV",
     position: "Vice President",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/Kuhan M.png",
   },
   {
     id: 3,
@@ -30,7 +27,7 @@ const membersData = [
     year: "IV",
     position: "Vice President",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/member.jpg",
   },
   {
     id: 4,
@@ -39,7 +36,7 @@ const membersData = [
     year: "IV",
     position: "Secretary",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/Namrutha_K.jpg",
   },
   {
     id: 5,
@@ -48,7 +45,7 @@ const membersData = [
     year: "IV",
     position: "Treasurer",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/Prithiv_Varma_S_B.jpg",
   },
 
   // =======================
@@ -61,7 +58,7 @@ const membersData = [
     year: "III",
     position: "Joint Secretary",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/member.jpg",
   },
   {
     id: 7,
@@ -70,7 +67,7 @@ const membersData = [
     year: "III",
     position: "Joint Secretary",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/Sri_Harini_K.jpg",
   },
   {
     id: 8,
@@ -79,7 +76,7 @@ const membersData = [
     year: "III",
     position: "Joint Treasurer",
     domain: "Association",
-    image: dummyProfile,
+    image: "/assets/Mohamed_Hisham_M.jpg",
   },
   {
     id: 9,
@@ -88,7 +85,7 @@ const membersData = [
     year: "III",
     position: "Executive",
     domain: "AI Innovate",
-    image: dummyProfile,
+    image: "/assets/Varsha_G.jpg",
   },
   {
     id: 10,
@@ -97,7 +94,7 @@ const membersData = [
     year: "III",
     position: "Executive",
     domain: "Enigma",
-    image: dummyProfile,
+    image: "/assets/Harikrishna.jpg",
   },
   {
     id: 11,
@@ -106,7 +103,7 @@ const membersData = [
     year: "III",
     position: "Executive",
     domain: "Genesys",
-    image: dummyProfile,
+    image: "/assets/Rithanya_S.jpg",
   },
   {
     id: 12,
@@ -115,7 +112,7 @@ const membersData = [
     year: "III",
     position: "Executive",
     domain: "Techlore",
-    image: dummyProfile,
+    image: "/assets/member.jpg",
   },
 
   // =======================
@@ -128,7 +125,7 @@ const membersData = [
     year: "II",
     position: "Co-ordinator",
     domain: "AI Innovate",
-    image: dummyProfile,
+    image: "/assets/Mridula_Sugumar.jpg",
   },
   {
     id: 14,
@@ -137,7 +134,7 @@ const membersData = [
     year: "II",
     position: "Co-ordinator",
     domain: "Enigma",
-    image: dummyProfile,
+    image: "/assets/Karthic_V.jpg",
   },
   {
     id: 15,
@@ -146,7 +143,7 @@ const membersData = [
     year: "II",
     position: "Co-ordinator",
     domain: "Genesys",
-    image: dummyProfile,
+    image: "/assets/Krishna_J.jpg",
   },
   {
     id: 16,
@@ -155,7 +152,7 @@ const membersData = [
     year: "II",
     position: "Co-ordinator",
     domain: "Techlore",
-    image: dummyProfile,
+    image: "/assets/Lakshana_Krishnan_C.jpg",
   },
 
   // =======================
@@ -168,7 +165,7 @@ const membersData = [
     year: "I (Section A)",
     position: "Co-ordinator",
     domain: "AI Innovate",
-    image: dummyProfile,
+    image: "/assets/Kanishka_S.jpg",
   },
   {
     id: 18,
@@ -177,7 +174,7 @@ const membersData = [
     year: "I (Section A)",
     position: "Co-ordinator",
     domain: "Enigma",
-    image: dummyProfile,
+    image: "/assets/Dharun_kumar_A.jpg",
   },
   {
     id: 19,
@@ -186,7 +183,7 @@ const membersData = [
     year: "I (Section A)",
     position: "Co-ordinator",
     domain: "Genesys",
-    image: dummyProfile,
+    image: "/assets/Haridhraa_A.jpg",
   },
   {
     id: 20,
@@ -195,7 +192,7 @@ const membersData = [
     year: "I (Section A)",
     position: "Co-ordinator",
     domain: "Techlore",
-    image: dummyProfile,
+    image: "/assets/B_S_Varun_Adithya.jpg",
   },
 
   // =======================
@@ -208,7 +205,7 @@ const membersData = [
     year: "I (Section B)",
     position: "Co-ordinator",
     domain: "AI Innovate",
-    image: dummyProfile,
+    image: "/assets/Shabnam.jpg",
   },
   {
     id: 22,
@@ -217,7 +214,7 @@ const membersData = [
     year: "I (Section B)",
     position: "Co-ordinator",
     domain: "Enigma",
-    image: dummyProfile,
+    image: "/assets/member.jpg",
   },
   {
     id: 23,
@@ -226,7 +223,7 @@ const membersData = [
     year: "I (Section B)",
     position: "Co-ordinator",
     domain: "Genesys",
-    image: dummyProfile,
+    image: "/assets/VARSSUDHA J Y.jpg",
   },
   {
     id: 24,
@@ -235,8 +232,9 @@ const membersData = [
     year: "I (Section B)",
     position: "Co-ordinator",
     domain: "Techlore",
-    image: dummyProfile,
+    image: "/assets/Tharunika S.jpeg",
   },
 ];
 
 export default membersData;
+
