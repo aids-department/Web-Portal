@@ -1114,3 +1114,73 @@ table tr:nth-child(even) {
     font-size: 0.8em;
     font-weight: bold;
 }
+
+/* ===============================
+   LEADERBOARD RESPONSIVENESS FIX
+   =============================== */
+
+/* Stack leaderboard table & sidebar on small screens */
+@media (max-width: 1024px) {
+  .leaderboard-content {
+    flex-direction: column;
+  }
+
+  .leaderboard-table-container,
+  .sidebar-widgets {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  /* Remove forced alignment padding on mobile */
+  .sidebar-widgets {
+    padding-top: 0;
+  }
+}
+@media (max-width: 768px) {
+  .leaderboard-table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 650px; /* prevents column squeeze */
+  }
+}
+@media (max-width: 768px) {
+  table th,
+  table td {
+    padding: 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 768px) {
+  .team-tooltip {
+    right: auto;
+    left: 0;
+    transform: translateY(-50%);
+    max-width: 90vw;
+  }
+}
+@media (max-width: 768px) {
+  .codenigma-winners-box,
+  .organizers-box,
+  .organizers-box-genesis {
+    margin-top: 10px;
+  }
+}
+@media (max-width: 640px) {
+  table td:nth-child(2) { /* Project column */
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+@media (max-width: 640px) {
+  table {
+    table-layout: auto;
+  }
+}
+@media (max-width: 640px) {
+  .leaderboard-table-container {
+    padding-bottom: 8px;
+  }
+}
