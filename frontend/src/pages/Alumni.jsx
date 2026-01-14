@@ -92,13 +92,13 @@ export default function Alumni() {
   useEffect(() => {
     let result = alumni;
 
-    // Search filter
+    // Search filter - FIXED: Added null/undefined checks
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
         (a) =>
           a.name.toLowerCase().includes(term) ||
-          a.company.toLowerCase().includes(term) ||
+          (a.company && a.company.toLowerCase().includes(term)) || // NULL CHECK ADDED HERE
           a.skills.some((skill) =>
             skill.toLowerCase().includes(term)
           )
@@ -110,10 +110,10 @@ export default function Alumni() {
       result = result.filter((a) => a.passOutYear == filters.passOutYear);
     }
 
-    // Company filter
+    // Company filter - FIXED: Added null/undefined check
     if (filters.company) {
       result = result.filter((a) =>
-        a.company.toLowerCase().includes(filters.company.toLowerCase())
+        a.company && a.company.toLowerCase().includes(filters.company.toLowerCase()) // NULL CHECK ADDED HERE
       );
     }
 
