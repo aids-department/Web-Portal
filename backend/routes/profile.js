@@ -2,16 +2,17 @@ const express = require("express");
 const router = express.Router();
 const Profile = require("../models/Profile");
 const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
 
 const upload = multer({ dest: "uploads/" });
 
+/**
+ * SEARCH profiles
+ */
 router.get("/", async (req, res) => {
   try {
     const q = req.query.q || "";
-
     if (!q.trim()) return res.json([]);
 
     const profiles = await Profile.find(
@@ -33,21 +34,14 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 /**
  * GET profile by userId
  */
 router.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-
     const profile = await Profile.findOne({ userId });
-
-    if (!profile) {
-      return res.json(null); // frontend handles empty profile
-    }
-
-    res.json(profile);
+    res.json(profile || null);
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.status(500).json({ error: "Server error" });
@@ -61,17 +55,12 @@ router.put("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const payload = req.body;
-    
-    console.log('Received profile update for userId:', userId);
-    console.log('Payload:', payload);
 
     const profile = await Profile.findOneAndUpdate(
       { userId },
       { ...payload, userId },
       { new: true, upsert: true }
     );
-    
-    console.log('Updated profile:', profile);
 
     res.json(profile);
   } catch (err) {
@@ -80,7 +69,9 @@ router.put("/:userId", async (req, res) => {
   }
 });
 
-// UPLOAD / UPDATE profile image
+/**
+ * UPLOAD / UPDATE profile image
+ */
 router.post("/:userId/image", upload.single("image"), async (req, res) => {
   try {
     const { userId } = req.params;
@@ -91,7 +82,6 @@ router.post("/:userId/image", upload.single("image"), async (req, res) => {
 
     const profile = await Profile.findOne({ userId });
 
-    // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "profiles",
       resource_type: "image",
@@ -101,7 +91,6 @@ router.post("/:userId/image", upload.single("image"), async (req, res) => {
       ],
     });
 
-    // Delete old image if exists
     if (profile?.profileImage?.publicId) {
       await cloudinary.uploader.destroy(profile.profileImage.publicId);
     }
@@ -117,9 +106,18 @@ router.post("/:userId/image", upload.single("image"), async (req, res) => {
       { new: true, upsert: true }
     );
 
-    fs.unlinkSync(req.file.path); // cleanup temp file
+    fs.unlinkSync(req.file.path);
 
-// UPLOAD / UPDATE resume
+    res.json(updated.profileImage);
+  } catch (err) {
+    console.error("Image upload error:", err);
+    res.status(500).json({ error: "Failed to upload image" });
+  }
+});
+
+/**
+ * UPLOAD / UPDATE resume
+ */
 router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
   try {
     const { userId } = req.params;
@@ -130,15 +128,15 @@ router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
 
     const profile = await Profile.findOne({ userId });
 
-    // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "resumes",
-      resource_type: "raw", // for non-image files like PDF
+      resource_type: "raw",
     });
 
-    // Delete old resume if exists
     if (profile?.resume?.publicId) {
-      await cloudinary.uploader.destroy(profile.resume.publicId, { resource_type: "raw" });
+      await cloudinary.uploader.destroy(profile.resume.publicId, {
+        resource_type: "raw",
+      });
     }
 
     const updated = await Profile.findOneAndUpdate(
@@ -153,7 +151,7 @@ router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
       { new: true, upsert: true }
     );
 
-    fs.unlinkSync(req.file.path); // cleanup temp file
+    fs.unlinkSync(req.file.path);
 
     res.json(updated.resume);
   } catch (err) {
