@@ -203,7 +203,7 @@ export default function Profile() {
                 <p className="text-sm text-gray-600">Click to view your resume</p>
               </div>
               <a
-                href={`https://web-portal-760h.onrender.com/api/profile/${profile.userId}/resume/view`}
+                href={profile.resume.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
