@@ -10,8 +10,15 @@ const ProfileSchema = new mongoose.Schema(
     },
     name: String,
     year: String,
+    dob: String,
+    registerNumber: String,
     bio: String,
     skills: [String],
+    socialLinks: {
+      github: String,
+      leetcode: String,
+      linkedin: String,
+    },
     profileImage: {
       url: String,
       publicId: String,

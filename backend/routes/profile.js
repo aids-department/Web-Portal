@@ -61,12 +61,17 @@ router.put("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const payload = req.body;
+    
+    console.log('Received profile update for userId:', userId);
+    console.log('Payload:', payload);
 
     const profile = await Profile.findOneAndUpdate(
       { userId },
       { ...payload, userId },
       { new: true, upsert: true }
     );
+    
+    console.log('Updated profile:', profile);
 
     res.json(profile);
   } catch (err) {
