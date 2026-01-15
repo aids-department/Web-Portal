@@ -347,12 +347,12 @@ app.post("/api/auth/login", async (req, res) => {
 app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate('author', 'username fullName')
+      .populate('author', 'username fullName _id')
       .populate({
         path: 'comments',
         populate: [
           { path: 'author', select: 'username fullName' },
-          { 
+          {
             path: 'replies',
             populate: { path: 'author', select: 'username fullName' }
           }
@@ -360,7 +360,22 @@ app.get("/api/posts", async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    res.json(posts);
+    // Add profile data to each post's author
+    const postsWithProfiles = await Promise.all(
+      posts.map(async (post) => {
+        if (post.author && !post.isAnonymous) {
+          try {
+            const profile = await require('./models/Profile').findOne({ userId: post.author._id });
+            post.author.profile = profile;
+          } catch (err) {
+            console.error('Error fetching profile for post author:', err);
+          }
+        }
+        return post;
+      })
+    );
+
+    res.json(postsWithProfiles);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

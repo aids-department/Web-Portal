@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, ArrowUp, MessageCircle, Share2, X, Upload, XCircle, Filter, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Search, Plus, ArrowUp, MessageCircle, Share2, X, Upload, XCircle, Filter, Bookmark, BookmarkCheck, FileText } from 'lucide-react';
 
 const PostsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -9,6 +9,8 @@ const PostsPage = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('newest');
   const [savedPosts, setSavedPosts] = useState([]);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -176,6 +178,17 @@ const PostsPage = () => {
     }
   };
 
+  const handleProfileClick = async (author) => {
+    try {
+      const response = await fetch(`https://web-portal-760h.onrender.com/api/profile/${author._id || author.id}`);
+      const profile = await response.json();
+      setSelectedProfile({ ...profile, username: author.username });
+      setIsProfileModalOpen(true);
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -251,6 +264,7 @@ const PostsPage = () => {
                     onSave={() => handleSavePost(post._id)}
                     isSaved={savedPosts.includes(post._id)}
                     currentUserId={currentUser.id}
+                    onProfileClick={handleProfileClick}
                   />
                 ))
               )}
@@ -279,12 +293,89 @@ const PostsPage = () => {
           currentUser={currentUser}
         />
       )}
+
+      {/* Profile Modal */}
+      {isProfileModalOpen && selectedProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Profile</h3>
+                <button
+                  onClick={() => setIsProfileModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="text-center mb-6">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden">
+                  {selectedProfile.profileImage?.url ? (
+                    <img src={selectedProfile.profileImage.url} alt={selectedProfile.username} className="w-full h-full object-cover" />
+                  ) : (
+                    selectedProfile.name?.[0]?.toUpperCase() || selectedProfile.username?.[0]?.toUpperCase() || "U"
+                  )}
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-1">
+                  {selectedProfile.name || selectedProfile.username}
+                </h4>
+                <p className="text-gray-600">{selectedProfile.year || "Student"}</p>
+              </div>
+
+              {selectedProfile.bio && (
+                <div className="mb-4">
+                  <h5 className="font-semibold text-gray-900 mb-2">About</h5>
+                  <p className="text-gray-700 text-sm">{selectedProfile.bio}</p>
+                </div>
+              )}
+
+              {selectedProfile.skills && selectedProfile.skills.length > 0 && (
+                <div className="mb-4">
+                  <h5 className="font-semibold text-gray-900 mb-2">Skills</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProfile.skills.map((skill, i) => (
+                      <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedProfile.resume?.url && (
+                <div className="mb-4">
+                  <h5 className="font-semibold text-gray-900 mb-2">Resume</h5>
+                  <a
+                    href={selectedProfile.resume.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                  >
+                    <FileText size={16} />
+                    View Resume
+                  </a>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsProfileModalOpen(false)}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 // Post Card Component
-const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUserId }) => {
+const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUserId, onProfileClick }) => {
   const displayName = post.isAnonymous ? 'Anonymous' : post.author?.username || 'Unknown';
   const hasUpvoted = post.upvotes?.includes(currentUserId);
   const createdAt = new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -294,12 +385,25 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
       {/* Header */}
       <div className="p-5">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-lg shrink-0">
-            {displayName[0].toUpperCase()}
+          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-lg shrink-0 overflow-hidden">
+            {post.author?.profileImage?.url ? (
+              <img src={post.author.profileImage.url} alt={displayName} className="w-full h-full object-cover" />
+            ) : (
+              displayName[0].toUpperCase()
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold text-gray-900 text-sm">{displayName}</h4>
+              {!post.isAnonymous ? (
+                <button
+                  onClick={() => onProfileClick(post.author)}
+                  className="font-semibold text-gray-900 text-sm hover:text-blue-600 transition-colors text-left"
+                >
+                  {displayName}
+                </button>
+              ) : (
+                <h4 className="font-semibold text-gray-900 text-sm">{displayName}</h4>
+              )}
               {post.isAnonymous && <span className="text-xs text-gray-500">• Anonymous</span>}
             </div>
             <p className="text-xs text-gray-500">{createdAt}</p>
