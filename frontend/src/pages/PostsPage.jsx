@@ -11,6 +11,7 @@ const PostsPage = () => {
   const [savedPosts, setSavedPosts] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profilePosition, setProfilePosition] = useState({ top: 0, left: 0 });
 
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -23,6 +24,7 @@ const PostsPage = () => {
     try {
       const response = await fetch('https://web-portal-760h.onrender.com/api/posts');
       const data = await response.json();
+      console.log('Posts data:', data.slice(0, 2)); // Log first 2 posts for debugging
       setPosts(data);
       setLoading(false);
     } catch (err) {
@@ -178,16 +180,38 @@ const PostsPage = () => {
     }
   };
 
-  const handleProfileClick = async (author) => {
-    try {
-      const response = await fetch(`https://web-portal-760h.onrender.com/api/profile/${author._id || author.id}`);
-      const profile = await response.json();
-      setSelectedProfile({ ...profile, username: author.username });
-      setIsProfileModalOpen(true);
-    } catch (err) {
-      console.error('Failed to fetch profile:', err);
-    }
-  };
+
+const handleProfileClick = async (author, event) => {
+  try {
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    setProfilePosition({
+      top: rect.bottom + window.scrollY + 8,
+      left: rect.left + window.scrollX,
+    });
+
+    const profileResponse = await fetch(
+      `https://web-portal-760h.onrender.com/api/profile/${author._id || author.id}`
+    );
+    const profile = await profileResponse.json();
+
+    // Fetch achievements for this user
+    const achievementsResponse = await fetch(
+      `https://web-portal-760h.onrender.com/api/achievements/user/${author._id || author.id}`
+    );
+    const achievements = await achievementsResponse.json();
+
+    setSelectedProfile({ 
+      ...profile, 
+      username: author.username,
+      achievements: achievements.filter(a => a.status === 'approved') // Only show approved achievements
+    });
+    setIsProfileModalOpen(true);
+  } catch (err) {
+    console.error('Failed to fetch profile:', err);
+  }
+};
+
 
   if (loading) {
     return (
@@ -198,180 +222,306 @@ const PostsPage = () => {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 overflow-hidden min-h-[80vh]">
-      {/* Decorative orbs */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
+  <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 overflow-hidden min-h-[80vh]">
+    {/* Decorative orbs */}
+    <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
+    <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
 
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="text-center mb-6 md:mb-10">
-          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-3 md:mb-4 font-cursive leading-tight">
-            Community Posts
-          </h1>
-          <div className="w-24 md:w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-3 md:mb-4"></div>
-          <p className="text-sm md:text-lg text-gray-700 max-w-2xl mx-auto px-4">
-            Discuss, share, and connect with the community
-          </p>
-        </div>
-
-        <div className="flex justify-center gap-8">
-          {/* Main Feed */}
-          <div className="w-full max-w-2xl flex flex-col">
-            <div className="mb-6 flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
-              <div className="relative flex-1 max-w-xl">
-                <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search posts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 md:pl-12 pr-4 md:pr-6 py-3 md:py-4 bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base shadow-sm"
-                />
-              </div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 md:py-4 bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base shadow-sm"
-              >
-                <option value="newest">Newest</option>
-                <option value="popular">Most Upvoted</option>
-                <option value="discussed">Most Discussed</option>
-              </select>
-              <button
-                onClick={() => setIsPostModalOpen(true)}
-                className="flex items-center justify-center gap-2 px-5 md:px-6 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-lg text-sm md:text-base"
-              >
-                <Plus size={20} /> Create Post
-              </button>
-            </div>
-
-            {/* Posts List */}
-            <div className="flex-1 overflow-y-auto space-y-4 md:space-y-5 pb-8">
-              {filteredPosts.length === 0 ? (
-                <div className="bg-white/70 backdrop-blur-md rounded-3xl p-12 md:p-20 text-center shadow-lg border border-white/40">
-                  <MessageCircle className="w-12 h-12 md:w-16 md:h-16 mx-auto text-gray-400 mb-4 md:mb-6" />
-                  <p className="text-lg md:text-xl font-semibold text-gray-700">No posts yet. Be the first to post!</p>
-                </div>
-              ) : (
-                filteredPosts.map(post => (
-                  <PostCard
-                    key={post._id}
-                    post={post}
-                    onOpen={() => setSelectedPost(post)}
-                    onUpvote={() => handleUpvote(post._id)}
-                    onShare={() => handleSharePost(post)}
-                    onSave={() => handleSavePost(post._id)}
-                    isSaved={savedPosts.includes(post._id)}
-                    currentUserId={currentUser.id}
-                    onProfileClick={handleProfileClick}
-                  />
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Comment Sidebar */}
-          {selectedPost && (
-            <CommentSidebar
-              post={selectedPost}
-              onClose={() => setSelectedPost(null)}
-              onAddComment={handleAddComment}
-              onAddReply={handleAddReply}
-              onUpvoteComment={handleUpvoteComment}
-              currentUser={currentUser}
-            />
-          )}
-        </div>
+    <div className="relative z-10">
+      {/* Header */}
+      <div className="text-center mb-6 md:mb-10">
+        <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-3 md:mb-4 font-cursive leading-tight">
+          Community Posts
+        </h1>
+        <div className="w-24 md:w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-3 md:mb-4"></div>
+        <p className="text-sm md:text-lg text-gray-700 max-w-2xl mx-auto px-4">
+          Discuss, share, and connect with the community
+        </p>
       </div>
 
-      {/* Create Post Modal */}
-      {isPostModalOpen && (
-        <PostModal
-          onClose={() => setIsPostModalOpen(false)}
-          onSubmit={handleCreatePost}
-          currentUser={currentUser}
-        />
-      )}
-
-      {/* Profile Modal */}
-      {isProfileModalOpen && selectedProfile && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Profile</h3>
-                <button
-                  onClick={() => setIsProfileModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden">
-                  {selectedProfile.profileImage?.url ? (
-                    <img src={selectedProfile.profileImage.url} alt={selectedProfile.username} className="w-full h-full object-cover" />
-                  ) : (
-                    selectedProfile.name?.[0]?.toUpperCase() || selectedProfile.username?.[0]?.toUpperCase() || "U"
-                  )}
-                </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-1">
-                  {selectedProfile.name || selectedProfile.username}
-                </h4>
-                <p className="text-gray-600">{selectedProfile.year || "Student"}</p>
-              </div>
-
-              {selectedProfile.bio && (
-                <div className="mb-4">
-                  <h5 className="font-semibold text-gray-900 mb-2">About</h5>
-                  <p className="text-gray-700 text-sm">{selectedProfile.bio}</p>
-                </div>
-              )}
-
-              {selectedProfile.skills && selectedProfile.skills.length > 0 && (
-                <div className="mb-4">
-                  <h5 className="font-semibold text-gray-900 mb-2">Skills</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProfile.skills.map((skill, i) => (
-                      <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedProfile.resume?.url && (
-                <div className="mb-4">
-                  <h5 className="font-semibold text-gray-900 mb-2">Resume</h5>
-                  <a
-                    href={selectedProfile.resume.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
-                  >
-                    <FileText size={16} />
-                    View Resume
-                  </a>
-                </div>
-              )}
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setIsProfileModalOpen(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
-                >
-                  Close
-                </button>
-              </div>
+      <div className="flex justify-center gap-8">
+        {/* Main Feed */}
+        <div className="w-full max-w-2xl flex flex-col">
+          <div className="mb-6 flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
+            <div className="relative flex-1 max-w-xl">
+              <Search
+                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 md:pl-12 pr-4 md:pr-6 py-3 md:py-4 bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base shadow-sm"
+              />
             </div>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-3 md:py-4 bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base shadow-sm"
+            >
+              <option value="newest">Newest</option>
+              <option value="popular">Most Upvoted</option>
+              <option value="discussed">Most Discussed</option>
+            </select>
+
+            <button
+              onClick={() => setIsPostModalOpen(true)}
+              className="flex items-center justify-center gap-2 px-5 md:px-6 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-lg text-sm md:text-base"
+            >
+              <Plus size={20} /> Create Post
+            </button>
+          </div>
+
+          {/* Posts List */}
+          <div className="flex-1 overflow-y-auto space-y-4 md:space-y-5 pb-8">
+            {filteredPosts.length === 0 ? (
+              <div className="bg-white/70 backdrop-blur-md rounded-3xl p-12 md:p-20 text-center shadow-lg border border-white/40">
+                <MessageCircle className="w-12 h-12 md:w-16 md:h-16 mx-auto text-gray-400 mb-4 md:mb-6" />
+                <p className="text-lg md:text-xl font-semibold text-gray-700">
+                  No posts yet. Be the first to post!
+                </p>
+              </div>
+            ) : (
+              filteredPosts.map((post) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  onOpen={() => setSelectedPost(post)}
+                  onUpvote={() => handleUpvote(post._id)}
+                  onShare={() => handleSharePost(post)}
+                  onSave={() => handleSavePost(post._id)}
+                  isSaved={savedPosts.includes(post._id)}
+                  currentUserId={currentUser.id}
+                  onProfileClick={handleProfileClick}
+                />
+              ))
+            )}
           </div>
         </div>
-      )}
+
+        {/* Comment Sidebar */}
+        {selectedPost && (
+          <CommentSidebar
+            post={selectedPost}
+            onClose={() => setSelectedPost(null)}
+            onAddComment={handleAddComment}
+            onAddReply={handleAddReply}
+            onUpvoteComment={handleUpvoteComment}
+            currentUser={currentUser}
+          />
+        )}
+      </div>
     </div>
-  );
+
+    {/* Create Post Modal */}
+    {isPostModalOpen && (
+      <PostModal
+        onClose={() => setIsPostModalOpen(false)}
+        onSubmit={handleCreatePost}
+        currentUser={currentUser}
+      />
+    )}
+
+    {/* Profile Modal */}
+    {isProfileModalOpen && selectedProfile && (
+  <>
+    {/* Backdrop */}
+    <div
+      className="fixed inset-0 z-[999] bg-black/50"
+      onClick={() => setIsProfileModalOpen(false)}
+    />
+
+    {/* Popup */}
+    <div
+      className="absolute z-[1000] bg-white rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto"
+      style={{
+        top: Math.min(profilePosition.top, window.innerHeight - 500),
+        left: window.innerWidth < 768 
+          ? '50%' 
+          : Math.min(profilePosition.left, window.innerWidth - 320),
+        transform: window.innerWidth < 768 
+          ? 'translateX(-50%)' 
+          : 'none',
+      }}
+    >
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-bold text-gray-900 text-lg">Profile</h3>
+          <button 
+            onClick={() => setIsProfileModalOpen(false)}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Profile Image and Basic Info */}
+        <div className="text-center mb-6">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-4 overflow-hidden flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+            {selectedProfile.profileImage?.url ? (
+              <img
+                src={selectedProfile.profileImage.url}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              selectedProfile.name?.[0]?.toUpperCase() || selectedProfile.username?.[0]?.toUpperCase() || "U"
+            )}
+          </div>
+
+          <h4 className="font-bold text-xl text-gray-900 mb-1">
+            {selectedProfile.name || selectedProfile.username}
+          </h4>
+          <p className="text-sm text-gray-600 mb-2">
+            {selectedProfile.year ? `${selectedProfile.year} Year Student` : "Student"}
+          </p>
+          
+          {selectedProfile.registerNumber && (
+            <p className="text-xs text-gray-500 mb-2">
+              Reg: {selectedProfile.registerNumber}
+            </p>
+          )}
+          
+          {selectedProfile.dob && (
+            <p className="text-xs text-gray-500">
+              DOB: {new Date(selectedProfile.dob).toLocaleDateString()}
+            </p>
+          )}
+        </div>
+
+        {/* Bio */}
+        {selectedProfile.bio && (
+          <div className="mb-6">
+            <h5 className="font-semibold text-gray-900 mb-2">About</h5>
+            <p className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-lg">
+              {selectedProfile.bio}
+            </p>
+          </div>
+        )}
+
+        {/* Skills */}
+        {selectedProfile.skills && selectedProfile.skills.length > 0 && (
+          <div className="mb-6">
+            <h5 className="font-semibold text-gray-900 mb-3">Skills</h5>
+            <div className="flex flex-wrap gap-2">
+              {selectedProfile.skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Social Links */}
+        {selectedProfile.socialLinks && (
+          <div className="mb-6">
+            <h5 className="font-semibold text-gray-900 mb-3">Connect</h5>
+            <div className="space-y-2">
+              {selectedProfile.socialLinks.github && (
+                <a
+                  href={selectedProfile.socialLinks.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition-colors p-2 hover:bg-gray-50 rounded-lg"
+                >
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold">GH</span>
+                  </div>
+                  GitHub Profile
+                </a>
+              )}
+              
+              {selectedProfile.socialLinks.leetcode && (
+                <a
+                  href={selectedProfile.socialLinks.leetcode}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition-colors p-2 hover:bg-gray-50 rounded-lg"
+                >
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-orange-600">LC</span>
+                  </div>
+                  LeetCode Profile
+                </a>
+              )}
+              
+              {selectedProfile.socialLinks.linkedin && (
+                <a
+                  href={selectedProfile.socialLinks.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition-colors p-2 hover:bg-gray-50 rounded-lg"
+                >
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-blue-600">in</span>
+                  </div>
+                  LinkedIn Profile
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Achievements */}
+        {selectedProfile.achievements && selectedProfile.achievements.length > 0 && (
+          <div className="mb-6">
+            <h5 className="font-semibold text-gray-900 mb-3">Achievements</h5>
+            <div className="space-y-3">
+              {selectedProfile.achievements.slice(0, 3).map((achievement) => (
+                <div key={achievement._id} className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-lg border border-yellow-200">
+                  <h6 className="font-semibold text-gray-900 text-sm mb-1">{achievement.title}</h6>
+                  {achievement.description && (
+                    <p className="text-xs text-gray-700 mb-2">{achievement.description}</p>
+                  )}
+                  {achievement.certificate?.url && (
+                    <a
+                      href={achievement.certificate.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                    >
+                      <FileText size={12} /> View Certificate
+                    </a>
+                  )}
+                </div>
+              ))}
+              {selectedProfile.achievements.length > 3 && (
+                <p className="text-xs text-gray-500 text-center">
+                  +{selectedProfile.achievements.length - 3} more achievements
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Resume */}
+        {selectedProfile.resume?.url && (
+          <div className="border-t pt-4">
+            <a
+              href={selectedProfile.resume.url}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold text-sm"
+            >
+              <FileText size={16} /> View Resume
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  </>
+)}
+
+  </div>
+);
 };
 
 // Post Card Component
@@ -380,27 +530,42 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
   const hasUpvoted = post.upvotes?.includes(currentUserId);
   const createdAt = new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+  // Debug logging
+  console.log('Post author data:', post.author);
+  console.log('Profile image URL:', post.author?.profile?.profileImage?.url || post.author?.profileImage?.url);
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
       {/* Header */}
       <div className="p-5">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-lg shrink-0 overflow-hidden">
-            {post.author?.profileImage?.url ? (
-              <img src={post.author.profileImage.url} alt={displayName} className="w-full h-full object-cover" />
+            {(post.author?.profile?.profileImage?.url || post.author?.profileImage?.url) ? (
+              <img 
+                src={post.author?.profile?.profileImage?.url || post.author?.profileImage?.url} 
+                alt={displayName} 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">${displayName[0].toUpperCase()}</div>`;
+                }}
+              />
             ) : (
-              displayName[0].toUpperCase()
+              <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                {displayName[0].toUpperCase()}
+              </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               {!post.isAnonymous ? (
                 <button
-                  onClick={() => onProfileClick(post.author)}
-                  className="font-semibold text-gray-900 text-sm hover:text-blue-600 transition-colors text-left"
-                >
-                  {displayName}
-                </button>
+  onClick={(e) => onProfileClick(post.author, e)}
+  className="font-semibold text-gray-900 text-sm hover:text-blue-600 transition-colors text-left"
+>
+  {displayName}
+</button>
+
               ) : (
                 <h4 className="font-semibold text-gray-900 text-sm">{displayName}</h4>
               )}

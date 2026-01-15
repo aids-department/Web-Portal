@@ -22,6 +22,7 @@ const User = require("./models/User");
 const Admin = require("./models/Admin");
 const { Post, Comment } = require("./models/Post");
 const QuestionPaper = require("./models/QuestionPaper");
+const Profile = require("./models/Profile");
 
 // Updates Schema
 const updateSchema = new mongoose.Schema({
@@ -365,8 +366,13 @@ app.get("/api/posts", async (req, res) => {
       posts.map(async (post) => {
         if (post.author && !post.isAnonymous) {
           try {
-            const profile = await require('./models/Profile').findOne({ userId: post.author._id });
-            post.author.profile = profile;
+            const profile = await Profile.findOne({ userId: post.author._id });
+            if (profile) {
+              post.author.profile = profile;
+              console.log(`Profile found for user ${post.author.username}:`, profile.profileImage?.url);
+            } else {
+              console.log(`No profile found for user ${post.author.username}`);
+            }
           } catch (err) {
             console.error('Error fetching profile for post author:', err);
           }
