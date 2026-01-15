@@ -431,7 +431,7 @@ export default function EditProfile() {
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">{resume.filename || "Resume"}</p>
                   <a
-                    href={resume.url}
+                    href={`https://web-portal-760h.onrender.com/api/profile/${userId}/resume/view`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:text-blue-700"

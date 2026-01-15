@@ -158,7 +158,26 @@ router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
     res.json(updated.resume);
   } catch (err) {
     console.error("Resume upload error:", err);
-    res.status(500).json({ error: "Failed to upload resume" });
+  }
+});
+
+// VIEW RESUME
+router.get("/:userId/resume/view", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const profile = await Profile.findOne({ userId });
+
+    if (!profile?.resume?.url) {
+      return res.status(404).json({ error: "Resume not found" });
+    }
+
+    // Redirect to Cloudinary URL for viewing in browser
+    res.setHeader('Content-Type', 'application/pdf');
+    res.redirect(profile.resume.url);
+  } catch (err) {
+    console.error("Resume view error:", err);
+    res.status(500).json({ error: "Failed to view resume" });
   }
 });
 
