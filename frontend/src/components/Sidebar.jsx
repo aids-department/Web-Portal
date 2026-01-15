@@ -9,21 +9,25 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
 
   const menu = [
     { name: "Dashboard", path: "/" },
+    { type: "divider", label: "Department" },
     { name: "About", type: "dropdown", items: [
       { name: "Faculty Info", path: "/about/faculty" },
       { name: "Staff Info", path: "/about/staff" },
       { name: "Syllabus", path: "/about/syllabus" }
     ]},
     { name: "Team Members", path: "/team-info" },
-    { name: "Leaderboards", path: "/leaderboards" },
+    { name: "Association Members", path: "/association-members" },
+    { type: "divider", label: "Activities" },
     { name: "Events", path: "/events" },
+    { name: "Leaderboards", path: "/leaderboards" },
     { name: "Achievements", path: "/achievements" },
+    { type: "divider", label: "Community" },
     { name: "Alumni", path: "/alumni" },
-    { name: "Connect", path: "/connect" },
-    { name: "Projects", path: "/projects" },
     { name: "Posts", path: "/posts" },
     { name: "Question Bank", path: "/question-bank" },
-    { name: "Association Members", path: "/association-members" },
+    { type: "divider", label: "Coming Soon" },
+    { name: "Connect", path: "/connect" },
+    { name: "Projects", path: "/projects" },
   ];
 
   const isActivePath = (path) => location.pathname === path;
@@ -47,7 +51,17 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         }`}
       >
         <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-8rem)]">
-          {menu.map((item) => {
+          {menu.map((item, index) => {
+            if (item.type === "divider") {
+              return (
+                <div key={`divider-${index}`} className="pt-4 pb-2">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">
+                    {item.label}
+                  </div>
+                </div>
+              );
+            }
+            
             if (item.type === "dropdown") {
               return (
                 <div key={item.name}>
@@ -68,7 +82,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                           onClick={() => toggleSidebar()}
                           className={`block w-full text-left px-4 py-2 text-sm rounded-lg transition ${
                             isActivePath(subItem.path)
-                              ? "bg-blue-600 text-white"
+                              ? "bg-gray-800 text-white border border-gray-700"
                               : "text-gray-300 hover:bg-gray-800"
                           }`}
                         >
@@ -88,7 +102,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 onClick={() => toggleSidebar()}
                 className={`block w-full text-left px-4 py-2 rounded-lg font-medium transition ${
                   isActivePath(item.path)
-                    ? "bg-blue-600 text-white"
+                    ? "bg-gray-800 text-white border border-gray-700"
                     : "text-white hover:bg-gray-800"
                 }`}
               >

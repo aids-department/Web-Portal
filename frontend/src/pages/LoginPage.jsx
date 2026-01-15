@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Lock, UserCircle } from 'lucide-react';
+import Navbar from '../components/Navbar';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -57,8 +58,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 pt-20">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         
         {/* Header */}
         <div className="text-center mb-8">
@@ -134,8 +137,9 @@ const LoginPage = () => {
             </Link>
           </p>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -31,8 +31,8 @@ import ManageUploads from "./components/ManageUploads";
 import ManageContent from "./components/ManageContent"; 
 import UpdateContent from "./components/ManageContentupdates.jsx";
 // Images for Dashboard
-import img1 from "./assets/enigma.png";
-import img2 from "./assets/genesys.png";
+import img1 from "../public/images/events/enigma.png";
+import img2 from "../public/images/events/genesys.png";
 import Dashboard_Carousel from "./components/Dashboard_Carousel";
 import AchievementsCarousel from "./components/AchievementsCarousel";
 import Profile from "./pages/Profile";
@@ -248,7 +248,15 @@ function ProjectsPage() {
 
       <div className="relative z-10">
         <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Projects</h2>
-        <p className="text-gray-600 mb-4">Projects content coming soon...</p>
+        <div className="text-center mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800 font-medium">🚧 Projects showcase coming soon!</p>
+            <p className="text-blue-600 text-sm mt-1">We're working on showcasing amazing student and faculty projects.</p>
+          </div>
+        </div>
+        <div className="text-center mb-4">
+          <p className="text-gray-600 text-sm">Meanwhile, enjoy a quick game to pass the time:</p>
+        </div>
         <BrickBreakerGame />
       </div>
     </div>

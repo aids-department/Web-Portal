@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, ArrowUp, MessageCircle, Share2, X, Upload, XCircle } from 'lucide-react';
+import { Search, Plus, ArrowUp, MessageCircle, Share2, X, Upload, XCircle, Filter, Bookmark, BookmarkCheck } from 'lucide-react';
 
 const PostsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -7,6 +7,8 @@ const PostsPage = () => {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('newest');
+  const [savedPosts, setSavedPosts] = useState([]);
 
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -148,7 +150,31 @@ const PostsPage = () => {
   const filteredPosts = posts.filter(p =>
     (p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.content?.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  ).sort((a, b) => {
+    if (sortBy === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortBy === 'popular') return (b.upvotes?.length || 0) - (a.upvotes?.length || 0);
+    if (sortBy === 'discussed') return (b.comments?.length || 0) - (a.comments?.length || 0);
+    return 0;
+  });
+
+  const handleSavePost = (postId) => {
+    setSavedPosts(prev => 
+      prev.includes(postId) ? prev.filter(id => id !== postId) : [...prev, postId]
+    );
+  };
+
+  const handleSharePost = (post) => {
+    if (navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: post.content,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
 
   if (loading) {
     return (
@@ -159,66 +185,90 @@ const PostsPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="bg-white shadow-sm px-6 py-5 rounded-2xl mb-6">
-        <h2 className="text-3xl font-bold text-gray-900">Posts</h2>
-        <p className="text-gray-500 mt-1">Discuss, share, and connect with the community</p>
-      </div>
+    <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 overflow-hidden min-h-[80vh]">
+      {/* Decorative orbs */}
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
 
-      <div className="flex-1 flex gap-8">
-        {/* Main Feed */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="mb-6 flex items-center gap-4">
-            <div className="relative flex-1 max-w-xl">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={22} />
-              <input
-                type="text"
-                placeholder="Search posts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={() => setIsPostModalOpen(true)}
-              className="flex items-center gap-2 px-6 py-4 bg-blue-900 text-white rounded-xl font-medium hover:bg-blue-700 transition"
-            >
-              <Plus size={20} /> Create Post
-            </button>
-          </div>
-
-          {/* Posts List */}
-          <div className="flex-1 overflow-y-auto space-y-5 pb-8">
-            {filteredPosts.length === 0 ? (
-              <div className="text-center py-20 text-gray-500">
-                <p className="text-xl">No posts yet. Be the first to post!</p>
-              </div>
-            ) : (
-              filteredPosts.map(post => (
-                <PostCard
-                  key={post._id}
-                  post={post}
-                  onOpen={() => setSelectedPost(post)}
-                  onUpvote={() => handleUpvote(post._id)}
-                  currentUserId={currentUser.id}
-                />
-              ))
-            )}
-          </div>
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="text-center mb-6 md:mb-10">
+          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-3 md:mb-4 font-cursive leading-tight">
+            Community Posts
+          </h1>
+          <div className="w-24 md:w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-3 md:mb-4"></div>
+          <p className="text-sm md:text-lg text-gray-700 max-w-2xl mx-auto px-4">
+            Discuss, share, and connect with the community
+          </p>
         </div>
 
-        {/* Comment Sidebar */}
-        {selectedPost && (
-          <CommentSidebar
-            post={selectedPost}
-            onClose={() => setSelectedPost(null)}
-            onAddComment={handleAddComment}
-            onAddReply={handleAddReply}
-            onUpvoteComment={handleUpvoteComment}
-            currentUser={currentUser}
-          />
-        )}
+        <div className="flex justify-center gap-8">
+          {/* Main Feed */}
+          <div className="w-full max-w-2xl flex flex-col">
+            <div className="mb-6 flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
+              <div className="relative flex-1 max-w-xl">
+                <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search posts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 md:pl-12 pr-4 md:pr-6 py-3 md:py-4 bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base shadow-sm"
+                />
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-3 md:py-4 bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base shadow-sm"
+              >
+                <option value="newest">Newest</option>
+                <option value="popular">Most Upvoted</option>
+                <option value="discussed">Most Discussed</option>
+              </select>
+              <button
+                onClick={() => setIsPostModalOpen(true)}
+                className="flex items-center justify-center gap-2 px-5 md:px-6 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-lg text-sm md:text-base"
+              >
+                <Plus size={20} /> Create Post
+              </button>
+            </div>
+
+            {/* Posts List */}
+            <div className="flex-1 overflow-y-auto space-y-4 md:space-y-5 pb-8">
+              {filteredPosts.length === 0 ? (
+                <div className="bg-white/70 backdrop-blur-md rounded-3xl p-12 md:p-20 text-center shadow-lg border border-white/40">
+                  <MessageCircle className="w-12 h-12 md:w-16 md:h-16 mx-auto text-gray-400 mb-4 md:mb-6" />
+                  <p className="text-lg md:text-xl font-semibold text-gray-700">No posts yet. Be the first to post!</p>
+                </div>
+              ) : (
+                filteredPosts.map(post => (
+                  <PostCard
+                    key={post._id}
+                    post={post}
+                    onOpen={() => setSelectedPost(post)}
+                    onUpvote={() => handleUpvote(post._id)}
+                    onShare={() => handleSharePost(post)}
+                    onSave={() => handleSavePost(post._id)}
+                    isSaved={savedPosts.includes(post._id)}
+                    currentUserId={currentUser.id}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Comment Sidebar */}
+          {selectedPost && (
+            <CommentSidebar
+              post={selectedPost}
+              onClose={() => setSelectedPost(null)}
+              onAddComment={handleAddComment}
+              onAddReply={handleAddReply}
+              onUpvoteComment={handleUpvoteComment}
+              currentUser={currentUser}
+            />
+          )}
+        </div>
       </div>
 
       {/* Create Post Modal */}
@@ -234,36 +284,92 @@ const PostsPage = () => {
 };
 
 // Post Card Component
-const PostCard = ({ post, onOpen, onUpvote, currentUserId }) => {
+const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUserId }) => {
   const displayName = post.isAnonymous ? 'Anonymous' : post.author?.username || 'Unknown';
   const hasUpvoted = post.upvotes?.includes(currentUserId);
+  const createdAt = new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-xl font-bold text-gray-900">{post.title}</h3>
-        <span className="text-sm text-gray-500">{displayName}</span>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+      {/* Header */}
+      <div className="p-5">
+        <div className="flex items-start gap-3">
+          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-lg shrink-0">
+            {displayName[0].toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-semibold text-gray-900 text-sm">{displayName}</h4>
+              {post.isAnonymous && <span className="text-xs text-gray-500">• Anonymous</span>}
+            </div>
+            <p className="text-xs text-gray-500">{createdAt}</p>
+          </div>
+        </div>
       </div>
 
-      <p className="text-gray-600 mb-4">{post.content}</p>
+      {/* Content */}
+      <div className="px-5 pb-4">
+        <h3 className="text-base font-semibold text-gray-900 mb-2">{post.title}</h3>
+        <p className="text-sm text-gray-700 leading-relaxed">{post.content}</p>
+      </div>
 
+      {/* Images */}
       {post.images && post.images.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 my-4">
-          {post.images.map((img, i) => (
-            <img key={i} src={img.url} alt="" className="rounded-lg max-h-64 object-cover w-full" />
-          ))}
+        <div className="px-5 pb-4">
+          <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+            {post.images.slice(0, 4).map((img, i) => (
+              <div key={i} className="relative aspect-video bg-gray-100 rounded overflow-hidden border border-gray-200">
+                <img src={img.url} alt="" className="w-full h-full object-cover" />
+                {i === 3 && post.images.length > 4 && (
+                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                    <span className="text-white font-semibold text-xl">+{post.images.length - 4}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div className="flex gap-6 text-gray-600">
+      {/* Stats */}
+      <div className="px-5 py-3 border-t border-gray-200">
+        <div className="flex items-center gap-4 text-xs text-gray-500">
+          <span className="flex items-center gap-1.5">
+            <ArrowUp size={14} />
+            {post.upvotes?.length || 0}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <MessageCircle size={14} />
+            {post.comments?.length || 0}
+          </span>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="px-3 py-2 border-t border-gray-200 flex items-center">
         <button
           onClick={onUpvote}
-          className={`flex items-center gap-2 font-medium ${hasUpvoted ? 'text-blue-600' : 'hover:text-blue-600'}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-gray-100 transition text-sm font-medium ${hasUpvoted ? 'text-blue-600' : 'text-gray-600'}`}
         >
-          <ArrowUp size={20} /> {post.upvotes?.length || 0}
+          <ArrowUp size={18} /> Upvote
         </button>
-        <button onClick={onOpen} className="flex items-center gap-2 hover:text-blue-600 font-medium">
-          <MessageCircle size={20} /> {post.comments?.length || 0}
+        <button
+          onClick={onOpen}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-gray-100 transition text-sm font-medium text-gray-600"
+        >
+          <MessageCircle size={18} /> Comment
+        </button>
+        <button
+          onClick={onShare}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-gray-100 transition text-sm font-medium text-gray-600"
+        >
+          <Share2 size={18} /> Share
+        </button>
+        <button
+          onClick={onSave}
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg hover:bg-gray-100 transition text-sm font-medium ${isSaved ? 'text-blue-600' : 'text-gray-600'}`}
+        >
+          {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
         </button>
       </div>
     </div>
@@ -299,21 +405,21 @@ const PostModal = ({ onClose, onSubmit, currentUser }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-2xl my-8 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Create Post</h2>
-          <button onClick={onClose}><X size={28} /></button>
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Create Post</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition"><X size={28} /></button>
         </div>
 
         <div className="flex gap-3 mb-6">
-          <button onClick={() => setMode('Public')} className={`px-4 py-2 rounded-xl ${mode === 'Public' ? 'bg-blue-900 text-white' : 'bg-gray-100'}`}>Public</button>
-          <button onClick={() => setMode('Anonymous')} className={`px-4 py-2 rounded-xl ${mode === 'Anonymous' ? 'bg-blue-900 text-white' : 'bg-gray-100'}`}>Anonymous</button>
+          <button onClick={() => setMode('Public')} className={`px-5 py-2.5 rounded-xl font-semibold transition ${mode === 'Public' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>Public</button>
+          <button onClick={() => setMode('Anonymous')} className={`px-5 py-2.5 rounded-xl font-semibold transition ${mode === 'Anonymous' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>Anonymous</button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" className="w-full px-4 py-3 border rounded-xl mb-4" />
-          <textarea required value={content} onChange={e => setContent(e.target.value)} placeholder="What's on your mind?" className="w-full px-4 py-3 border rounded-xl h-32 mb-4" />
+          <input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl mb-4 focus:border-blue-500 focus:outline-none transition text-sm md:text-base" />
+          <textarea required value={content} onChange={e => setContent(e.target.value)} placeholder="What's on your mind?" className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl h-32 mb-4 focus:border-blue-500 focus:outline-none transition resize-none text-sm md:text-base" />
 
           {images.length > 0 && (
             <div className="grid grid-cols-3 gap-3 mb-4">
@@ -328,13 +434,13 @@ const PostModal = ({ onClose, onSubmit, currentUser }) => {
             </div>
           )}
 
-          <label className="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer mb-6">
-            <Upload size={40} className="mx-auto mb-2 text-gray-400" />
-            <p>Click or drag images</p>
+          <label className="block border-2 border-dashed border-gray-300 rounded-xl p-6 md:p-8 text-center cursor-pointer mb-6 hover:border-blue-400 hover:bg-blue-50/30 transition">
+            <Upload size={36} className="mx-auto mb-2 text-gray-400" />
+            <p className="text-sm md:text-base text-gray-600 font-medium">Click or drag images</p>
             <input type="file" multiple accept="image/*" onChange={handleFileChange} className="hidden" />
           </label>
 
-          <button type="submit" className="w-full bg-blue-900 text-white py-3 rounded-xl font-bold hover:bg-blue-800">
+          <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition shadow-lg text-sm md:text-base">
             Post
           </button>
         </form>
@@ -360,52 +466,63 @@ const CommentSidebar = ({ post, onClose, onAddComment, onAddReply, onUpvoteComme
   };
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl border-l border-gray-200 overflow-y-auto z-50">
-      <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center z-10">
-        <h2 className="text-2xl font-bold">Comments</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          <X size={28} />
-        </button>
-      </div>
-
-      <div className="p-6">
-        <div className="bg-gray-50 rounded-xl p-5 mb-6">
-          <h3 className="font-bold text-lg mb-2">{post.title}</h3>
-          <p className="text-gray-700 mb-3">{post.content}</p>
-          <p className="text-sm text-gray-500">
-            — {post.isAnonymous ? 'Anonymous' : post.author?.username}
-          </p>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 p-4 md:p-6 flex justify-between items-center z-10 shadow-lg rounded-t-3xl shrink-0">
+          <h2 className="text-lg md:text-2xl font-bold text-white">Comments</h2>
+          <button onClick={onClose} className="text-white hover:text-gray-200 transition">
+            <X size={24} className="md:w-7 md:h-7" />
+          </button>
         </div>
 
-        <div className="flex gap-3 mb-5">
-          <button onClick={() => setMode('Public')} className={`px-5 py-2 rounded-xl font-medium ${mode === 'Public' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}>Public</button>
-          <button onClick={() => setMode('Anonymous')} className={`px-5 py-2 rounded-xl font-medium ${mode === 'Anonymous' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}>Anonymous</button>
-        </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+          {/* Post Info */}
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 md:p-5 mb-5 border border-blue-100">
+            <h3 className="font-bold text-base md:text-lg mb-2 text-gray-900">{post.title}</h3>
+            <p className="text-sm md:text-base text-gray-700 mb-2 line-clamp-3">{post.content}</p>
+            <p className="text-xs md:text-sm text-gray-500 font-medium">
+              — {post.isAnonymous ? 'Anonymous' : post.author?.username}
+            </p>
+          </div>
 
-        <form onSubmit={handleNewComment} className="flex gap-2 mb-8">
-          <input
-            value={commentText}
-            onChange={e => setCommentText(e.target.value)}
-            placeholder="Add a comment..."
-            className="flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button type="submit" className="px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800">Send</button>
-        </form>
+          {/* Mode Toggle */}
+          <div className="flex gap-2 mb-4">
+            <button onClick={() => setMode('Public')} className={`flex-1 px-4 py-2 rounded-xl font-semibold transition text-sm ${mode === 'Public' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>Public</button>
+            <button onClick={() => setMode('Anonymous')} className={`flex-1 px-4 py-2 rounded-xl font-semibold transition text-sm ${mode === 'Anonymous' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>Anonymous</button>
+          </div>
 
-        <div className="mt-8">
-          {!post.comments || post.comments.length === 0 ? (
-            <p className="text-center text-gray-500 py-12">No comments yet. Be the first!</p>
-          ) : (
-            post.comments.map(comment => (
-              <CommentCard
-                key={comment._id}
-                comment={comment}
-                onAddReply={onAddReply}
-                onUpvoteComment={onUpvoteComment}
-                currentUser={currentUser}
-              />
-            ))
-          )}
+          {/* Comment Form */}
+          <form onSubmit={handleNewComment} className="flex gap-2 mb-6">
+            <input
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 px-3 md:px-4 py-2 md:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition text-sm"
+            />
+            <button type="submit" className="px-4 md:px-5 py-2 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition shadow-md font-semibold text-sm">Send</button>
+          </form>
+
+          {/* Comments List */}
+          <div>
+            {!post.comments || post.comments.length === 0 ? (
+              <div className="text-center py-12">
+                <MessageCircle className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                <p className="text-gray-500 font-medium text-sm">No comments yet. Be the first!</p>
+              </div>
+            ) : (
+              post.comments.map(comment => (
+                <CommentCard
+                  key={comment._id}
+                  comment={comment}
+                  onAddReply={onAddReply}
+                  onUpvoteComment={onUpvoteComment}
+                  currentUser={currentUser}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -434,9 +551,9 @@ const CommentCard = ({ comment, onAddReply, onUpvoteComment, currentUser, depth 
   };
 
   return (
-    <div className={depth > 0 ? "ml-8 mt-5 border-l-2 border-gray-200 pl-4" : "mt-6"}>
-      <div className="bg-gray-50 rounded-xl p-5">
-        <p className="font-medium text-gray-800 mb-2">{comment.content}</p>
+    <div className={depth > 0 ? "ml-4 md:ml-8 mt-5 border-l-2 border-gray-200 pl-3 md:pl-4" : "mt-6"}>
+      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 md:p-5 border border-gray-200">
+        <p className="font-medium text-sm md:text-base text-gray-800 mb-2">{comment.content}</p>
 
         <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
           <span>{displayName}</span>
@@ -444,32 +561,32 @@ const CommentCard = ({ comment, onAddReply, onUpvoteComment, currentUser, depth 
           <span>{comment.upvotes?.length || 0} upvote{comment.upvotes?.length !== 1 ? 's' : ''}</span>
         </div>
 
-        <div className="flex gap-6 text-sm">
+        <div className="flex gap-4 md:gap-6 text-xs md:text-sm">
           <button
             onClick={() => onUpvoteComment(comment._id)}
-            className={`flex items-center gap-1.5 font-medium transition ${hasUpvoted ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}
+            className={`flex items-center gap-1.5 font-semibold transition ${hasUpvoted ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}
           >
-            <ArrowUp size={18} /> Upvote
+            <ArrowUp size={16} className="md:w-[18px] md:h-[18px]" /> Upvote
           </button>
-          <button onClick={() => setShowReply(!showReply)} className="flex items-center gap-1.5 font-medium text-gray-600 hover:text-gray-800 transition">
-            <MessageCircle size={18} /> Reply
+          <button onClick={() => setShowReply(!showReply)} className="flex items-center gap-1.5 font-semibold text-gray-600 hover:text-purple-600 transition">
+            <MessageCircle size={16} className="md:w-[18px] md:h-[18px]" /> Reply
           </button>
         </div>
 
         {showReply && (
           <div className="mt-5">
             <div className="flex gap-2 mb-3">
-              <button onClick={() => setMode('Public')} className={`px-4 py-1.5 rounded-lg text-xs font-medium ${mode === 'Public' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}>Public</button>
-              <button onClick={() => setMode('Anonymous')} className={`px-4 py-1.5 rounded-lg text-xs font-medium ${mode === 'Anonymous' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}>Anonymous</button>
+              <button onClick={() => setMode('Public')} className={`px-3 md:px-4 py-1.5 rounded-lg text-xs font-semibold ${mode === 'Public' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Public</button>
+              <button onClick={() => setMode('Anonymous')} className={`px-3 md:px-4 py-1.5 rounded-lg text-xs font-semibold ${mode === 'Anonymous' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}>Anonymous</button>
             </div>
             <form onSubmit={handleReply} className="flex gap-2">
               <input
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
                 placeholder="Write a reply..."
-                className="flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 md:px-4 py-2 md:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition text-sm"
               />
-              <button type="submit" className="px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800">Send</button>
+              <button type="submit" className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition font-semibold text-sm">Send</button>
             </form>
           </div>
         )}

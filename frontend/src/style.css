@@ -20,12 +20,16 @@ body {
 /* Desktop scrollbar */
 @media (min-width: 640px) {
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1e3a8a;
+    background: #9ca3af;
     border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 

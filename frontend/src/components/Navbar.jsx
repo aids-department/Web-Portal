@@ -35,12 +35,12 @@ export default function Navbar({ toggleSidebar }) {
   };
 
   return (
-    <nav className="w-full bg-gray-900 border-b border-gray-700 px-10 py-4 flex items-center justify-between shadow-sm fixed top-0 z-40">
+    <nav className="w-full bg-gray-900 border-b border-gray-700 px-4 md:px-10 py-3 md:py-4 flex items-center justify-between shadow-sm fixed top-0 z-40">
       <Link to="/">
         <img
           src={logo}
           alt="AI & DS Association"
-          className="h-10 w-auto cursor-pointer"
+          className="h-8 md:h-10 w-auto cursor-pointer"
         />
       </Link>
 
@@ -50,9 +50,9 @@ export default function Navbar({ toggleSidebar }) {
       {!user ? (
         <Link
           to="/login"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium font-sans"
+          className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition font-medium font-sans border border-gray-700 text-sm md:text-base"
         >
-          <LogIn size={18} />
+          <LogIn size={16} className="md:w-[18px] md:h-[18px]" />
           Login
         </Link>
       ) : (
@@ -66,7 +66,7 @@ export default function Navbar({ toggleSidebar }) {
               setProfileMenuOpen((s) => !s);
             }}
           >
-            <FaUserCircle size={42} />
+            <FaUserCircle size={32} className="md:w-[42px] md:h-[42px]" />
           </div>
 
           {/* Dropdown */}
