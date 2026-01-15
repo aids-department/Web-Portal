@@ -37,7 +37,6 @@ export default function EditProfile() {
   const [profileImage, setProfileImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [resume, setResume] = useState(null);
-  const [resumeFile, setResumeFile] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalDesc, setModalDesc] = useState("");
@@ -138,10 +137,10 @@ export default function EditProfile() {
     }
   };
 
-  const handleResumeUpload = async () => {
-    if (!resumeFile) return;
+  const handleResumeUpload = async (file) => {
+    if (!file) return;
     const formData = new FormData();
-    formData.append("resume", resumeFile);
+    formData.append("resume", file);
     try {
       const res = await fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}/resume`, {
         method: "POST",
@@ -150,7 +149,6 @@ export default function EditProfile() {
       if (!res.ok) throw new Error("Upload failed");
       const uploaded = await res.json();
       setResume(uploaded);
-      setResumeFile(null);
     } catch (err) {
       alert("Failed to upload resume");
     }
@@ -457,18 +455,15 @@ export default function EditProfile() {
                     type="file"
                     accept=".pdf"
                     className="hidden"
-                    onChange={(e) => setResumeFile(e.target.files[0])}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        handleResumeUpload(file);
+                      }
+                    }}
                   />
                 </label>
               </div>
-            )}
-            {resumeFile && (
-              <button
-                onClick={handleResumeUpload}
-                className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:shadow-lg transition text-sm md:text-base"
-              >
-                Upload Resume
-              </button>
             )}
           </div>
         </div>
