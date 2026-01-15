@@ -31,8 +31,8 @@ import ManageUploads from "./components/ManageUploads";
 import ManageContent from "./components/ManageContent"; 
 import UpdateContent from "./components/ManageContentupdates.jsx";
 // Images for Dashboard
-import img1 from "../public/images/events/enigma.png";
-import img2 from "../public/images/events/genesys.png";
+import img1 from "./assets/enigma.png";
+import img2 from "./assets/genesys.png";
 import Dashboard_Carousel from "./components/Dashboard_Carousel";
 import AchievementsCarousel from "./components/AchievementsCarousel";
 import Profile from "./pages/Profile";

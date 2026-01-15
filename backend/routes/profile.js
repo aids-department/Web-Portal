@@ -119,12 +119,47 @@ router.post("/:userId/image", upload.single("image"), async (req, res) => {
 
     fs.unlinkSync(req.file.path); // cleanup temp file
 
-    res.json(updated.profileImage);
+// UPLOAD / UPDATE resume
+router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No resume provided" });
+    }
+
+    const profile = await Profile.findOne({ userId });
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "resumes",
+      resource_type: "raw", // for non-image files like PDF
+    });
+
+    // Delete old resume if exists
+    if (profile?.resume?.publicId) {
+      await cloudinary.uploader.destroy(profile.resume.publicId, { resource_type: "raw" });
+    }
+
+    const updated = await Profile.findOneAndUpdate(
+      { userId },
+      {
+        resume: {
+          url: result.secure_url,
+          publicId: result.public_id,
+          filename: req.file.originalname,
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    fs.unlinkSync(req.file.path); // cleanup temp file
+
+    res.json(updated.resume);
   } catch (err) {
-    console.error("Profile image upload error:", err);
-    res.status(500).json({ error: "Failed to upload profile image" });
+    console.error("Resume upload error:", err);
+    res.status(500).json({ error: "Failed to upload resume" });
   }
 });
-
 
 module.exports = router;

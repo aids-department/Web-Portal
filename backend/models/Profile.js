@@ -23,6 +23,11 @@ const ProfileSchema = new mongoose.Schema(
       url: String,
       publicId: String,
     },
+    resume: {
+      url: String,
+      publicId: String,
+      filename: String,
+    },
   },
   { timestamps: true }
 );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Briefcase, Award, Upload, X, Plus, Edit2, Trash2, Save, AlertCircle } from "lucide-react";
+import { User, Briefcase, Award, Upload, X, Plus, Edit2, Trash2, Save, AlertCircle, FileText } from "lucide-react";
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -36,6 +36,8 @@ export default function EditProfile() {
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [resume, setResume] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalDesc, setModalDesc] = useState("");
@@ -74,6 +76,7 @@ export default function EditProfile() {
         setLinkedin(profileData.linkedin);
         setSkills(profileData.skills);
         setProfileImage(data.profileImage || null);
+        setResume(data.resume || null);
         setOriginalData(profileData);
       })
       .catch((err) => console.error("Load profile error", err));
@@ -132,6 +135,24 @@ export default function EditProfile() {
       setImageFile(null);
     } catch (err) {
       alert("Failed to upload profile image");
+    }
+  };
+
+  const handleResumeUpload = async () => {
+    if (!resumeFile) return;
+    const formData = new FormData();
+    formData.append("resume", resumeFile);
+    try {
+      const res = await fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}/resume`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const uploaded = await res.json();
+      setResume(uploaded);
+      setResumeFile(null);
+    } catch (err) {
+      alert("Failed to upload resume");
     }
   };
 
@@ -397,7 +418,60 @@ export default function EditProfile() {
           </div>
         </div>
 
-        {/* Skills Section */}
+        {/* Resume Section */}
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
+          <div className="flex items-center gap-2 mb-4">
+            <Upload className="w-5 h-5 text-green-600" />
+            <h2 className="text-lg md:text-xl font-semibold text-gray-800">Resume</h2>
+          </div>
+          <div className="space-y-3">
+            {resume?.url ? (
+              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <FileText className="w-5 h-5 text-green-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{resume.filename || "Resume"}</p>
+                  <a
+                    href={resume.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    View Resume →
+                  </a>
+                </div>
+                <button
+                  onClick={() => setResume(null)}
+                  className="text-red-500 hover:text-red-700 p-1"
+                  title="Remove resume"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                <p className="text-sm text-gray-600 mb-2">Upload your resume (PDF format)</p>
+                <label className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition">
+                  Choose File
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    onChange={(e) => setResumeFile(e.target.files[0])}
+                  />
+                </label>
+              </div>
+            )}
+            {resumeFile && (
+              <button
+                onClick={handleResumeUpload}
+                className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:shadow-lg transition text-sm md:text-base"
+              >
+                Upload Resume
+              </button>
+            )}
+          </div>
+        </div>
         <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
           <div className="flex items-center gap-2 mb-4">
             <Briefcase className="w-5 h-5 text-purple-600" />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Mail, Calendar, Award, Code, Edit, TrendingUp, MessageCircle, Hash, Cake, Save } from "lucide-react";
+import { Mail, Calendar, Award, Code, Edit, TrendingUp, MessageCircle, Hash, Cake, Save, Github, Link, FileText } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Profile() {
@@ -116,7 +116,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {/* Bio Section */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">About</h3>
@@ -142,6 +142,82 @@ export default function Profile() {
               <p className="text-gray-500 text-sm">No skills added yet. Add your skills to showcase your expertise!</p>
             )}
           </div>
+
+          {/* Social Links Section */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Link size={20} /> Social Links
+            </h3>
+            {profile?.socialLinks && (profile.socialLinks.github || profile.socialLinks.leetcode || profile.socialLinks.linkedin) ? (
+              <div className="space-y-3">
+                {profile.socialLinks.github && (
+                  <a
+                    href={profile.socialLinks.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    <Github size={16} />
+                    <span className="text-sm">GitHub</span>
+                  </a>
+                )}
+                {profile.socialLinks.leetcode && (
+                  <a
+                    href={profile.socialLinks.leetcode}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors"
+                  >
+                    <Code size={16} />
+                    <span className="text-sm">LeetCode</span>
+                  </a>
+                )}
+                {profile.socialLinks.linkedin && (
+                  <a
+                    href={profile.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-700 hover:text-blue-800 transition-colors"
+                  >
+                    <Link size={16} />
+                    <span className="text-sm">LinkedIn</span>
+                  </a>
+                )}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">No social links added yet. Add your profiles to connect with others!</p>
+            )}
+          </div>
+        </div>
+
+        {/* Resume Section */}
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 mt-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <FileText size={20} /> Resume
+          </h3>
+          {profile?.resume?.url ? (
+            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+              <FileText className="w-8 h-8 text-green-600" />
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">{profile.resume.filename || "Resume.pdf"}</p>
+                <p className="text-sm text-gray-600">Click to view or download</p>
+              </div>
+              <a
+                href={profile.resume.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+              >
+                View Resume
+              </a>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <FileText className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-500">No resume uploaded yet</p>
+              <p className="text-sm text-gray-400">Upload your resume in Edit Profile to showcase your experience!</p>
+            </div>
+          )}
         </div>
 
         {/* Achievements Section */}
