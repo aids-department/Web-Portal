@@ -200,15 +200,16 @@ export default function Profile() {
               <FileText className="w-8 h-8 text-green-600" />
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{profile.resume.filename || "Resume.pdf"}</p>
-                <p className="text-sm text-gray-600">Click to view or download</p>
+                <p className="text-sm text-gray-600">Click to download your resume</p>
               </div>
               <a
                 href={profile.resume.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                download={profile.resume.filename || "Resume.pdf"}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
               >
-                View Resume
+                Download Resume
               </a>
             </div>
           ) : (

@@ -131,6 +131,8 @@ router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "resumes",
       resource_type: "raw",
+      type: "upload",
+      access_mode: "public",
     });
 
     if (profile?.resume?.publicId) {
