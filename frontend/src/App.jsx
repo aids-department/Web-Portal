@@ -533,6 +533,15 @@ export default function App() {
         />
 
         <Route
+          path="/profile/:userId"
+          element={
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <Profile />
+            </MainLayout>
+          }
+        />
+
+        <Route
           path="/edit-profile"
           element={
             <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>

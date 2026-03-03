@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Mail, Calendar, Award, Code, Edit, TrendingUp, MessageCircle, Hash, Cake, Save, Github, Link, FileText } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useRef } from "react";
 
 export default function Profile() {
+  const { userId: paramUserId } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [achievements, setAchievements] = useState([]);
@@ -10,9 +13,11 @@ export default function Profile() {
   const [showSavedToast, setShowSavedToast] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const hasShownToast = useRef(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?.id;
+  const loggedInUserId = user?.id;
+  const userId = paramUserId || loggedInUserId;
 
   useEffect(() => {
     if (location.state?.profileSaved) {
@@ -23,14 +28,30 @@ export default function Profile() {
   }, [location]);
 
   useEffect(() => {
-    if (!userId) {
+    if (!paramUserId && !loggedInUserId) {
       window.location.href = "/login";
       return;
     }
 
+    // Reset state on route change
+    setProfile(null);
+    setLoading(true);
+    hasShownToast.current = false;
+
     fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`)
       .then((res) => res.ok ? res.json() : null)
-      .then((data) => setProfile(data))
+      .then((data) => {
+        if (!data && paramUserId) {
+          if (!hasShownToast.current) {
+            toast.error("Profile not found");
+            hasShownToast.current = true;
+          }
+          setProfile(null);
+          return;
+        }
+
+        setProfile(data);
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
 
@@ -49,6 +70,22 @@ export default function Profile() {
   }, [userId]);
 
   if (loading) return (
+    <div className="flex items-center justify-center h-full">
+      <div className="text-xl text-gray-600">Loading profile...</div>
+    </div>
+  );
+
+  
+
+  if (!profile && paramUserId) {
+    return (
+      <div className="text-center mt-20 text-gray-700 text-lg">
+        Profile Not Found
+      </div>
+    );
+  }
+
+  if (!profile) return (
     <div className="flex items-center justify-center h-full">
       <div className="text-xl text-gray-600">Loading profile...</div>
     </div>

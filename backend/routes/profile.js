@@ -6,6 +6,7 @@ const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
 
 const upload = multer({ dest: "uploads/" });
+const mongoose = require("mongoose");
 
 /**
  * SEARCH profiles
@@ -40,8 +41,15 @@ router.get("/", async (req, res) => {
 router.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+
+    // Prevent CastError
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.json(null);
+    }
+
     const profile = await Profile.findOne({ userId });
     res.json(profile || null);
+
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.status(500).json({ error: "Server error" });

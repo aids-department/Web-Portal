@@ -5,6 +5,8 @@ const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 
+const mongoose = require("mongoose");
+
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
@@ -114,6 +116,10 @@ router.get("/user/:userId", async (req, res) => {
     const { all } = req.query;
 
     const filter = { userId };
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.json([]);
+    }
 
     // Only profile page should see approved
     if (!all) {

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const formatRows = (rows) => {
   return rows.map((r, index) => ({
@@ -16,6 +18,7 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
   const [nonFirstYearData, setNonFirstYearData] = useState([]);
   const [codenigmaData, setCodenigmaData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadLeaderboards() {
@@ -104,7 +107,18 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
                   className="border-t border-gray-200/60 hover:bg-gray-50/60 transition"
                 >
                   <td className="p-4 font-medium text-gray-700">{row.rank}</td>
-                  <td className="p-4 font-medium text-gray-700">{row.name}</td>
+                  <td
+                    className="p-4 font-medium text-blue-700 cursor-pointer hover:underline"
+                    onClick={() => {
+                      if (row.roll && /^[a-fA-F0-9]{24}$/.test(row.roll)) {
+                        navigate(`/profile/${row.roll}`);
+                      } else {
+                        toast.error("Profile not available");
+                      }
+                    }}
+                  >
+                    {row.name}
+                  </td>
                   <td className="p-4 text-gray-600">{row.yearDisplay}</td>
                   <td className="p-4 font-medium text-gray-700">{row.score}</td>
                   <td className="p-4 text-gray-600 hidden sm:table-cell">
