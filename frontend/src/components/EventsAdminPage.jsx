@@ -1,7 +1,22 @@
-import React, { useState } from "react";
-import { Calendar, Plus, Clock, MapPin, Users, Trophy, ArrowRight, ArrowLeft, Save, Upload, CheckCircle } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Calendar,
+  Plus,
+  Clock,
+  MapPin,
+  Users,
+  Trophy,
+  ArrowRight,
+  ArrowLeft,
+  Save,
+  Upload,
+  CheckCircle,
+  Pencil,
+  Trash
+} from "lucide-react";
 
 export default function EventsAdminPage() {
+
   const [activeTab, setActiveTab] = useState("upcoming");
 
   const categories = [
@@ -10,438 +25,381 @@ export default function EventsAdminPage() {
     "Workshops", "Trainings", "Internships",
   ];
 
-  const festCategories = ["Cultural Fests", "Management Fests", "Seminar", "Workshops"];
   const hackathonCategories = ["Hackathon"];
-  const trainingCategories = ["Trainings", "Internships"];
-  const literaryCategories = ["Literary Fests"];
-  const sportsCategories = ["Sports Fests"];
-  const conferenceCategories = ["Conferences"];
-  const onlineCategories = ["Online Events"];
 
-  // UPCOMING STATE
-  const [step, setStep] = useState("category");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [eventData, setEventData] = useState({
-    name: "", mode: "", venue: "", type: "", theme: "", organizer: "",
-    startDate: "", endDate: "", startTime: "", endTime: "", description: "",
-    poster: null, deadlines: "", fees: "", registrationLink: "", guestDetails: "",
-    contact: "", maxParticipants: "", teamSize: "", eligibility: "",
-    companyName: "", domain: "", duration: "", litCategory: "", rules: "",
-    sportType: "", maxTeams: "", equipment: "", journalInfo: "", keynote: "",
-    platform: "", eventLink: "",
-    hackProblemStatements: "", hackTechStack: "", hackJudgingCriteria: "",
-    hackPrizes: "", hackMentors: "", hackRules: "",
+  const [events,setEvents] = useState([]);
+
+  const [editingEventId,setEditingEventId] = useState(null);
+
+  const [step,setStep] = useState("category");
+
+  const [selectedCategory,setSelectedCategory] = useState("");
+
+  const [isUploading,setIsUploading] = useState(false);
+
+  const [eventData,setEventData] = useState({
+    name:"",
+    mode:"",
+    venue:"",
+    organizer:"",
+    startDate:"",
+    endDate:"",
+    startTime:"",
+    endTime:"",
+    description:"",
+    poster:null,
+    deadlines:"",
+    registrationLink:"",
+    contact:"",
+    hackProblemStatements:"",
+    hackTechStack:"",
+    hackJudgingCriteria:"",
+    hackPrizes:"",
+    hackMentors:"",
+    hackRules:"",
+    theme:"",
+    teamSize:"",
   });
 
-  // Loading state for uploads
-  const [isUploading, setIsUploading] = useState(false);
+  useEffect(()=>{
+    fetchEvents();
+  },[]);
 
-  // PAST STATE (unchanged)
-  const [pastStep, setPastStep] = useState("category");
-  const [pastSelectedCategory, setPastSelectedCategory] = useState("");
-  const [pastData, setPastData] = useState({
-    eventName: "", date: "", summary: "",
-    hackWinningTeam: "", hackWinningMembers: "", hackPrizeAmount: "", hackRunnerUp: "", hackBestInnovation: "",
-    festOverallChampion: "", festBestPerformance: "", festCategoryWinners: "", festJudgeComments: "",
-    litWinnerName: "", litCategory: "", litBestPerformer: "",
-    sportType: "", sportWinner: "", sportRunnerUp: "", sportScore: "", sportBestPlayer: "",
-    confKeynote: "", confPapersPresented: "", confBestPaper: "", confHighlights: "",
-    trainCompanyName: "", trainDomain: "", trainStudentsCount: "", trainDuration: "", trainOutcomeSummary: "",
-    onlineType: "", onlineSpeaker: "", onlineParticipants: "", onlineRecordingLink: "",
-  });
-
-  const handleEventChange = (e) => {
-    const { name, value, files } = e.target;
-    setEventData(prev => ({ ...prev, [name]: files ? files[0] : value }));
+  const fetchEvents = async ()=>{
+    try{
+      const res = await fetch("https://web-portal-760h.onrender.com/api/events");
+      const data = await res.json();
+      setEvents(data);
+    }catch(err){
+      console.error(err);
+    }
   };
 
-  const handlePastChange = (e) => {
-    const { name, value } = e.target;
-    setPastData(prev => ({ ...prev, [name]: value }));
+  const handleEventChange = (e)=>{
+    const {name,value,files} = e.target;
+    setEventData(prev=>({...prev,[name]:files?files[0]:value}));
   };
 
-  // SUBMIT UPCOMING - UPDATED FOR FILE UPLOAD
-  const handleUpcomingSubmit = async (e) => {
+  const handleEdit = (event)=>{
+
+    setEditingEventId(event._id);
+
+    setSelectedCategory(event.eventType);
+
+    setActiveTab("upcoming");
+
+    setEventData({
+      name:event.eventName,
+      mode:event.eventMode,
+      venue:event.venue,
+      organizer:event.organizer,
+      startDate:event.startDate,
+      endDate:event.endDate,
+      startTime:event.startTime,
+      endTime:event.endTime,
+      description:event.description,
+      poster:null,
+      deadlines:event.deadlines,
+      registrationLink:event.registrationLink === "NO_LINK" ? "" : event.registrationLink,
+      contact:event.contact,
+      hackProblemStatements:event.hackProblemStatements,
+      hackTechStack:event.hackTechStack,
+      hackJudgingCriteria:event.hackJudgingCriteria,
+      hackPrizes:event.hackPrizes,
+      hackMentors:event.hackMentors,
+      hackRules:event.hackRules,
+      theme:event.theme,
+      teamSize:event.teamSize,
+    });
+
+    setStep("form");
+  };
+
+  const handleDelete = async(id)=>{
+
+    if(!window.confirm("Delete this event?")) return;
+
+    try{
+      await fetch(`https://web-portal-760h.onrender.com/api/events/${id}`,{
+        method:"DELETE"
+      });
+
+      fetchEvents();
+    }catch(err){
+      alert("Delete failed");
+    }
+
+  };
+
+  const handleUpcomingSubmit = async(e)=>{
+
     e.preventDefault();
+
     setIsUploading(true);
 
-    try {
-      // Create FormData for file upload
+    try{
+
       const formData = new FormData();
-      
-      // Add all event data fields
-      formData.append('eventName', eventData.name);
-      formData.append('eventType', selectedCategory);
-      formData.append('startDate', eventData.startDate);
-      formData.append('endDate', eventData.endDate || eventData.startDate);
-      formData.append('venue', eventData.venue);
-      formData.append('eventMode', eventData.mode);
-      formData.append('organizer', eventData.organizer);
-      formData.append('description', eventData.description);
-      formData.append('registrationLink', eventData.registrationLink);
-      formData.append('contact', eventData.contact);
-      formData.append('deadlines', eventData.deadlines);
-      formData.append('fees', eventData.fees);
-      formData.append('eligibility', eventData.eligibility);
-      formData.append('maxParticipants', eventData.maxParticipants);
-      formData.append('startTime', eventData.startTime);
-      formData.append('endTime', eventData.endTime);
-      
-      // Add category-specific fields
-      if (hackathonCategories.includes(selectedCategory)) {
-        formData.append('hackProblemStatements', eventData.hackProblemStatements);
-        formData.append('hackTechStack', eventData.hackTechStack);
-        formData.append('hackJudgingCriteria', eventData.hackJudgingCriteria);
-        formData.append('hackPrizes', eventData.hackPrizes);
-        formData.append('hackMentors', eventData.hackMentors);
-        formData.append('hackRules', eventData.hackRules);
-        formData.append('theme', eventData.theme);
-        formData.append('teamSize', eventData.teamSize);
-      }
-      
-      if (festCategories.includes(selectedCategory)) {
-        formData.append('guestDetails', eventData.guestDetails);
-        formData.append('theme', eventData.theme);
-      }
-      
-      if (trainingCategories.includes(selectedCategory)) {
-        formData.append('companyName', eventData.companyName);
-        formData.append('domain', eventData.domain);
-        formData.append('duration', eventData.duration);
-      }
-      
-      if (literaryCategories.includes(selectedCategory)) {
-        formData.append('litCategory', eventData.litCategory);
-        formData.append('rules', eventData.rules);
-      }
-      
-      if (sportsCategories.includes(selectedCategory)) {
-        formData.append('sportType', eventData.sportType);
-        formData.append('maxTeams', eventData.maxTeams);
-        formData.append('equipment', eventData.equipment);
-        formData.append('rules', eventData.rules);
-      }
-      
-      if (conferenceCategories.includes(selectedCategory)) {
-        formData.append('journalInfo', eventData.journalInfo);
-        formData.append('keynote', eventData.keynote);
-        formData.append('theme', eventData.theme);
-      }
-      
-      if (onlineCategories.includes(selectedCategory)) {
-        formData.append('platform', eventData.platform);
-        formData.append('eventLink', eventData.eventLink);
-      }
-      
-      // Add image file if exists
-      if (eventData.poster) {
-        formData.append('poster', eventData.poster);
+
+      formData.append("eventName",eventData.name);
+      formData.append("eventType",selectedCategory);
+      formData.append("startDate",eventData.startDate);
+      formData.append("endDate",eventData.endDate || eventData.startDate);
+      formData.append("venue",eventData.venue);
+      formData.append("eventMode",eventData.mode);
+      formData.append("organizer",eventData.organizer);
+      formData.append("description",eventData.description);
+
+      formData.append("registrationLink",eventData.registrationLink || "NO_LINK");
+
+      formData.append("contact",eventData.contact);
+
+      formData.append("deadlines",eventData.deadlines || eventData.startDate);
+
+      formData.append("startTime",eventData.startTime);
+      formData.append("endTime",eventData.endTime);
+
+      if(hackathonCategories.includes(selectedCategory)){
+
+        formData.append("hackProblemStatements",eventData.hackProblemStatements);
+        formData.append("hackTechStack",eventData.hackTechStack);
+        formData.append("hackJudgingCriteria",eventData.hackJudgingCriteria);
+        formData.append("hackPrizes",eventData.hackPrizes);
+        formData.append("hackMentors",eventData.hackMentors);
+        formData.append("hackRules",eventData.hackRules);
+        formData.append("theme",eventData.theme);
+        formData.append("teamSize",eventData.teamSize);
+
       }
 
-      const res = await fetch("https://web-portal-760h.onrender.com/api/events", {
-        method: "POST",
-        body: formData, // Send FormData, not JSON
-        // Don't set Content-Type header - browser will set it with boundary
-      });
+      if(eventData.poster){
+        formData.append("poster",eventData.poster);
+      }
 
-      const result = await res.json();
+      const url = editingEventId
+        ? `https://web-portal-760h.onrender.com/api/events/${editingEventId}`
+        : "https://web-portal-760h.onrender.com/api/events";
 
-      if (res.ok) {
-        alert("Upcoming event saved successfully!");
-        console.log("Event saved:", result);
-        
-        // Reset form
-        setEventData({
-          name: "", mode: "", venue: "", type: "", theme: "", organizer: "",
-          startDate: "", endDate: "", startTime: "", endTime: "", description: "",
-          poster: null, deadlines: "", fees: "", registrationLink: "", guestDetails: "",
-          contact: "", maxParticipants: "", teamSize: "", eligibility: "",
-          companyName: "", domain: "", duration: "", litCategory: "", rules: "",
-          sportType: "", maxTeams: "", equipment: "", journalInfo: "", keynote: "",
-          platform: "", eventLink: "",
-          hackProblemStatements: "", hackTechStack: "", hackJudgingCriteria: "",
-          hackPrizes: "", hackMentors: "", hackRules: "",
-        });
+      const method = editingEventId ? "PUT":"POST";
+
+      const res = await fetch(url,{
+  method,
+  headers: editingEventId ? { "Content-Type":"application/json" } : undefined,
+  body: editingEventId
+    ? JSON.stringify(Object.fromEntries(formData))
+    : formData
+});
+
+      if(res.ok){
+
+        alert("Event saved successfully");
+
+        fetchEvents();
+
+        setEditingEventId(null);
+
         setStep("category");
+
         setSelectedCategory("");
-      } else {
-        alert(`Error: ${result.error || 'Failed to save event'}`);
+
+        setEventData({
+          name:"",
+          mode:"",
+          venue:"",
+          organizer:"",
+          startDate:"",
+          endDate:"",
+          startTime:"",
+          endTime:"",
+          description:"",
+          poster:null,
+          deadlines:"",
+          registrationLink:"",
+          contact:"",
+          hackProblemStatements:"",
+          hackTechStack:"",
+          hackJudgingCriteria:"",
+          hackPrizes:"",
+          hackMentors:"",
+          hackRules:"",
+          theme:"",
+          teamSize:"",
+        });
+
+      }else{
+        alert("Error saving event");
       }
-    } catch (err) {
-      console.error("Error saving event:", err);
-      alert("Error saving event: " + err.message);
-    } finally {
+
+    }catch(err){
+      alert(err.message);
+    }finally{
       setIsUploading(false);
     }
-  };
 
-  // SUBMIT PAST (unchanged)
-  const handlePastSubmit = async (e) => {
-    e.preventDefault();
-    
-    const payload = {
-      eventName: pastData.eventName,
-      eventType: pastSelectedCategory,
-      startDate: pastData.date,
-      endDate: pastData.date,
-      ...pastData,
-    };
-
-    try {
-      const res = await fetch("https://web-portal-760h.onrender.com/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      
-      if (res.ok) {
-        alert("Past event saved successfully!");
-        setPastData({
-          eventName: "", date: "", summary: "",
-          hackWinningTeam: "", hackWinningMembers: "", hackPrizeAmount: "", hackRunnerUp: "", hackBestInnovation: "",
-          festOverallChampion: "", festBestPerformance: "", festCategoryWinners: "", festJudgeComments: "",
-          litWinnerName: "", litCategory: "", litBestPerformer: "",
-          sportType: "", sportWinner: "", sportRunnerUp: "", sportScore: "", sportBestPlayer: "",
-          confKeynote: "", confPapersPresented: "", confBestPaper: "", confHighlights: "",
-          trainCompanyName: "", trainDomain: "", trainStudentsCount: "", trainDuration: "", trainOutcomeSummary: "",
-          onlineType: "", onlineSpeaker: "", onlineParticipants: "", onlineRecordingLink: "",
-        });
-        setPastStep("category");
-        setPastSelectedCategory("");
-      }
-    } catch (err) {
-      alert("Error saving past event");
-    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-6 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Events Admin Panel</h1>
 
-        {/* Tabs */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-6 px-4">
+
+      <div className="max-w-5xl mx-auto">
+
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          Events Admin Panel
+        </h1>
+
         <div className="flex justify-center gap-3 mb-6">
+
           <button
-            onClick={() => setActiveTab("upcoming")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
-              activeTab === "upcoming"
-                ? "bg-blue-600 text-white shadow-lg"
-                : "bg-white text-gray-700 shadow-md hover:shadow-lg"
+            onClick={()=>setActiveTab("upcoming")}
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
+              activeTab==="upcoming"
+              ? "bg-blue-600 text-white"
+              : "bg-white text-gray-700"
             }`}
           >
-            <Plus className="w-4 h-4" />
-            Add Upcoming Event
+            <Plus className="w-4 h-4"/>
+            Add Event
           </button>
+
           <button
-            onClick={() => setActiveTab("past")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
-              activeTab === "past"
-                ? "bg-purple-600 text-white shadow-lg"
-                : "bg-white text-gray-700 shadow-md hover:shadow-lg"
+            onClick={()=>setActiveTab("manage")}
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
+              activeTab==="manage"
+              ? "bg-purple-600 text-white"
+              : "bg-white text-gray-700"
             }`}
           >
-            <Trophy className="w-4 h-4" />
-            Add Past Event Results
+            <Users className="w-4 h-4"/>
+            Manage Events
           </button>
+
         </div>
 
-        {/* UPCOMING SECTION */}
-        {activeTab === "upcoming" && (
+        {activeTab==="manage" && (
+
           <div className="bg-white rounded-xl shadow-lg p-6">
-            {step === "category" ? (
-              <div className="text-center">
-                <div className="flex justify-center mb-4">
-                  <Calendar className="w-12 h-12 text-blue-600" />
+
+            <h2 className="font-bold text-lg mb-4">Existing Events</h2>
+
+            <div className="space-y-3">
+
+              {events.map(ev=>(
+                <div key={ev._id} className="flex justify-between items-center border p-3 rounded">
+
+                  <div>
+                    <p className="font-semibold">{ev.eventName}</p>
+                    <p className="text-sm text-gray-500">{ev.eventType}</p>
+                  </div>
+
+                  <div className="flex gap-2">
+
+                    <button
+                      onClick={()=>handleEdit(ev)}
+                      className="p-2 bg-blue-500 text-white rounded"
+                    >
+                      <Pencil size={16}/>
+                    </button>
+
+                    <button
+                      onClick={()=>handleDelete(ev._id)}
+                      className="p-2 bg-red-500 text-white rounded"
+                    >
+                      <Trash size={16}/>
+                    </button>
+
+                  </div>
+
                 </div>
-                <h2 className="text-xl font-bold text-gray-800 mb-6">Select Event Category</h2>
+              ))}
+
+            </div>
+
+          </div>
+
+        )}
+
+        {activeTab==="upcoming" && (
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+
+            {step==="category" ? (
+
+              <div className="text-center">
+
+                <h2 className="text-xl font-bold mb-6">
+                  Select Event Category
+                </h2>
+
                 <select
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full max-w-md mx-auto p-3 border-2 border-gray-300 rounded-lg text-base focus:border-blue-500 focus:outline-none"
+                  onChange={(e)=>setSelectedCategory(e.target.value)}
+                  className="w-full max-w-md mx-auto p-3 border rounded-lg"
                 >
                   <option value="">Choose category...</option>
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {categories.map(cat=>(
+                    <option key={cat}>{cat}</option>
                   ))}
                 </select>
+
                 <button
-                  onClick={() => selectedCategory && setStep("form")}
-                  disabled={!selectedCategory}
-                  className="mt-6 px-8 py-3 bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition flex items-center gap-2 mx-auto"
+                  onClick={()=>selectedCategory && setStep("form")}
+                  className="mt-6 px-8 py-3 bg-blue-600 text-white rounded-lg flex items-center gap-2 mx-auto"
                 >
                   Next
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight size={16}/>
                 </button>
+
               </div>
-            ) : (
+
+            ):(
               <form onSubmit={handleUpcomingSubmit} className="space-y-4">
-                <h2 className="text-xl font-bold text-gray-800 text-center mb-6">
-                  {selectedCategory} Details
-                </h2>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <input name="name" placeholder="Event Name *" required className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.name} />
-                  <select name="mode" required className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.mode}>
-                    <option value="">Mode *</option>
-                    <option>Online</option><option>Offline</option>
+
+                  <input name="name" required placeholder="Event Name" className="p-3 border rounded-lg" value={eventData.name} onChange={handleEventChange}/>
+
+                  <select name="mode" required className="p-3 border rounded-lg" value={eventData.mode} onChange={handleEventChange}>
+                    <option value="">Mode</option>
+                    <option>Online</option>
+                    <option>Offline</option>
                   </select>
-                  <input name="venue" placeholder="Venue / Platform" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.venue} />
-                  <input name="organizer" placeholder="Organizer" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.organizer} />
-                  <input name="startDate" type="date" required className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.startDate} />
-                  <input name="endDate" type="date" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.endDate} />
-                  <input name="startTime" type="time" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.startTime} />
-                  <input name="endTime" type="time" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.endTime} />
-                  <div className="flex flex-col gap-1">
-  <label className="text-sm font-medium text-gray-700">
-    Registration Deadline
-  </label>
-  <input
-    name="deadlines"
-    type="date"
-    className="p-3 border rounded-lg"
-    onChange={handleEventChange}
-    value={eventData.deadlines}
-  />
-</div>
 
-                  <input name="registrationLink" placeholder="Registration Link" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.registrationLink} />
-                  <input name="contact" placeholder="Contact Info" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.contact} />
-                  <div className="col-span-2">
-                    <textarea name="description" placeholder="Description" rows={3} className="w-full p-3 border rounded-lg" onChange={handleEventChange} value={eventData.description}></textarea>
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Event Poster / Image
-                    </label>
-                    <input 
-                      type="file" 
-                      name="poster" 
-                      accept="image/*" 
-                      className="w-full p-3 border rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
-                      onChange={handleEventChange} 
-                    />
-                    {eventData.poster && (
-                      <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
-                        <CheckCircle className="w-4 h-4" />
-                        Selected: {eventData.poster.name}
-                      </p>
-                    )}
-                  </div>
+                  <input name="venue" required placeholder="Venue" className="p-3 border rounded-lg" value={eventData.venue} onChange={handleEventChange}/>
+
+                  <input name="contact" required placeholder="Contact Info" className="p-3 border rounded-lg" value={eventData.contact} onChange={handleEventChange}/>
+
+                  <input type="date" name="startDate" required className="p-3 border rounded-lg" value={eventData.startDate} onChange={handleEventChange}/>
+
+                  <input type="date" name="endDate" required className="p-3 border rounded-lg" value={eventData.endDate} onChange={handleEventChange}/>
+
+                  <input type="time" name="startTime" required className="p-3 border rounded-lg" value={eventData.startTime} onChange={handleEventChange}/>
+
+                  <input type="time" name="endTime" className="p-3 border rounded-lg" value={eventData.endTime} onChange={handleEventChange}/>
+
+                  <input type="date" name="deadlines" required className="p-3 border rounded-lg" value={eventData.deadlines} onChange={handleEventChange}/>
+
+                  <input name="registrationLink" placeholder="Registration Link" className="p-3 border rounded-lg" value={eventData.registrationLink} onChange={handleEventChange}/>
+
                 </div>
 
-                {/* Category-specific fields */}
-                {hackathonCategories.includes(selectedCategory) && (
-                  <div className="grid md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-lg">
-                    <h3 className="col-span-2 font-bold text-base text-gray-700">Hackathon Details</h3>
-                    <textarea name="hackProblemStatements" placeholder="Problem Statements" rows={2} className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackProblemStatements}></textarea>
-                    <input name="hackTechStack" placeholder="Tech Stack" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackTechStack} />
-                    <textarea name="hackJudgingCriteria" placeholder="Judging Criteria" rows={2} className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackJudgingCriteria}></textarea>
-                    <input name="hackPrizes" placeholder="Prizes" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackPrizes} />
-                    <input name="hackMentors" placeholder="Mentors" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackMentors} />
-                    <input name="theme" placeholder="Theme" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.theme} />
-                    <input name="teamSize" placeholder="Team Size" className="p-3 border rounded-lg" onChange={handleEventChange} value={eventData.teamSize} />
-                    <textarea name="hackRules" placeholder="Rules" rows={2} className="col-span-2 p-3 border rounded-lg" onChange={handleEventChange} value={eventData.hackRules}></textarea>
-                  </div>
-                )}
+                <textarea name="description" placeholder="Description" className="w-full p-3 border rounded-lg" rows={3} value={eventData.description} onChange={handleEventChange}/>
 
-                <div className="flex justify-between mt-6">
-                  <button 
-                    type="button" 
-                    onClick={() => setStep("category")} 
-                    className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition"
-                    disabled={isUploading}
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isUploading}
-                  >
-                    {isUploading ? (
-                      <>
-                        <Upload className="w-4 h-4 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Save Event
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        )}
-
-        {/* PAST SECTION - Unchanged */}
-        {activeTab === "past" && (
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            {pastStep === "category" ? (
-              <div className="text-center">
-                <div className="flex justify-center mb-4">
-                  <Trophy className="w-12 h-12 text-purple-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-800 mb-6">Select Past Event Category</h2>
-                <select
-                  value={pastSelectedCategory}
-                  onChange={(e) => setPastSelectedCategory(e.target.value)}
-                  className="w-full max-w-md mx-auto p-3 border-2 border-gray-300 rounded-lg text-base focus:border-purple-500 focus:outline-none"
-                >
-                  <option value="">Choose category...</option>
-                  {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                </select>
-                <button
-                  onClick={() => pastSelectedCategory && setPastStep("form")}
-                  disabled={!pastSelectedCategory}
-                  className="mt-6 px-8 py-3 bg-purple-600 text-white rounded-lg font-medium disabled:opacity-50 hover:bg-purple-700 transition flex items-center gap-2 mx-auto"
-                >
-                  Next
-                  <ArrowRight className="w-4 h-4" />
+                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg flex items-center gap-2">
+                  <Save size={16}/>
+                  {editingEventId ? "Update Event":"Save Event"}
                 </button>
-              </div>
-            ) : (
-              <form onSubmit={handlePastSubmit} className="space-y-4">
-                <h2 className="text-xl font-bold text-center text-gray-800 mb-6">
-                  {pastSelectedCategory} Results
-                </h2>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <input name="eventName" placeholder="Event Name *" required className="p-3 border rounded-lg" onChange={handlePastChange} value={pastData.eventName} />
-                  <input name="date" type="date" required className="p-3 border rounded-lg" onChange={handlePastChange} value={pastData.date} />
-                </div>
-
-                {hackathonCategories.includes(pastSelectedCategory) && (
-                  <div className="bg-orange-50 p-4 rounded-lg space-y-3">
-                    <h3 className="font-bold text-base text-gray-700">Winners & Results</h3>
-                    <input name="hackWinningTeam" placeholder="Winning Team Name" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackWinningTeam} />
-                    <input name="hackWinningMembers" placeholder="Winning Team Members" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackWinningMembers} />
-                    <input name="hackPrizeAmount" placeholder="Prize Amount" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackPrizeAmount} />
-                    <input name="hackRunnerUp" placeholder="Runner-up Team" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackRunnerUp} />
-                    <input name="hackBestInnovation" placeholder="Best Innovation Award" className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.hackBestInnovation} />
-                  </div>
-                )}
-
-                <textarea name="summary" placeholder="Overall Summary / Key Takeaways" rows={4} className="w-full p-3 border rounded-lg" onChange={handlePastChange} value={pastData.summary}></textarea>
-
-                <div className="flex justify-between mt-6">
-                  <button type="button" onClick={() => setPastStep("category")} className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition">
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </button>
-                  <button type="submit" className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition">
-                    <CheckCircle className="w-4 h-4" />
-                    Save Results
-                  </button>
-                </div>
               </form>
             )}
+
           </div>
+
         )}
+
       </div>
+
     </div>
   );
+
 }

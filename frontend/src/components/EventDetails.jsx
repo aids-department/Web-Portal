@@ -111,22 +111,19 @@ const EventDetails = ({ event, onBack }) => {
             )}
 
             <div className="pt-4">
-              {event.registrationLink ? (
-                <a
-                  href={event.registrationLink}
-                  target="_blank"
-                  className="inline-block px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl transition"
-                >
+              <button
+                  onClick={() => {
+                    if (!event.registrationLink || event.registrationLink === "NO_LINK") {
+                      alert("No registration link has been provided for this event.");
+                      return;
+                    }
+                    window.open(event.registrationLink, "_blank");
+                  }}
+                  className="inline-block px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl transition">
                   Register Now
-                </a>
-              ) : (
-                <button
-                  disabled
-                  className="px-8 py-3 rounded-2xl bg-gray-200 text-gray-500 font-bold cursor-not-allowed"
-                >
-                  Registration Closed
                 </button>
-              )}
+                
+              
             </div>
           </div>
         </div>

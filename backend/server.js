@@ -644,6 +644,51 @@ app.post("/api/events", upload.single("poster"), async (req, res) => {
   } finally {
     if (temp && fs.existsSync(temp)) fs.unlinkSync(temp);
   }
+})
+;
+app.put("/api/events/:id", upload.single("poster"), async (req, res) => {
+  try {
+
+    const updateData = {
+      eventName: req.body.eventName,
+      eventType: req.body.eventType,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      venue: req.body.venue,
+      eventMode: req.body.eventMode,
+      organizer: req.body.organizer,
+      description: req.body.description,
+      registrationLink: req.body.registrationLink,
+      contact: req.body.contact,
+      deadlines: req.body.deadlines,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      hackProblemStatements: req.body.hackProblemStatements,
+      hackTechStack: req.body.hackTechStack,
+      hackJudgingCriteria: req.body.hackJudgingCriteria,
+      hackPrizes: req.body.hackPrizes,
+      hackMentors: req.body.hackMentors,
+      hackRules: req.body.hackRules,
+      theme: req.body.theme,
+      teamSize: req.body.teamSize
+    };
+
+    if (req.file) {
+      updateData.poster = req.file.path;
+    }
+
+    const updated = await Event.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.json(updated);
+
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ error: "Failed to update event" });
+  }
 });
 
 app.delete("/api/events/:id", async (req, res) => {
@@ -829,4 +874,48 @@ app.listen(PORT, () => {
   console.log("→ Posts System Enabled");
   console.log("→ Alumni Routes Enabled");
   console.log(`  Authorize: http://localhost:${PORT}/calendar/auth`);
+});
+app.put("/api/events/:id", upload.single("poster"), async (req, res) => {
+
+  try {
+
+    const id = req.params.id;
+
+    const updateData = {
+      ...req.body
+    };
+
+    if (req.file) {
+      updateData.poster = req.file.path;
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
+
+    res.json(updatedEvent);
+
+  } catch (error) {
+
+    res.status(500).json({ error: "Update failed" });
+
+  }
+
+});
+
+
+app.delete("/api/events/:id", async (req, res) => {
+  try {
+
+    const eventId = req.params.id;
+
+    await Event.findByIdAndDelete(eventId);
+
+    res.json({ message: "Event deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete event" });
+  }
 });
