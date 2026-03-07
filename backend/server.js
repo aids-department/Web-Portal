@@ -638,6 +638,7 @@ app.post("/api/events", upload.single("poster"), async (req, res) => {
       }
     }
 
+
     res.json({ success: true, event: savedEvent });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -646,6 +647,26 @@ app.post("/api/events", upload.single("poster"), async (req, res) => {
   }
 })
 ;
+app.put("/api/events/:id", async (req, res) => {
+  try {
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    res.json(updatedEvent);
+
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: "Failed to update event" });
+  }
+});
 app.put("/api/events/:id", upload.single("poster"), async (req, res) => {
   try {
 
