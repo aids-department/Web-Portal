@@ -53,11 +53,9 @@ const EventsPage = () => {
         </div>
 
         {/* Search & Tabs */}
-        {/* Search Bar */}
-
-        {/* Search Bar */}
         <div className="grid lg:grid-cols-3 gap-6 md:gap-10 mb-6 md:mb-12">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-4">
+              {/* Search Bar */}
             <div className="relative w-full">
               <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input
@@ -75,6 +73,30 @@ const EventsPage = () => {
                   transition-all duration-200
                 "
               />
+            </div>
+
+            {/* Tab Toggle Buttons */}
+            <div className="flex space-x-2 md:space-x-4">
+              <button
+                onClick={() => setActiveTab('upcoming')}
+                className={`px-6 py-2.5 rounded-2xl font-semibold text-sm md:text-base transition-all duration-200 ${
+                  activeTab === 'upcoming'
+                    ? 'bg-white text-blue-600 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1)] border border-gray-100'
+                    : 'bg-transparent text-slate-600 hover:bg-white/40 hover:text-slate-800'
+                }`}
+              >
+                Upcoming Events
+              </button>
+              <button
+                onClick={() => setActiveTab('past')}
+                className={`px-6 py-2.5 rounded-2xl font-semibold text-sm md:text-base transition-all duration-200 ${
+                  activeTab === 'past'
+                    ? 'bg-white text-blue-600 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1)] border border-gray-100'
+                    : 'bg-transparent text-slate-600 hover:bg-white/40 hover:text-slate-800'
+                }`}
+              >
+                Past Events
+              </button>
             </div>
           </div>
         </div>
