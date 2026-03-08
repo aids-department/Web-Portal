@@ -23,7 +23,7 @@ const Admin = require("./models/Admin");
 const { Post, Comment } = require("./models/Post");
 const QuestionPaper = require("./models/QuestionPaper");
 const Profile = require("./models/Profile");
-
+const { generateToken } = require('./middleware/auth');
 // Updates Schema
 const updateSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -214,33 +214,38 @@ async function createCalendarEvent(payload) {
 // ============================================
 
 // ADMIN LOGIN
-app.post("/api/admin/login", async (req, res) => {
+app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ error: "Username and password are required" });
+      return res.status(400).json({ error: 'Username and password are required' });
     }
 
     const admin = await Admin.findOne({ username });
-    
+
     if (!admin || admin.password !== password) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    console.log("✓ Admin logged in:", admin.username);
+    // Admin schema has role: { default: 'admin' }
+    // so the JWT will carry role:'admin' automatically
+    const token = generateToken(admin);
+
+    console.log('✓ Admin logged in:', admin.username);
+
     res.json({
       success: true,
-      message: "Admin login successful",
+      message: 'Admin login successful',
+      token,        // ← this is what was missing before
       admin: {
-        id: admin._id,
+        id:       admin._id,
         username: admin.username,
-        role: admin.role
-      }
+        role:     admin.role,
+      },
     });
-
   } catch (err) {
-    console.error("Admin login error:", err);
+    console.error('Admin login error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -250,92 +255,90 @@ app.post("/api/admin/login", async (req, res) => {
 // ============================================
 
 // SIGNUP
-app.post("/api/auth/signup", async (req, res) => {
+app.post('/api/auth/signup', async (req, res) => {
   try {
     const { fullName, username, email, password, year } = req.body;
 
     if (!fullName || !username || !email || !password || !year) {
-      return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const existingUsername = await User.findOne({ username });
-    if (existingUsername) {
-      return res.status(400).json({ error: "Username already taken" });
+    if (await User.findOne({ username: username.toLowerCase() })) {
+      return res.status(400).json({ error: 'Username already taken' });
+    }
+    if (await User.findOne({ email: email.toLowerCase() })) {
+      return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).json({ error: "Email already registered" });
-    }
-
-    const newUser = new User({
+    const newUser = await User.create({
       fullName,
       username,
       email,
-      password,
-      year
+      password,   // plain text — fine for now
+      year,
+      role: 'user',
     });
 
-    await newUser.save();
+    const token = generateToken(newUser);
 
-    console.log("✓ New user registered:", username);
-    res.json({ 
-      success: true, 
-      message: "Account created successfully",
+    res.status(201).json({
+      success: true,
+      message: 'Account created successfully',
+      token,
       user: {
-        id: newUser._id,
+        id:       newUser._id,
         fullName: newUser.fullName,
         username: newUser.username,
-        email: newUser.email,
-        year: newUser.year
-      }
+        email:    newUser.email,
+        year:     newUser.year,
+        role:     newUser.role,
+      },
     });
-
   } catch (err) {
-    console.error("Signup error:", err);
+    console.error('Signup error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // LOGIN
-app.post("/api/auth/login", async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
     if (!identifier || !password) {
-      return res.status(400).json({ error: "Please provide credentials" });
+      return res.status(400).json({ error: 'Please provide credentials' });
     }
 
     const user = await User.findOne({
       $or: [
         { username: identifier.toLowerCase() },
-        { email: identifier.toLowerCase() }
-      ]
+        { email:    identifier.toLowerCase() },
+      ],
     });
 
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    if (user.password !== password) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
+    // generateToken now correctly reads role from DB
+    // because we added role to the User schema
+    const token = generateToken(user);
 
-    console.log("✓ User logged in:", user.username);
     res.json({
       success: true,
-      message: "Login successful",
+      message: 'Login successful',
+      token,
       user: {
-        id: user._id.toString(),
+        id:       user._id.toString(),
         fullName: user.fullName,
         username: user.username,
-        email: user.email,
-        year: user.year
-      }
+        email:    user.email,
+        year:     user.year,
+        role:     user.role,
+      },
     });
-
   } catch (err) {
-    console.error("Login error:", err);
+    console.error('Login error:', err);
     res.status(500).json({ error: err.message });
   }
 });
