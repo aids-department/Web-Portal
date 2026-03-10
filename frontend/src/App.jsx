@@ -45,7 +45,7 @@ import AdminAchievements from "./pages/AdminAchievements";
 import UserAchievements from "./pages/UserAchievements";
 import AdminLogin from "./pages/AdminLogin";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
-
+import PostDetailPage from './pages/PostDetailPage';
 import "./style.css";
 
 
@@ -700,6 +700,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/posts/:postId"
+          element={
+            <ProtectedRoute>
+              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+                <PostDetailPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        /> 
 
         <Route
           path="/question-bank"

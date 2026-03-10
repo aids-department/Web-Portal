@@ -33,7 +33,7 @@ const Update = mongoose.model('RecentUpdate', updateSchema);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+const postsRouter = require('./routes/post');
 const leaderboardRoutes = require("./routes/leaderboard");
 const profileRoutes = require("./routes/profile");
 const achievementRoutes = require("./routes/achievements");
@@ -348,248 +348,7 @@ app.post('/api/auth/login', async (req, res) => {
 // ============================================
 
 // GET ALL POSTS
-app.get("/api/posts", async (req, res) => {
-  try {
-    const posts = await Post.find()
-      .populate('author', 'username fullName _id')
-      .populate({
-        path: 'comments',
-        populate: [
-          { path: 'author', select: 'username fullName' },
-          {
-            path: 'replies',
-            populate: { path: 'author', select: 'username fullName' }
-          }
-        ]
-      })
-      .sort({ createdAt: -1 });
-
-    // Add profile data to each post's author
-    const postsWithProfiles = await Promise.all(
-      posts.map(async (post) => {
-        if (post.author && !post.isAnonymous) {
-          try {
-            const profile = await Profile.findOne({ userId: post.author._id });
-            if (profile) {
-              post.author.profile = profile;
-              console.log(`Profile found for user ${post.author.username}:`, profile.profileImage?.url);
-            } else {
-              console.log(`No profile found for user ${post.author.username}`);
-            }
-          } catch (err) {
-            console.error('Error fetching profile for post author:', err);
-          }
-        }
-        return post;
-      })
-    );
-
-    res.json(postsWithProfiles);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// CREATE POST
-app.post("/api/posts", upload.array('images', 5), async (req, res) => {
-  try {
-    const { title, content, authorId, isAnonymous } = req.body;
-
-    if (!title || !content || !authorId) {
-      return res.status(400).json({ error: "Title, content, and author are required" });
-    }
-
-    const images = [];
-    
-    // Upload images to Cloudinary
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const uploaded = await imageService.uploadImage(file.path, file.originalname);
-        images.push({
-          url: uploaded.imageUrl,
-          publicId: uploaded.publicId
-        });
-        // Delete temp file
-        fs.unlinkSync(file.path);
-      }
-    }
-
-    const newPost = new Post({
-      title,
-      content,
-      author: authorId,
-      isAnonymous: isAnonymous === 'true',
-      images,
-      upvotes: [],
-      comments: []
-    });
-
-    await newPost.save();
-    
-    const populatedPost = await Post.findById(newPost._id)
-      .populate('author', 'username fullName');
-
-    console.log("✓ Post created:", newPost._id);
-    res.json({ success: true, post: populatedPost });
-
-  } catch (err) {
-    console.error("Post creation error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// UPVOTE POST
-app.post("/api/posts/:postId/upvote", async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const { userId } = req.body;
-
-    const post = await Post.findById(postId);
-    
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    // Toggle upvote
-    const upvoteIndex = post.upvotes.indexOf(userId);
-    if (upvoteIndex > -1) {
-      post.upvotes.splice(upvoteIndex, 1); // Remove upvote
-    } else {
-      post.upvotes.push(userId); // Add upvote
-    }
-
-    await post.save();
-    res.json({ success: true, upvotes: post.upvotes.length });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ADD COMMENT TO POST
-app.post("/api/posts/:postId/comments", async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const { content, authorId, isAnonymous } = req.body;
-
-    if (!content || !authorId) {
-      return res.status(400).json({ error: "Content and author are required" });
-    }
-
-    const newComment = new Comment({
-      content,
-      author: authorId,
-      isAnonymous: isAnonymous === 'true' || isAnonymous === true,
-      upvotes: [],
-      replies: []
-    });
-
-    await newComment.save();
-
-    const post = await Post.findById(postId);
-    post.comments.push(newComment._id);
-    await post.save();
-
-    const populatedComment = await Comment.findById(newComment._id)
-      .populate('author', 'username fullName');
-
-    console.log("✓ Comment added to post:", postId);
-    res.json({ success: true, comment: populatedComment });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ADD REPLY TO COMMENT
-app.post("/api/comments/:commentId/replies", async (req, res) => {
-  try {
-    const { commentId } = req.params;
-    const { content, authorId, isAnonymous } = req.body;
-
-    if (!content || !authorId) {
-      return res.status(400).json({ error: "Content and author are required" });
-    }
-
-    const newReply = new Comment({
-      content,
-      author: authorId,
-      isAnonymous: isAnonymous === 'true' || isAnonymous === true,
-      upvotes: [],
-      replies: []
-    });
-
-    await newReply.save();
-
-    const parentComment = await Comment.findById(commentId);
-    parentComment.replies.push(newReply._id);
-    await parentComment.save();
-
-    const populatedReply = await Comment.findById(newReply._id)
-      .populate('author', 'username fullName');
-
-    console.log("✓ Reply added to comment:", commentId);
-    res.json({ success: true, reply: populatedReply });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// UPVOTE COMMENT
-app.post("/api/comments/:commentId/upvote", async (req, res) => {
-  try {
-    const { commentId } = req.params;
-    const { userId } = req.body;
-
-    const comment = await Comment.findById(commentId);
-    
-    if (!comment) {
-      return res.status(404).json({ error: "Comment not found" });
-    }
-
-    const upvoteIndex = comment.upvotes.indexOf(userId);
-    if (upvoteIndex > -1) {
-      comment.upvotes.splice(upvoteIndex, 1);
-    } else {
-      comment.upvotes.push(userId);
-    }
-
-    await comment.save();
-    res.json({ success: true, upvotes: comment.upvotes.length });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE POST
-app.delete("/api/posts/:postId", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.postId);
-
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    // Delete images from Cloudinary
-    if (post.images && post.images.length > 0) {
-      for (const img of post.images) {
-        await imageService.deleteImage(img.publicId);
-      }
-    }
-
-    // Delete all comments associated with the post
-    await Comment.deleteMany({ _id: { $in: post.comments } });
-
-    await Post.findByIdAndDelete(req.params.postId);
-    res.json({ success: true });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
+app.use("/api/posts", postsRouter);
 // ============================================
 // API ROUTES – EVENTS CRUD
 // ============================================
@@ -941,5 +700,36 @@ app.delete("/api/events/:id", async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ error: "Failed to delete event" });
+  }
+});
+
+app.get('/api/migrate-posts', async (req, res) => {
+  try {
+    const { Post, Comment } = require('./models/Post');
+
+    const postResult = await Post.updateMany(
+      { isDeleted: { $exists: false } },
+      { $set: { isDeleted: false, isEdited: false, isAnonymous: false } }
+    );
+
+    // Also fix posts that have isDeleted but missing isAnonymous
+    const anonResult = await Post.updateMany(
+      { isAnonymous: { $exists: false } },
+      { $set: { isAnonymous: false } }
+    );
+
+    const commentResult = await Comment.updateMany(
+      { isDeleted: { $exists: false } },
+      { $set: { isDeleted: false, isEdited: false, isAnonymous: false } }
+    );
+
+    res.json({
+      success:          true,
+      postsMigrated:    postResult.modifiedCount,
+      anonFixed:        anonResult.modifiedCount,
+      commentsMigrated: commentResult.modifiedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
