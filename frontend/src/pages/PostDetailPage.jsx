@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://web-portal-760h.onrender.com';
 
 const authHeaders = () => ({
   'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 //http://localhost:5173/
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://web-portal-760h.onrender.com';
 //const BASE_URL = 'https://web-portal-760h.onrender.com';
 // ─── helper: always send JWT from localStorage ───────────────────────────────
 const authHeaders = () => ({
