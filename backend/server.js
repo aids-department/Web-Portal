@@ -347,16 +347,12 @@ app.post('/api/auth/login', async (req, res) => {
 // participation count
 // ============================================
 // 1. Define Schemas
-const updateSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
-});
+;
 const statsSchema = new mongoose.Schema({
   key: { type: String, default: "participant_count" },
   value: { type: Number, default: 23 }
 });
 
-const Update = mongoose.model('RecentUpdate', updateSchema);
 const Stats = mongoose.model('Stats', statsSchema);
 
 // 2. Add Routes
