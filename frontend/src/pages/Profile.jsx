@@ -63,7 +63,15 @@ export default function Profile() {
     fetch(`https://web-portal-760h.onrender.com/api/posts`)
       .then(res => res.json())
       .then(data => {
-        const userPosts = data.filter(post => post.author?._id === userId || post.author?.id === userId);
+        if (!Array.isArray(data)) {
+          setPostsCount(0);
+          return;
+        }
+
+        const userPosts = data.filter(
+          post => post.author?._id === userId || post.author?.id === userId
+        );
+
         setPostsCount(userPosts.length);
       })
       .catch(err => console.error(err));
@@ -76,8 +84,7 @@ export default function Profile() {
   );
 
   
-
-  if (!profile && paramUserId) {
+  if (!loading && !profile && paramUserId) {
     return (
       <div className="text-center mt-20 text-gray-700 text-lg">
         Profile Not Found
@@ -85,11 +92,6 @@ export default function Profile() {
     );
   }
 
-  if (!profile) return (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-xl text-gray-600">Loading profile...</div>
-    </div>
-  );
 
   return (
     <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 overflow-hidden min-h-[80vh]">
