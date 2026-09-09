@@ -3,7 +3,7 @@ import React from 'react';
 const FacultyCard = ({ faculty }) => {
   const specs = faculty.specialization.split(',').map((s) => s.trim()).filter(Boolean);
   return (
-    <div className="bg-white border border-ds-edge flex flex-col">
+    <div className="bg-white flex flex-col hover:bg-ds-ground transition-colors">
       <div className="h-[150px] bg-ds-blue-tint border-b border-ds-edge grid place-items-center overflow-hidden">
         <img
           src={faculty.imageUrl}

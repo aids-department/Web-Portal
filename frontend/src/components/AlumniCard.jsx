@@ -22,7 +22,7 @@ export default function AlumniCard({ alumni }) {
       {/* ================= CARD ================= */}
       <button
         onClick={() => setOpen(true)}
-        className="bg-white border border-ds-edge p-5 flex flex-col gap-3.5 text-left w-full"
+        className="bg-white p-5 flex flex-col gap-3.5 text-left w-full hover:bg-ds-ground transition-colors"
       >
         <div className="flex gap-3.5 items-start">
           <Avatar initials={initials} size={66} />

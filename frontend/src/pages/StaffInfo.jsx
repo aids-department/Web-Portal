@@ -1,55 +1,59 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Tabs from "../components/ui/Tabs";
-
-// Import images properly
-import kanagarajImg from "../assets/staff/kanagaraj.jpg";
-import shaliniImg from "../assets/staff/shalini.jpg";
 
 export default function StaffInfo() {
   const staffData = [
-    {
-      name: "Mr. R. Kanagaraj",
-      role: "Instructor",
-      img: kanagarajImg,
-    },
-    {
-      name: "Ms. K. Shalini",
-      role: "Junior Assistant",
-      img: shaliniImg,
-    },
+    { name: "Mr. R. Kanagaraj", role: "Instructor", duty: "Hardware Lab & Systems", loc: "Lab 3", ext: "432" },
+    { name: "Ms. K. Shalini", role: "Junior Assistant", duty: "Department Administration", loc: "Main Office", ext: "401" },
   ];
 
   return (
-    <div>
-      <Tabs className="mb-8 -mt-2">
-        <Link to="/about/faculty"><Tabs.Tab>Faculty</Tabs.Tab></Link>
-        <Tabs.Tab active>Staff</Tabs.Tab>
-        <Link to="/about/syllabus"><Tabs.Tab>Syllabus</Tabs.Tab></Link>
-      </Tabs>
-
-      <div className="mb-10">
-        <span className="text-kicker tracking-kicker uppercase text-ds-red">Administrative and technical</span>
-        <h1 className="text-page-heading text-navy mt-2.5">Staff</h1>
+    <div className="bg-white">
+      {/* Sub-nav tab strip */}
+      <div className="flex gap-[26px] px-gutter border-b-2 border-navy bg-white">
+        <Link to="/about/faculty" className="py-4 text-[12.5px] leading-none font-medium text-ds-ink-soft hover:text-navy no-underline">Faculty</Link>
+        <span className="py-4 text-[12.5px] leading-none font-semibold text-navy shadow-[inset_0_-3px_0_#dd2b0f]">Staff</span>
+        <Link to="/about/syllabus" className="py-4 text-[12.5px] leading-none font-medium text-ds-ink-soft hover:text-navy no-underline">Syllabus</Link>
+        <span className="py-4 text-[12.5px] leading-none font-medium text-ds-ink-soft hover:text-navy cursor-pointer">The department</span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-ds-edge border border-ds-edge max-w-2xl">
-        {staffData.map((staff) => (
-          <div key={staff.name} className="bg-white flex flex-col">
-            <div className="h-[150px] bg-ds-blue-tint overflow-hidden">
-              <img
-                src={staff.img}
-                alt={staff.name}
-                className="w-full h-full object-cover grayscale"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            </div>
-            <div className="p-5">
-              <h2 className="text-card-title text-navy">{staff.name}</h2>
-              <p className="text-label text-ds-ink-soft mt-1.5">{staff.role}</p>
-            </div>
-          </div>
-        ))}
+      {/* Page heading */}
+      <div className="pt-10 px-gutter pb-[22px] bg-white flex flex-col gap-2.5">
+        <span className="font-medium text-[10.5px] leading-none tracking-kicker uppercase text-ds-red">
+          Administrative and technical
+        </span>
+        <h1 className="m-0 font-semibold text-[44px] leading-none tracking-display text-navy">
+          Staff
+        </h1>
+        <p className="m-0 max-w-[74ch] font-normal text-[14px] leading-[1.7] text-ds-ink-soft">
+          Office hours are 09:00 to 16:30 on working days. Lab access outside those hours is arranged through the technical staff a day in advance.
+        </p>
+      </div>
+
+      {/* Staff table */}
+      <div className="pt-3 px-gutter pb-12 bg-white">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b-2 border-navy">
+              <th className="text-left py-3 pr-[14px] font-semibold text-[10.5px] leading-none tracking-table-head uppercase text-navy">Name</th>
+              <th className="text-left p-3 font-semibold text-[10.5px] leading-none tracking-table-head uppercase text-navy">Role</th>
+              <th className="text-left p-3 font-semibold text-[10.5px] leading-none tracking-table-head uppercase text-navy">Responsible for</th>
+              <th className="text-left p-3 font-semibold text-[10.5px] leading-none tracking-table-head uppercase text-navy">Location</th>
+              <th className="text-left py-3 pl-[14px] font-semibold text-[10.5px] leading-none tracking-table-head uppercase text-navy">Extension</th>
+            </tr>
+          </thead>
+          <tbody>
+            {staffData.map((s, idx) => (
+              <tr key={idx} className="border-b border-ds-row">
+                <td className="py-3.5 pr-[14px] font-medium text-[14px] leading-[1.3] text-navy">{s.name}</td>
+                <td className="p-3.5 font-normal text-[13.5px] leading-[1.3] text-[#3a3838]">{s.role}</td>
+                <td className="p-3.5 font-normal text-[13.5px] leading-[1.3] text-ds-ink-soft">{s.duty}</td>
+                <td className="p-3.5 font-normal text-[13.5px] leading-[1.3] text-ds-ink-soft">{s.loc}</td>
+                <td className="py-3.5 pl-[14px] font-normal text-[13.5px] leading-[1.3] text-ds-blue tabular-nums">{s.ext}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

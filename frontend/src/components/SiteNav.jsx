@@ -2,7 +2,6 @@
 import { useRef, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
-import logo from "../assets/logo.png";
 
 const NAV_ITEMS = [
   { name: "Dashboard", path: "/" },
@@ -81,12 +80,14 @@ export default function SiteNav() {
   return (
     <header className="flex items-stretch justify-between bg-white border-b-2 border-navy font-sans fixed top-0 left-0 right-0 z-40">
       <div className="flex items-center gap-9 px-gutter-mobile sm:px-gutter">
-        <Link to="/" className="flex items-center gap-2.5 py-3.5">
-          <img src={logo} alt="" className="h-6 w-6 grayscale" />
-          <span className="flex flex-col leading-none">
-            <span className="text-label font-bold tracking-label text-navy">AI &amp; DS</span>
-            <span className="text-[9px] tracking-label uppercase text-ds-ink-faint">Department</span>
-          </span>
+        <Link to="/" className="flex items-center gap-2.5 py-4">
+          <div className="w-[26px] h-[26px] bg-navy flex items-center justify-center flex-shrink-0">
+            <div className="w-2 h-2 bg-ds-red" />
+          </div>
+          <div className="flex flex-col gap-[1px] leading-none">
+            <span className="text-[13px] font-bold tracking-[0.14em] text-navy leading-none">AI &amp; DS</span>
+            <span className="text-[9px] tracking-[0.1em] uppercase text-ds-ink-faint leading-none">Department</span>
+          </div>
         </Link>
 
         <nav className="flex items-stretch gap-6">
@@ -144,20 +145,12 @@ export default function SiteNav() {
 
       <div className="flex items-center gap-2.5 px-gutter-mobile sm:px-gutter">
         {!user ? (
-          <>
-            <Link
+          <Link
               to="/login"
               className="px-3.5 py-2 text-label font-medium text-navy border border-ds-edge"
             >
               Sign in
             </Link>
-            <Link
-              to="/signup"
-              className="px-3.5 py-2 text-label font-semibold text-white bg-navy"
-            >
-              Create account
-            </Link>
-          </>
         ) : (
           <div className="relative">
             <div

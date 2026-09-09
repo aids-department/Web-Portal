@@ -11,8 +11,6 @@ import {
   Building,
   BookOpen
 } from 'lucide-react';
-import Tag from './ui/Tag';
-import Button from './ui/Button';
 
 const UpcomingEventCard = ({ event, onOpenModal }) => {
 
@@ -43,10 +41,10 @@ const UpcomingEventCard = ({ event, onOpenModal }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[190px_1fr] gap-5 border border-ds-edge p-4 bg-white">
+    <div className="grid grid-cols-1 md:grid-cols-[190px_1fr] gap-5 border border-ds-edge p-4 bg-white hover:bg-ds-ground transition-colors">
 
       {/* LEFT: POSTER */}
-      <div className="w-full h-48 md:h-full bg-ds-blue-tint border border-ds-edge shrink-0 overflow-hidden">
+      <div className="w-full h-44 md:h-full bg-ds-blue-tint border border-ds-edge shrink-0 overflow-hidden">
         <img
           src={event.poster || event.image}
           alt={event.eventName}
@@ -59,48 +57,51 @@ const UpcomingEventCard = ({ event, onOpenModal }) => {
 
         {/* Badge + Date */}
         <div className="flex justify-between items-start gap-3">
-          <Tag variant="outline" className="inline-flex items-center gap-1.5">
+          <span className="px-2 py-1 text-[9.5px] font-semibold tracking-wider uppercase bg-navy text-white inline-flex items-center gap-1.5">
             {getEventIcon(event.eventType)}
             {event.eventType || 'Event'}
-          </Tag>
-          <span className="text-label text-ds-ink-faint tabular-nums whitespace-nowrap">
+          </span>
+          <span className="text-[11.5px] text-ds-ink-faint tabular-nums whitespace-nowrap">
             {formatDate(event.startDate || event.date)}
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="text-card-title text-navy leading-tight line-clamp-2">
+        <h3 className="text-[17px] font-semibold text-navy leading-tight line-clamp-2 m-0">
           {event.eventName || event.title}
         </h3>
 
         {/* Organizer */}
-        <p className="text-label text-ds-ink-soft">
+        <p className="text-[12.5px] text-ds-ink-soft m-0">
           {event.eventType?.toLowerCase().includes('internship')
             ? event.companyName
             : event.organizer || event.conductedBy}
         </p>
 
         {/* Highlights */}
-        <div className="flex flex-wrap gap-5 text-label text-ds-ink-soft">
+        <div className="flex flex-wrap gap-5 text-[12px] text-ds-ink-soft">
           <span className="flex items-center gap-1.5 tabular-nums">
-            <Calendar size={14} className="text-ds-ink-faint" />
+            <Calendar size={13} className="text-ds-ink-faint" />
             {formatDate(event.startDate || event.date)}
           </span>
           <span className="flex items-center gap-1.5">
-            <MapPin size={14} className="text-ds-ink-faint" />
+            <MapPin size={13} className="text-ds-ink-faint" />
             {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On Campus'}
           </span>
         </div>
 
-        <div className="mt-auto pt-3 border-t border-ds-row flex items-center justify-between gap-4">
+        <div className="mt-auto pt-2.5 border-t border-ds-row flex items-center justify-between gap-4">
           {event.totalParticipants ? (
-            <span className="text-label text-ds-ink-faint">
+            <span className="text-[12px] text-ds-ink-faint">
               <span className="font-medium text-ds-ink-soft tabular-nums">{event.totalParticipants}</span> participants
             </span>
           ) : <span />}
-          <Button variant="secondary" onClick={() => onOpenModal(event)}>
-            View details
-          </Button>
+          <button
+            onClick={() => onOpenModal(event)}
+            className="px-3.5 py-1.5 text-[11.5px] font-semibold text-ds-red border border-ds-red hover:bg-ds-red hover:text-white transition-colors"
+          >
+            Details →
+          </button>
         </div>
       </div>
     </div>

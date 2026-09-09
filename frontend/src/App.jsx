@@ -33,12 +33,8 @@ import EventsAdminPage from "./components/EventsAdminPage";
 import AdminDashboard from "./components/AdminDashboard";
 import ProfessionalAdminLayout from "./components/ProfessionalAdminLayout";
 import ManageUploads from "./components/ManageUploads";
-import ManageContent from "./components/ManageContent"; 
+import ManageContent from "./components/ManageContent";
 import UpdateContent from "./components/ManageContentupdates.jsx";
-// Images for Dashboard
-import img1 from "./assets/enigma.png";
-import img2 from "./assets/genesys.png";
-import Dashboard_Carousel from "./components/Dashboard_Carousel";
 import AchievementsCarousel from "./components/AchievementsCarousel";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
@@ -84,7 +80,6 @@ const ScrollNumber = ({ target, suffix = "", duration = 1000 }) => {
 // ============================================
 function DashboardPage() {
     const [updates, setUpdates] = useState([]);
-    const [achievements, setAchievements] = useState([]);
     // Fetch updates from the dedicated MongoDB server on port 5001
     useEffect(() => {
         const fetchUpdates = async () => {
@@ -95,18 +90,7 @@ function DashboardPage() {
                 console.error("Failed to fetch updates:", err);
             }
         };
-        // Fetch achievements from the Render API
-        const fetchAchievements = async () => {
-            try {
-                const res = await fetch("https://web-portal-760h.onrender.com/api/achievements/approved/recent");
-                const data = await res.json();
-                setAchievements(data);
-            } catch (err) {
-                console.error("Failed to fetch achievements:", err);
-            }
-        };
         fetchUpdates();
-        fetchAchievements();
     }, []);
 
     const stats = [
@@ -117,17 +101,10 @@ function DashboardPage() {
     ];
 
     const quickInfo = [
-        { kicker: "Contests", title: "Leaderboard is live", to: "/leaderboards" },
-        { kicker: "Calendar", title: "See upcoming events", to: "/events" },
-        { kicker: "Resources", title: "Browse the question bank", to: "/question-bank" },
-        { kicker: "Recognition", title: "Recent achievements", to: "/achievements" },
-    ];
-
-    const researchGroups = [
-        { name: "Computer vision and imaging" },
-        { name: "Language and speech systems" },
-        { name: "Applied statistics and forecasting" },
-        { name: "Responsible AI and governance" },
+        { kicker: "Now open", title: "Winter internship applications", to: "/events" },
+        { kicker: "Next event", title: "DataFest · 14 Oct, Seminar Hall", to: "/events" },
+        { kicker: "Contest", title: "Round 3 leaderboard is live", to: "/leaderboards" },
+        { kicker: "Resources", title: "Sem 5 question bank updated", to: "/question-bank" },
     ];
 
     return (
@@ -170,90 +147,65 @@ function DashboardPage() {
                     <Link
                         key={item.kicker}
                         to={item.to}
-                        className={`px-gutter-mobile sm:px-7 py-5.5 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-ds-edge' : ''}`}
+                        className={`px-gutter-mobile sm:px-7 py-[22px] hover:bg-ds-ground transition-colors ${
+                            i === 0
+                                ? 'border-r border-ds-edge'
+                                : i < 3
+                                ? 'border-r border-ds-edge border-t sm:border-t-0'
+                                : 'border-t sm:border-t-0'
+                        }`}
                     >
-                        <div className="text-kicker tracking-kicker uppercase text-ds-red">{item.kicker}</div>
-                        <div className="text-label font-medium text-ds-ink pt-2">{item.title}</div>
+                        <div className="text-kicker tracking-kicker uppercase" style={{ color: i === 0 ? '#dd2b0f' : '#7d7979' }}>{item.kicker}</div>
+                        <div className="text-[13.5px] font-medium text-ds-ink pt-2 leading-snug">{item.title}</div>
                     </Link>
                 ))}
             </div>
 
-            <div className="px-gutter-mobile sm:px-gutter">
-                {/* EVENTS */}
-                <section id="events" className="pt-10 pb-2">
-                    <h2 className="text-section-heading text-navy mb-6">Events</h2>
-                    <Dashboard_Carousel
-                        slides={[
-                            { img: img1, page: "/events/codenigma" },
-                            { img: img2, page: "/events/genesys" },
-                        ]}
-                    />
-                </section>
-
-                {/* RECENT ACHIEVEMENTS */}
-                <section className="pt-10 pb-2 border-t-2 border-navy mt-10">
+            {/* ACHIEVEMENTS + UPDATES — white bg, no floating lines */}
+            <div className="bg-white px-gutter-mobile sm:px-gutter pb-12">
+                <div className="pt-8">
                     <AchievementsCarousel />
-                </section>
-
-                {/* RECENT UPDATES - Dynamic from MongoDB */}
-                <section className="pt-10 pb-12 border-t-2 border-navy mt-10">
-                    <h2 className="text-section-heading text-navy mb-6">Recent updates</h2>
-
+                </div>
+                <div className="mt-10">
+                    <div className="flex items-end justify-between border-b-2 border-navy pb-3 mb-0">
+                        <h2 className="text-[28px] font-semibold leading-none tracking-[-0.01em] text-navy">Recent updates</h2>
+                        <Link to="/posts" className="text-[12px] font-medium text-ds-blue no-underline pb-[3px]" style={{ borderBottom: '2px solid #dd2b0f' }}>View all</Link>
+                    </div>
                     {updates.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-ds-edge border border-ds-edge">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-ds-edge border-x border-b border-ds-edge">
                             {updates.map((u) => (
                                 <article key={u._id} className="bg-white p-6 flex flex-col gap-3">
-                                    <div className="h-[130px] bg-ds-blue-tint border border-ds-edge grid place-items-center">
-                                        <span className="text-kicker tracking-kicker uppercase text-ds-blue">Update</span>
+                                    <div className="h-[120px] bg-ds-blue-tint border border-ds-edge grid place-items-center">
+                                        <span className="text-kicker tracking-kicker uppercase text-ds-blue">{u.category || 'General'}</span>
                                     </div>
-                                    <h3 className="text-card-title text-navy">{u.title}</h3>
-                                    <span className="text-label text-ds-ink-faint tabular-nums mt-auto pt-2">
+                                    <span className="text-kicker tracking-kicker uppercase text-ds-red">{u.category || 'Update'}</span>
+                                    <h3 className="text-[18px] font-semibold leading-snug text-navy m-0">{u.title}</h3>
+                                    {u.content && <p className="text-[13px] leading-relaxed text-ds-ink-soft m-0">{u.content}</p>}
+                                    <span className="text-[11.5px] text-ds-ink-faint tabular-nums mt-auto pt-2">
                                         {formatDistanceToNow(new Date(u.createdAt), { addSuffix: true })}
                                     </span>
                                 </article>
                             ))}
                         </div>
                     ) : (
-                        <p className="text-body text-ds-ink-faint italic">No updates available at the moment.</p>
+                        <div className="border-x border-b border-ds-edge bg-white p-6">
+                            <p className="text-[14px] text-ds-ink-faint italic m-0">No updates yet.</p>
+                        </div>
                     )}
-                </section>
-            </div>
-
-            {/* RESEARCH GROUPS */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 bg-ds-ground border-t-2 border-navy">
-                <div className="px-gutter-mobile sm:px-gutter py-11 lg:border-r border-ds-edge flex flex-col gap-5">
-                    <h3 className="text-section-heading text-navy">Research groups</h3>
-                    <div className="flex flex-col">
-                        {researchGroups.map((g) => (
-                            <div key={g.name} className="flex justify-between py-3.5 border-b border-ds-edge">
-                                <span className="text-body text-ds-ink">{g.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="px-gutter-mobile sm:px-gutter py-11 flex flex-col gap-5">
-                    <h3 className="text-section-heading text-navy">From the labs</h3>
-                    <div className="h-[180px] bg-navy grid place-items-center grayscale">
-                        <span className="text-kicker tracking-kicker uppercase text-on-navy-muted">Photograph — lab session, black and white</span>
-                    </div>
-                    <p className="text-body text-ds-ink-soft">
-                        Photographs print in black and white throughout, so student-submitted images stay consistent whatever their source.
-                    </p>
                 </div>
             </div>
-
             {/* FOOTER */}
-            <footer className="bg-navy px-gutter-mobile sm:px-gutter py-12 flex flex-col gap-8">
+            <footer className="bg-navy px-gutter-mobile sm:px-gutter py-10 flex flex-col gap-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-9">
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-6 h-6 bg-white flex items-center justify-center">
+                            <div className="w-6 h-6 bg-white flex items-center justify-center flex-shrink-0">
                                 <div className="w-2 h-2 bg-ds-red" />
                             </div>
-                            <span className="text-label font-bold tracking-label text-white">AI &amp; DS</span>
+                            <span className="text-[13px] font-bold tracking-[0.14em] text-white">AI &amp; DS</span>
                         </div>
                         <p className="text-body text-on-navy-muted max-w-[38ch]">
-                            Department of Artificial Intelligence and Data Science. Block C, second floor.
+                            Department of Artificial Intelligence and Data Science.
                         </p>
                     </div>
                     <div className="flex flex-col gap-2.5">
@@ -274,10 +226,6 @@ function DashboardPage() {
                         <Link to="/posts" className="text-body text-on-navy">Posts</Link>
                         <Link to="/question-bank" className="text-body text-on-navy">Question bank</Link>
                     </div>
-                </div>
-                <div className="border-t border-blue pt-4 flex flex-col sm:flex-row justify-between gap-2">
-                    <span className="text-label text-on-navy-muted">Maintained by the department web committee</span>
-                    <span className="text-label text-on-navy-muted">Updated 8 September 2026</span>
                 </div>
             </footer>
         </>
