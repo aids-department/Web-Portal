@@ -1,12 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    @apply font-sans;
-    font-family: 'Inter', sans-serif;
+:root {
+  /* structure */
+  --navy: #0e1c3d;
+  --navy-deep: #0b1730;
+  --blue: #1b3a6b;
+  --blue-tint: #e4eaf4;
+  --on-navy: #b6c2d8;
+  --on-navy-muted: #8c9ab5;
+
+  /* signal */
+  --red: #dd2b0f;
+  --red-deep: #ae1800;
+  --red-tint: #ffe0d9;
+
+  /* ink and edges */
+  --ink: #201e1d;
+  --ink-soft: #605d5d;
+  --ink-faint: #9b9797;
+  --edge: #d7d3d3;
+  --row: #eae7e7;
+  --ground: #f3f2f2;
+
+  /* type */
+  --font: Archivo, system-ui, sans-serif;
+  --track-display: -.02em;
+  --track-kicker: .2em;
+  --track-label: .16em;
+
+  /* geometry */
+  --radius: 0;
+  --gutter: 48px;
+  --gutter-mobile: 20px;
+  --rule-strong: 2px solid var(--navy);
+  --rule-edge: 1px solid var(--edge);
+  --rule-row: 1px solid var(--row);
+}
+
+html {
+  font-family: var(--font);
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--edge);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }

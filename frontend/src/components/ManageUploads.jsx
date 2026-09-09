@@ -72,29 +72,29 @@ export default function ManageUploads() {
       
       {/* ✅ CUSTOM DELETE MODAL OVERLAY */}
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform scale-100 transition-all">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50  p-4 animate-in fade-in duration-200">
+          <div className="bg-white   max-w-md w-full p-6 transform scale-100 transition-all">
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-red-100 rounded-full text-red-600">
+              <div className="p-3 bg-ds-red-tint  text-ds-red">
                 <AlertTriangle size={28} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Delete Resource?</h3>
-                <p className="text-gray-500 text-sm mt-1">This action cannot be undone. The file will be permanently removed.</p>
+                <h3 className="text-xl font-bold text-navy">Delete Resource?</h3>
+                <p className="text-ds-ink-soft text-sm mt-1">This action cannot be undone. The file will be permanently removed.</p>
               </div>
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
               <button 
                 onClick={() => setDeleteId(null)}
-                className="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors border border-gray-200"
+                className="px-5 py-2.5  text-ds-ink font-medium hover:bg-ds-ground transition-colors border border-ds-edge"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleDelete}
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors shadow-md flex items-center gap-2"
+                className="px-5 py-2.5  bg-ds-red text-white font-bold hover:bg-ds-red-deep transition-colors  flex items-center gap-2"
               >
                 {loading ? "Deleting..." : "Yes, Delete It"}
               </button>
@@ -105,19 +105,19 @@ export default function ManageUploads() {
 
       {/* HEADER + SEARCH BAR */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-800">Manage Resources</h1>
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-ds-edge">
+          <h1 className="text-3xl font-bold text-ds-ink">Manage Resources</h1>
+          <span className="bg-ds-blue-tint text-ds-blue px-3 py-1  text-sm font-semibold">
             Total: {uploads.length}
           </span>
         </div>
 
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-ds-ink-faint" size={20} />
           <input
             type="text"
             placeholder="Search by subject, code, or author..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none text-base transition-all"
+            className="w-full pl-12 pr-4 py-3 bg-white border border-ds-edge    focus:border-navy outline-none text-base transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -126,8 +126,8 @@ export default function ManageUploads() {
 
       {/* LIST */}
       {filteredUploads.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <p className="text-gray-500">
+        <div className="text-center py-20 bg-ds-ground  border border-dashed border-ds-edge">
+          <p className="text-ds-ink-soft">
             {uploads.length === 0 ? "No uploads found." : "No matches found."}
           </p>
         </div>
@@ -138,54 +138,54 @@ export default function ManageUploads() {
             const isBank = u.examType === "Question Bank";
 
             return (
-              <div key={u._id} className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+              <div key={u._id} className="relative bg-white p-6  border border-ds-edge  hover: transition-all">
                 
                 {/* AUTHOR BADGE */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-ds-blue-tint text-ds-blue px-3 py-1  text-xs font-bold border border-ds-blue/30">
                   <User size={12} />
                   {u.author ? u.author.username : "Unknown"}
                 </div>
 
                 <div className="flex items-start gap-4 pr-32">
-                  <div className={`p-3 rounded-lg shrink-0 ${isBank ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
+                  <div className={`p-3  shrink-0 ${isBank ? 'bg-ds-blue-tint text-ds-blue' : 'bg-ds-ground text-ds-ink-soft'}`}>
                      <FileText size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 leading-snug">
+                    <h3 className="text-lg font-bold text-navy leading-snug">
                       {u.subjectName}
                     </h3>
-                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600">
-                      <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-xs font-bold text-gray-500">
+                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-ds-ink-soft">
+                      <span className="font-mono bg-ds-ground px-2 py-0.5  text-xs font-bold text-ds-ink-soft">
                         {u.subjectCode}
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
-                        isBank ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
+                      <span className={`px-2 py-0.5  text-xs font-bold uppercase ${
+                        isBank ? 'bg-ds-blue-tint text-ds-blue' : 'bg-ds-blue-tint text-ds-blue'
                       }`}>
                         {u.examType}
                       </span>
-                      <span className="text-gray-400">•</span>
+                      <span className="text-ds-ink-faint">•</span>
                       <span>Semester {u.semester}</span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-ds-ink-faint mt-2">
                       Uploaded {new Date(u.uploadedAt).toLocaleString()}
                     </p>
                   </div>
                 </div>
 
                 {/* ACTIONS */}
-                <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-ds-edge">
                   <a
                     href={u.fileUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
+                    className="flex items-center gap-2 px-4 py-2  text-sm font-medium text-ds-ink-soft hover:bg-ds-ground transition"
                   >
                     <Eye size={16} /> View
                   </a>
 
                   <a
                     href={getDownloadUrl(u.fileUrl, niceName)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
+                    className="flex items-center gap-2 px-4 py-2  text-sm font-medium text-ds-ink-soft hover:bg-ds-ground transition"
                   >
                     <Download size={16} /> Download
                   </a>
@@ -193,7 +193,7 @@ export default function ManageUploads() {
                   {/* ✅ TRIGGER MODAL ON CLICK */}
                   <button
                     onClick={() => confirmDelete(u._id)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition ml-2"
+                    className="flex items-center gap-2 px-4 py-2  text-sm font-bold text-ds-red bg-ds-red-tint hover:bg-ds-red-tint border border-ds-red/30 transition ml-2"
                   >
                     <Trash2 size={16} /> Delete
                   </button>

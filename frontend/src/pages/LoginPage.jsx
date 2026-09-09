@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, UserCircle } from 'lucide-react';
-import Navbar from '../components/Navbar';
+import SiteNav from '../components/SiteNav';
+import HeroCanvas from '../components/HeroCanvas';
+import Field from '../components/ui/Field';
+import Button from '../components/ui/Button';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ const LoginPage = () => {
 
       if (response.ok) {
         // Store user data in localStorage
-        localStorage.setItem('token', data.token); 
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         navigate('/posts');
       } else {
@@ -60,84 +62,82 @@ const LoginPage = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 pt-20">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-        
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gray-900 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <UserCircle className="text-white" size={48} />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Login to AI & DS Association</p>
-        </div>
+      <SiteNav />
+      <div className="min-h-screen bg-ds-ground flex items-center justify-center px-gutter-mobile sm:px-gutter pt-16 py-10">
+        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-[1fr_400px] min-h-[520px] border border-ds-edge">
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Username or Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Username or Email
-            </label>
-            <div className="relative">
-              <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                name="identifier"
-                value={formData.identifier}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                placeholder="Enter username or email"
-              />
+          {/* Value panel */}
+          <div className="relative bg-navy-deep flex flex-col justify-between p-9 overflow-hidden">
+            <div className="relative z-10 flex items-center gap-2.5">
+              <div className="w-6 h-6 bg-white flex items-center justify-center">
+                <div className="w-2 h-2 bg-ds-red" />
+              </div>
+              <span className="text-label font-bold tracking-label text-white">AI &amp; DS</span>
+            </div>
+            <div className="absolute inset-0">
+              <HeroCanvas width={520} height={300} staticVariant />
+            </div>
+            <div className="relative z-10 flex flex-col gap-3">
+              <h2 className="text-section-heading text-white max-w-[16ch]">
+                Members see more of the department
+              </h2>
+              <p className="text-body text-on-navy max-w-[40ch]">
+                Posts, the alumni directory and the question bank need an account. Everything else stays open to visitors.
+              </p>
             </div>
           </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                placeholder="Enter your password"
-              />
+          {/* Form panel */}
+          <div className="bg-white p-9 flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-section-heading text-navy">Sign in</h1>
+              <p className="text-body text-ds-ink-soft">Use your department address.</p>
+            </div>
+            <div className="h-0.5 bg-navy" />
+
+            {error && (
+              <div className="bg-ds-red-tint border-t-2 border-ds-red text-ds-red-deep px-4 py-3 text-body">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <Field.Label htmlFor="identifier">Username or email</Field.Label>
+                <Field.Input
+                  id="identifier"
+                  type="text"
+                  name="identifier"
+                  value={formData.identifier}
+                  onChange={handleChange}
+                  placeholder="Enter username or email"
+                />
+              </div>
+
+              <div>
+                <Field.Label htmlFor="password">Password</Field.Label>
+                <Field.Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <Button type="submit" variant="primary" disabled={loading} className="w-full justify-center">
+                {loading ? 'Logging in…' : 'Sign in'}
+              </Button>
+            </form>
+
+            <div className="mt-auto border-t border-ds-row pt-4 flex justify-between items-center">
+              <span className="text-body text-ds-ink-soft">New here?</span>
+              <Link to="/signup" className="text-label font-semibold text-ds-blue border-b-2 border-ds-red pb-0.5">
+                Create an account
+              </Link>
             </div>
           </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        {/* Signup Link */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-gray-900 font-semibold hover:underline">
-              Sign up here
-            </Link>
-          </p>
-        </div>
         </div>
       </div>
     </>

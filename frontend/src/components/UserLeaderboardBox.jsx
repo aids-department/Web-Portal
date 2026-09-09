@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Table from "./ui/Table";
 
 const formatRows = (rows) => {
   return rows.map((r, index) => ({
@@ -68,54 +69,43 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
   ];
 
   if (loading)
-    return <p className="text-center text-gray-500 font-medium">Loading leaderboard…</p>;
+    return <p className="text-body text-ds-ink-soft">Loading leaderboard…</p>;
 
   return (
       <div className="flex flex-col lg:flex-row gap-8">
         {/* TABLE */}
         <div className="flex-1">
           {/* Sub Tabs */}
-          <div className="flex gap-3 mb-6">
+          <div className="flex gap-2 mb-6">
             {["first_years", "non_first_years"].map((tab) => (
                 <button
                     key={tab}
                     onClick={() => setActiveSubTab(tab)}
-                    className={`px-6 py-2.5 rounded-xl font-semibold transition ${
+                    className={`px-4.5 py-2.5 text-label font-medium border ${
                         activeSubTab === tab
-                            ? "bg-white shadow text-blue-700"
-                            : "text-gray-600 hover:text-gray-800"
+                            ? "bg-navy text-white border-navy"
+                            : "bg-white text-ds-ink-soft border-ds-edge"
                     }`}
                 >
-                  {tab === "first_years" ? "First Years" : "Non First Years"}
+                  {tab === "first_years" ? "First years" : "Non first years"}
                 </button>
             ))}
           </div>
 
-          <div className="overflow-x-auto bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40">
-            <table className="w-full text-sm">
-              <thead>
-              <tr className="bg-gray-100/60">
-                {["Rank", "Name", "Year", "Score", "Time"].map((h) => (
-                    <th
-                        key={h}
-                        className={`p-4 text-left font-bold text-gray-800 ${
-                            h === "Time" ? "hidden sm:table-cell" : ""
-                        }`}
-                    >
-                      {h}
-                    </th>
-                ))}
-              </tr>
-              </thead>
-              <tbody>
+          <Table>
+            <Table.Head>
+              <Table.HeadCell className="w-16">Rank</Table.HeadCell>
+              <Table.HeadCell>Name</Table.HeadCell>
+              <Table.HeadCell>Year</Table.HeadCell>
+              <Table.HeadCell>Score</Table.HeadCell>
+              <Table.HeadCell className="hidden sm:table-cell">Time</Table.HeadCell>
+            </Table.Head>
+            <tbody>
               {currentLeaderboard.map((row) => (
-                  <tr
-                      key={row.roll}
-                      className="border-t border-gray-200/60 hover:bg-gray-50/60 transition"
-                  >
-                    <td className="p-4 font-medium text-gray-700">{row.rank}</td>
-                    <td
-                        className="p-4 font-medium text-blue-700 cursor-pointer hover:underline"
+                  <Table.Row key={row.roll}>
+                    <Table.Cell><Table.RankChip rank={row.rank} /></Table.Cell>
+                    <Table.Cell
+                        className="font-medium text-ds-blue cursor-pointer hover:underline"
                         onClick={() => {
                           if (row.roll && /^[a-fA-F0-9]{24}$/.test(row.roll)) {
                             navigate(`/profile/${row.roll}`);
@@ -125,51 +115,43 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
                         }}
                     >
                       {row.name}
-                    </td>
-                    <td className="p-4 text-gray-600">{row.yearDisplay}</td>
-                    <td className="p-4 font-medium text-gray-700">{row.score}</td>
-                    <td className="p-4 text-gray-600 hidden sm:table-cell">
+                    </Table.Cell>
+                    <Table.Cell>{row.yearDisplay}</Table.Cell>
+                    <Table.Cell className="font-semibold text-navy tabular-nums">{row.score}</Table.Cell>
+                    <Table.Cell className="hidden sm:table-cell tabular-nums">
                       {row.timeDisplay}
-                    </td>
-                  </tr>
+                    </Table.Cell>
+                  </Table.Row>
               ))}
-              </tbody>
-            </table>
-          </div>
+            </tbody>
+          </Table>
         </div>
 
         {/* SIDEBAR */}
-        <div className="w-full lg:w-80 space-y-6">
-          {/* PARTICIPATION COUNT BOX */}
-
-
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Codenigma Winners
-            </h3>
-            <ol className="list-decimal list-inside space-y-1 text-gray-700">
+        <div className="w-full lg:w-72 flex flex-col gap-6">
+          <div className="border border-ds-edge p-5">
+            <h3 className="text-card-title text-navy mb-3">Codenigma winners</h3>
+            <ol className="flex flex-col gap-1.5 text-body text-ds-ink">
               {codenigmaWinners.map((winner, index) => (
-                  <li key={index}>{winner}</li>
+                  <li key={index}>{index + 1}. {winner}</li>
               ))}
             </ol>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3">
-              Organizers
-            </h3>
+          <div className="border border-ds-edge p-5">
+            <h3 className="text-card-title text-navy mb-3">Organizers</h3>
             {organizers.map((org, i) => (
-                <p key={i} className="text-gray-700">
+                <p key={i} className="text-body text-ds-ink-soft">
                   {org}
                 </p>
             ))}
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1">
-              Total Participants
+          <div className="bg-navy p-5">
+            <h3 className="text-label tracking-label uppercase text-on-navy-muted mb-1">
+              Total participants
             </h3>
-            <p className="text-4xl font-bold text-gray-900">
+            <p className="text-figure text-white tabular-nums">
               {participationCount}
             </p>
           </div>
@@ -192,60 +174,48 @@ const GenesisLeaderboard = () => {
 
   return (
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-1 overflow-x-auto bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40">
-          <table className="w-full text-sm">
-            <thead>
-            <tr className="bg-gray-100/60">
-              {["Rank", "Project", "Year", "Team", "Team Lead"].map((h) => (
-                  <th
-                      key={h}
-                      className={`p-4 text-left font-bold text-gray-800 ${
-                          h === "Team" ? "hidden sm:table-cell" : ""
-                      }`}
-                  >
-                    {h}
-                  </th>
-              ))}
-            </tr>
-            </thead>
+        <div className="flex-1">
+          <Table>
+            <Table.Head>
+              <Table.HeadCell className="w-16">Rank</Table.HeadCell>
+              <Table.HeadCell>Project</Table.HeadCell>
+              <Table.HeadCell>Year</Table.HeadCell>
+              <Table.HeadCell className="hidden sm:table-cell">Team</Table.HeadCell>
+              <Table.HeadCell>Team lead</Table.HeadCell>
+            </Table.Head>
             <tbody>
-            {leaderboardData.map((row) => (
-                <tr
-                    key={row.rank}
-                    className="border-t border-gray-200/60 hover:bg-gray-50/60 transition"
-                >
-                  <td className="p-4">{row.rank}</td>
-                  <td className="p-4">{row.projectName}</td>
-                  <td className="p-4">{row.year}</td>
-                  <td className="p-4 hidden sm:table-cell">{row.team}</td>
-                  <td
-                      className="p-4 relative cursor-pointer font-medium"
-                      onMouseEnter={() => setHoveredLead(row)}
-                      onMouseLeave={() => setHoveredLead(null)}
-                  >
-                    {row.lead}
-                    {hoveredLead?.rank === row.rank && (
-                        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 z-10 w-48 text-sm">
-                          <p className="font-semibold mb-1">Team Members</p>
-                          {row.members.map((m, i) => (
-                              <p key={i}>{m}</p>
-                          ))}
-                        </div>
-                    )}
-                  </td>
-                </tr>
-            ))}
+              {leaderboardData.map((row) => (
+                  <Table.Row key={row.rank}>
+                    <Table.Cell><Table.RankChip rank={row.rank} /></Table.Cell>
+                    <Table.Cell className="font-medium text-navy">{row.projectName}</Table.Cell>
+                    <Table.Cell>{row.year}</Table.Cell>
+                    <Table.Cell className="hidden sm:table-cell">{row.team}</Table.Cell>
+                    <Table.Cell
+                        className="relative cursor-pointer font-medium text-ds-blue"
+                        onMouseEnter={() => setHoveredLead(row)}
+                        onMouseLeave={() => setHoveredLead(null)}
+                    >
+                      {row.lead}
+                      {hoveredLead?.rank === row.rank && (
+                          <div className="absolute top-full left-0 mt-1 bg-white border border-ds-edge p-3 z-10 w-48 text-body">
+                            <p className="font-semibold text-navy mb-1">Team members</p>
+                            {row.members.map((m, i) => (
+                                <p key={i} className="text-ds-ink-soft">{m}</p>
+                            ))}
+                          </div>
+                      )}
+                    </Table.Cell>
+                  </Table.Row>
+              ))}
             </tbody>
-          </table>
+          </Table>
         </div>
 
-        <div className="w-full lg:w-80">
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3">
-              Organizers
-            </h3>
+        <div className="w-full lg:w-72">
+          <div className="border border-ds-edge p-5">
+            <h3 className="text-card-title text-navy mb-3">Organizers</h3>
             {organizers.map((org, i) => (
-                <p key={i} className="text-gray-700">
+                <p key={i} className="text-body text-ds-ink-soft">
                   {org}
                 </p>
             ))}

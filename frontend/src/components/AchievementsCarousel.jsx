@@ -32,11 +32,11 @@ export default function AchievementsCarousel() {
         }
     }, [achievements.length]);
 
-    if (loading) return <div className="h-48 flex items-center justify-center text-gray-500 italic">Loading achievements...</div>;
+    if (loading) return <div className="h-48 flex items-center justify-center text-body text-ds-ink-faint italic">Loading achievements…</div>;
     if (achievements.length === 0) return null;
 
     return (
-        <div className="relative w-full h-56 overflow-hidden rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+        <div className="relative w-full h-56 overflow-hidden bg-white border border-ds-edge">
 
             {/* Slides Container */}
             <div
@@ -46,22 +46,22 @@ export default function AchievementsCarousel() {
                 {achievements.map((a) => (
                     <div key={a._id} className="w-full flex-shrink-0 h-full p-8 flex flex-col justify-center">
                         <div className="max-w-3xl mx-auto text-center">
-              <span className="inline-block px-3 py-1 mb-3 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 rounded-full">
-                New Achievement
-              </span>
-                            <h4 className="text-2xl font-bold text-gray-900 mb-2 truncate">
+                            <span className="inline-block px-2.5 py-1 mb-3 text-kicker tracking-kicker uppercase text-ds-blue bg-ds-blue-tint">
+                                New achievement
+                            </span>
+                            <h4 className="text-section-heading text-navy mb-2 truncate">
                                 {a.title}
                             </h4>
-                            <p className="text-gray-600 line-clamp-2 mb-4 italic">
+                            <p className="text-body text-ds-ink-soft mb-4 italic">
                                 "{a.description}"
                             </p>
-                            <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-500">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs">
+                            <div className="flex items-center justify-center gap-2.5 text-label text-ds-ink-faint">
+                                <div className="w-7 h-7 bg-ds-blue-tint border border-ds-edge flex items-center justify-center text-navy text-label font-semibold">
                                     {a.userId?.fullName?.charAt(0) || "A"}
                                 </div>
                                 <span>{a.userId?.fullName}</span>
-                                <span className="text-gray-300">•</span>
-                                <span>{a.userId?.year} Year</span>
+                                <span>·</span>
+                                <span>{a.userId?.year} year</span>
                             </div>
                         </div>
                     </div>
@@ -69,13 +69,13 @@ export default function AchievementsCarousel() {
             </div>
 
             {/* Navigation Indicators */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 {achievements.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setCurrent(index)}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                            index === current ? "bg-blue-600 w-6" : "bg-gray-300"
+                        className={`h-1.5 transition-all ${
+                            index === current ? "bg-ds-red w-6" : "bg-ds-edge w-1.5"
                         }`}
                         aria-label={`Go to slide ${index + 1}`}
                     />
@@ -85,13 +85,13 @@ export default function AchievementsCarousel() {
             {/* Side arrows for manual navigation */}
             <button
                 onClick={() => setCurrent((c) => (c === 0 ? achievements.length - 1 : c - 1))}
-                className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                className="absolute top-1/2 left-4 -translate-y-1/2 text-ds-ink-faint hover:text-navy transition-colors"
             >
                 ‹
             </button>
             <button
                 onClick={() => setCurrent((c) => (c === achievements.length - 1 ? 0 : c + 1))}
-                className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                className="absolute top-1/2 right-4 -translate-y-1/2 text-ds-ink-faint hover:text-navy transition-colors"
             >
                 ›
             </button>

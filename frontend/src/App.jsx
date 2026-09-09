@@ -2,11 +2,16 @@ import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 
 import { useState, useEffect, useRef } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Users, BookOpen, GraduationCap, FlaskConical } from "lucide-react";
-import Sidebar from "./components/Sidebar";
-import Navbar from "./components/Navbar";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import {
+  LayoutDashboard, CalendarDays, FolderUp, Megaphone, PenSquare, Trophy, Award,
+} from "lucide-react";
+import SiteNav from "./components/SiteNav";
 import BrickBreakerGame from "./components/BrickBreakerGame";
+import HeroCanvas from "./components/HeroCanvas";
+import Button from "./components/ui/Button";
+import PageHeader from "./components/ui/PageHeader";
+import NoticeStrip from "./components/ui/NoticeStrip";
 
 // Pages from App 1
 import Codenigma from "./pages/Codenigma";
@@ -46,7 +51,6 @@ import UserAchievements from "./pages/UserAchievements";
 import AdminLogin from "./pages/AdminLogin";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import PostDetailPage from './pages/PostDetailPage';
-import "./style.css";
 
 
 // ScrollNumber Component
@@ -105,110 +109,177 @@ function DashboardPage() {
         fetchAchievements();
     }, []);
 
+    const stats = [
+        { label: "Students", num: "412", suffix: "" },
+        { label: "Faculty", num: "24", suffix: "" },
+        { label: "Publications", num: "61", suffix: "" },
+        { label: "Alumni", num: "870", suffix: "" },
+    ];
+
+    const quickInfo = [
+        { kicker: "Contests", title: "Leaderboard is live", to: "/leaderboards" },
+        { kicker: "Calendar", title: "See upcoming events", to: "/events" },
+        { kicker: "Resources", title: "Browse the question bank", to: "/question-bank" },
+        { kicker: "Recognition", title: "Recent achievements", to: "/achievements" },
+    ];
+
+    const researchGroups = [
+        { name: "Computer vision and imaging" },
+        { name: "Language and speech systems" },
+        { name: "Applied statistics and forecasting" },
+        { name: "Responsible AI and governance" },
+    ];
+
     return (
         <>
-            {/* HEADER SECTION - Kept exactly the same */}
-            <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 backdrop-blur-lg p-12 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/10 to-purple-100/10 rounded-full blur-3xl"></div>
-
-                <div className="relative z-10">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4 font-cursive leading-tight">
-                            Welcome to the Department of AI and DS
-                        </h1>
-                        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-6"></div>
+            {/* HERO */}
+            <div className="bg-navy grid grid-cols-1 lg:grid-cols-[1fr_480px] items-stretch">
+                <div className="flex flex-col gap-6 px-gutter-mobile sm:px-gutter py-14 lg:py-16 border-b lg:border-b-0 lg:border-r-2 border-blue">
+                    <span className="text-kicker tracking-kicker uppercase text-ds-red">Undergraduate and postgraduate</span>
+                    <h1 className="text-display text-white max-w-[16ch]">Artificial Intelligence and Data Science</h1>
+                    <p className="text-body text-on-navy max-w-[52ch]">
+                        A department built around applied machine learning, statistical modelling and the systems that carry them into production. Coursework, contests, research groups and an alumni network in one place.
+                    </p>
+                    <div className="flex flex-wrap gap-3 pt-1">
+                        <Link to="/about/syllabus"><Button variant="primary">Explore the programme</Button></Link>
+                        <Link to="/events"><Button variant="on-navy">Upcoming events</Button></Link>
                     </div>
-
-                    <div className="max-w-4xl mx-auto text-center mb-12">
-                        <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                            Our mission is to foster innovation and excellence in Artificial Intelligence and Data Science through
-                            <span className="font-semibold text-blue-700"> cutting-edge research</span>,
-                            <span className="font-semibold text-purple-700"> industry collaboration</span>, and a
-                            <span className="font-semibold text-green-700"> dynamic learning environment</span>.
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-                            <span className="px-3 py-1 bg-blue-100/50 rounded-full">🤖 AI Research</span>
-                            <span className="px-3 py-1 bg-purple-100/50 rounded-full">📊 Data Science</span>
-                            <span className="px-3 py-1 bg-green-100/50 rounded-full">🎓 Education</span>
-                            <span className="px-3 py-1 bg-orange-100/50 rounded-full">🚀 Innovation</span>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            { label: "Ongoing Projects", value: "50+", num: "50", icon: BookOpen, color: "text-blue-600" },
-                            { label: "Faculty Members", value: "12", num: "12", icon: Users, color: "text-purple-600" },
-                            { label: "Active Students", value: "300+", num: "300", icon: GraduationCap, color: "text-green-600" },
-                            { label: "Research Lab", value: "1", num: "1", icon: FlaskConical, color: "text-orange-600" },
-                        ].map((item) => {
-                            const IconComponent = item.icon;
-                            return (
-                                <div
-                                    key={item.label}
-                                    className="group bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-white/40 text-center hover:scale-105 hover:bg-white/90 hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    <div className="relative z-10">
-                                        <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3 ${item.color}`}>
-                                            <IconComponent size={24} />
-                                        </div>
-                                        <div className="text-4xl font-bold text-gray-900 mb-1">
-                                            <ScrollNumber target={item.num} suffix={item.value.includes('+') ? '+' : ''} />
-                                        </div>
-                                        <p className="text-gray-700 font-medium text-sm">{item.label}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div className="flex flex-wrap gap-9 pt-6 mt-auto border-t border-blue">
+                        {stats.map((item) => (
+                            <div key={item.label} className="flex flex-col gap-1.5 pt-5">
+                                <span className="text-figure text-white tabular-nums">
+                                    <ScrollNumber target={item.num} suffix={item.suffix} />
+                                </span>
+                                <span className="text-label tracking-label uppercase text-on-navy-muted">{item.label}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-            </section>
+                <div className="relative bg-navy-deep min-h-[320px] lg:min-h-[520px]">
+                    <HeroCanvas width={560} height={520} />
+                    <div className="absolute left-6 bottom-5 flex flex-col gap-1">
+                        <span className="text-kicker tracking-kicker uppercase text-ds-red">Interactive</span>
+                        <span className="text-label text-on-navy-muted">Move the cursor. Points settle from noise into structure.</span>
+                    </div>
+                </div>
+            </div>
 
-            {/* EVENTS - Kept exactly the same */}
-            <section id="events" className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+            {/* QUICK INFO STRIP */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b-2 border-navy bg-white">
+                {quickInfo.map((item, i) => (
+                    <Link
+                        key={item.kicker}
+                        to={item.to}
+                        className={`px-gutter-mobile sm:px-7 py-5.5 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-ds-edge' : ''}`}
+                    >
+                        <div className="text-kicker tracking-kicker uppercase text-ds-red">{item.kicker}</div>
+                        <div className="text-label font-medium text-ds-ink pt-2">{item.title}</div>
+                    </Link>
+                ))}
+            </div>
 
-                <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Events</h2>
+            <div className="px-gutter-mobile sm:px-gutter">
+                {/* EVENTS */}
+                <section id="events" className="pt-10 pb-2">
+                    <h2 className="text-section-heading text-navy mb-6">Events</h2>
                     <Dashboard_Carousel
                         slides={[
                             { img: img1, page: "/events/codenigma" },
                             { img: img2, page: "/events/genesys" },
                         ]}
                     />
-                </div>
-            </section>
-            {/* 3. NEW: RECENT ACHIEVEMENTS SECTION (Between Events and Updates) */}
-            <section className="mb-8">
-                <AchievementsCarousel />
-            </section>
-            {/* RECENT UPDATES - Now Dynamic from MongoDB */}
-            <section className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+                </section>
 
-                <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Recent Updates</h2>
+                {/* RECENT ACHIEVEMENTS */}
+                <section className="pt-10 pb-2 border-t-2 border-navy mt-10">
+                    <AchievementsCarousel />
+                </section>
 
-                    <div className="space-y-4">
-                        {updates.length > 0 ? (
-                            updates.map((u) => (
-                                <div key={u._id} className="group pb-4 border-b border-gray-200 hover:bg-white/60 transition-all duration-300 rounded-lg px-4 py-3 hover:shadow-md">
-                                    <p className="text-gray-900 font-medium group-hover:text-gray-800">{u.title}</p>
-                                    <p className="text-gray-500 text-sm group-hover:text-gray-600">
+                {/* RECENT UPDATES - Dynamic from MongoDB */}
+                <section className="pt-10 pb-12 border-t-2 border-navy mt-10">
+                    <h2 className="text-section-heading text-navy mb-6">Recent updates</h2>
+
+                    {updates.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-ds-edge border border-ds-edge">
+                            {updates.map((u) => (
+                                <article key={u._id} className="bg-white p-6 flex flex-col gap-3">
+                                    <div className="h-[130px] bg-ds-blue-tint border border-ds-edge grid place-items-center">
+                                        <span className="text-kicker tracking-kicker uppercase text-ds-blue">Update</span>
+                                    </div>
+                                    <h3 className="text-card-title text-navy">{u.title}</h3>
+                                    <span className="text-label text-ds-ink-faint tabular-nums mt-auto pt-2">
                                         {formatDistanceToNow(new Date(u.createdAt), { addSuffix: true })}
-                                    </p>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-gray-500 italic">No updates available at the moment.</p>
-                        )}
+                                    </span>
+                                </article>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-body text-ds-ink-faint italic">No updates available at the moment.</p>
+                    )}
+                </section>
+            </div>
+
+            {/* RESEARCH GROUPS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 bg-ds-ground border-t-2 border-navy">
+                <div className="px-gutter-mobile sm:px-gutter py-11 lg:border-r border-ds-edge flex flex-col gap-5">
+                    <h3 className="text-section-heading text-navy">Research groups</h3>
+                    <div className="flex flex-col">
+                        {researchGroups.map((g) => (
+                            <div key={g.name} className="flex justify-between py-3.5 border-b border-ds-edge">
+                                <span className="text-body text-ds-ink">{g.name}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-            </section>
+                <div className="px-gutter-mobile sm:px-gutter py-11 flex flex-col gap-5">
+                    <h3 className="text-section-heading text-navy">From the labs</h3>
+                    <div className="h-[180px] bg-navy grid place-items-center grayscale">
+                        <span className="text-kicker tracking-kicker uppercase text-on-navy-muted">Photograph — lab session, black and white</span>
+                    </div>
+                    <p className="text-body text-ds-ink-soft">
+                        Photographs print in black and white throughout, so student-submitted images stay consistent whatever their source.
+                    </p>
+                </div>
+            </div>
+
+            {/* FOOTER */}
+            <footer className="bg-navy px-gutter-mobile sm:px-gutter py-12 flex flex-col gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-9">
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-6 h-6 bg-white flex items-center justify-center">
+                                <div className="w-2 h-2 bg-ds-red" />
+                            </div>
+                            <span className="text-label font-bold tracking-label text-white">AI &amp; DS</span>
+                        </div>
+                        <p className="text-body text-on-navy-muted max-w-[38ch]">
+                            Department of Artificial Intelligence and Data Science. Block C, second floor.
+                        </p>
+                    </div>
+                    <div className="flex flex-col gap-2.5">
+                        <span className="text-kicker tracking-kicker uppercase text-ds-red">Department</span>
+                        <Link to="/about/faculty" className="text-body text-on-navy">Faculty</Link>
+                        <Link to="/about/staff" className="text-body text-on-navy">Staff</Link>
+                        <Link to="/about/syllabus" className="text-body text-on-navy">Syllabus</Link>
+                    </div>
+                    <div className="flex flex-col gap-2.5">
+                        <span className="text-kicker tracking-kicker uppercase text-ds-red">Student life</span>
+                        <Link to="/events" className="text-body text-on-navy">Events</Link>
+                        <Link to="/leaderboards" className="text-body text-on-navy">Leaderboard</Link>
+                        <Link to="/achievements" className="text-body text-on-navy">Achievements</Link>
+                    </div>
+                    <div className="flex flex-col gap-2.5">
+                        <span className="text-kicker tracking-kicker uppercase text-ds-red">Members</span>
+                        <Link to="/alumni" className="text-body text-on-navy">Alumni</Link>
+                        <Link to="/posts" className="text-body text-on-navy">Posts</Link>
+                        <Link to="/question-bank" className="text-body text-on-navy">Question bank</Link>
+                    </div>
+                </div>
+                <div className="border-t border-blue pt-4 flex flex-col sm:flex-row justify-between gap-2">
+                    <span className="text-label text-on-navy-muted">Maintained by the department web committee</span>
+                    <span className="text-label text-on-navy-muted">Updated 8 September 2026</span>
+                </div>
+            </footer>
         </>
     );
 }
@@ -218,47 +289,26 @@ function DashboardPage() {
 
 function ConnectPage() {
   return (
-    <div className="relative bg-gradient-to-br from-purple-50 via-white to-pink-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-      <div className="relative z-10">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Connect</h2>
-        <div className="text-center mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 font-medium">🚧 Connect features are coming soon!</p>
-            <p className="text-blue-600 text-sm mt-1">We're working on exciting ways to help you connect with peers and faculty.</p>
-          </div>
-        </div>
-        <div className="text-center mb-4">
-          <p className="text-gray-600 text-sm">Meanwhile, enjoy a quick game to pass the time:</p>
-        </div>
-        <BrickBreakerGame />
-      </div>
+    <div>
+      <PageHeader kicker="Coming soon" heading="Connect">
+        We're working on ways to help you connect with peers and faculty.
+      </PageHeader>
+      <NoticeStrip tagLabel="Notice" message="Connect features are coming soon." className="mb-8 -mx-gutter-mobile sm:-mx-gutter w-auto" />
+      <p className="text-body text-ds-ink-soft mb-4">Meanwhile, enjoy a quick game to pass the time.</p>
+      <BrickBreakerGame />
     </div>
   );
 }
 
 function ProjectsPage() {
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-white to-cyan-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-      <div className="relative z-10">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-cursive">Projects</h2>
-        <div className="text-center mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 font-medium">🚧 Projects showcase coming soon!</p>
-            <p className="text-blue-600 text-sm mt-1">We're working on showcasing amazing student and faculty projects.</p>
-          </div>
-        </div>
-        <div className="text-center mb-4">
-          <p className="text-gray-600 text-sm">Meanwhile, enjoy a quick game to pass the time:</p>
-        </div>
-        <BrickBreakerGame />
-      </div>
+    <div>
+      <PageHeader kicker="Coming soon" heading="Projects">
+        We're working on showcasing student and faculty projects.
+      </PageHeader>
+      <NoticeStrip tagLabel="Notice" message="The projects showcase is coming soon." className="mb-8 -mx-gutter-mobile sm:-mx-gutter w-auto" />
+      <p className="text-body text-ds-ink-soft mb-4">Meanwhile, enjoy a quick game to pass the time.</p>
+      <BrickBreakerGame />
     </div>
   );
 }
@@ -266,30 +316,21 @@ function ProjectsPage() {
 // ============================================
 // MAIN LAYOUT COMPONENT
 // ============================================
-function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
+function MainLayout({ children, fullBleed = false }) {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans overflow-x-hidden flex relative">
-      <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-
-      <div
-        className={`
-          flex-1 flex flex-col overflow-x-hidden transition-all duration-300 pt-20
-          ${isOpen ? "ml-64" : "ml-0"}
-        `}
-      >
-        <Navbar toggleSidebar={toggleSidebar} />
-        <main className={`flex-1 overflow-y-auto ${fullBleed ? 'p-0 bg-transparent' : 'p-8 bg-white shadow-inner'}`}>
-          {fullBleed ? (
-            <div className="w-full h-full">
-              {children}
-            </div>
-          ) : (
-            <div className="max-w-7xl mx-auto">
-              {children}
-            </div>
-          )}
-        </main>
-      </div>
+    <div className="min-h-screen bg-ds-ground font-sans overflow-x-hidden flex flex-col relative">
+      <SiteNav />
+      <main className={`flex-1 pt-16 overflow-x-hidden ${fullBleed ? 'p-0 pt-16 bg-transparent' : 'px-gutter-mobile sm:px-gutter py-10 bg-white'}`}>
+        {fullBleed ? (
+          <div className="w-full h-full">
+            {children}
+          </div>
+        ) : (
+          <div className="max-w-7xl">
+            {children}
+          </div>
+        )}
+      </main>
     </div>
   );
 }
@@ -297,120 +338,66 @@ function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
 // ============================================
 // ADMIN LAYOUT COMPONENT
 // ============================================
+const ADMIN_LINKS = [
+  { href: "/adminpage", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/adminpage/events", label: "Events", icon: CalendarDays },
+  { href: "/adminpage/manage-uploads", label: "Uploads", icon: FolderUp },
+  { href: "/adminpage/manage-content-updates", label: "Updates", icon: Megaphone },
+  { href: "/adminpage/manage-content", label: "Content", icon: PenSquare },
+  { href: "/adminpage/leaderboard", label: "Leaderboard", icon: Trophy },
+  { href: "/adminpage/achievements", label: "Achievements", icon: Award },
+];
+
 function AdminLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 font-sans relative overflow-hidden">
-      {/* Professional background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(59,130,246,0.08)_1px,transparent_0)] bg-[length:24px_24px]"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/20 to-transparent rounded-full -translate-y-48 translate-x-48"></div>
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-100/20 to-transparent rounded-full translate-y-40 -translate-x-40"></div>
+    <div className="min-h-screen bg-ds-ground font-sans">
       {/* ADMIN NAVBAR */}
-      <nav className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white shadow-2xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
+      <nav className="bg-navy text-white border-b-2 border-ds-red">
+        <div className="max-w-7xl px-gutter-mobile sm:px-gutter py-5">
+          <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
+              <div className="w-9 h-9 bg-white flex items-center justify-center">
+                <div className="w-2.5 h-2.5 bg-ds-red" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                  Admin Portal
-                </h1>
-                <p className="text-blue-200 text-xs">Management Dashboard</p>
+                <h1 className="text-card-title text-white">Admin portal</h1>
+                <p className="text-label text-on-navy-muted">Management dashboard</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => {
                 localStorage.removeItem('adminAuth');
                 localStorage.removeItem('adminData');
                 window.location.href = '/admin-login';
               }}
-              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg transition-all duration-300 text-red-200 hover:text-white text-sm"
+              className="px-3.5 py-2 text-label font-medium text-white border border-on-navy"
             >
               Logout
             </button>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <a
-              href="/adminpage"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-400 to-indigo-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📊</span>
-              </div>
-              <span className="text-xs font-medium text-center">Dashboard</span>
-            </a>
-            
-            <a
-              href="/adminpage/events"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📅</span>
-              </div>
-              <span className="text-xs font-medium text-center">Events</span>
-            </a>
-            
-            <a
-              href="/adminpage/manage-uploads"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📁</span>
-              </div>
-              <span className="text-xs font-medium text-center">Uploads</span>
-            </a>
-            
-            <a
-              href="/adminpage/manage-content-updates"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📢</span>
-              </div>
-              <span className="text-xs font-medium text-center">Updates</span>
-            </a>
-            
-            <a 
-              href="/adminpage/manage-content" 
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">✏️</span>
-              </div>
-              <span className="text-xs font-medium text-center">Content</span>
-            </a>
-            
-            <a 
-              href="/adminpage/leaderboard" 
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">🏆</span>
-              </div>
-              <span className="text-xs font-medium text-center">Leaderboard</span>
-            </a>
-            
-            <a 
-              href="/adminpage/achievements" 
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20 md:col-span-3 lg:col-span-1"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-red-400 to-red-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">🎖️</span>
-              </div>
-              <span className="text-xs font-medium text-center">Achievements</span>
-            </a>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-px bg-blue">
+            {ADMIN_LINKS.map((link) => {
+              const Icon = link.icon;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="flex flex-col items-center gap-2 py-4 bg-navy hover:bg-navy-deep transition-colors"
+                >
+                  <Icon size={18} className="text-on-navy" />
+                  <span className="text-label text-on-navy">{link.label}</span>
+                </a>
+              );
+            })}
           </div>
         </div>
       </nav>
 
       {/* ADMIN CONTENT */}
-      <main className="relative z-10 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 p-8 min-h-[calc(100vh-200px)]">
-            {children}
-          </div>
+      <main className="px-gutter-mobile sm:px-gutter py-10">
+        <div className="max-w-7xl bg-white border border-ds-edge p-8">
+          {children}
         </div>
       </main>
     </div>
@@ -421,8 +408,6 @@ function AdminLayout({ children }) {
 // MAIN APP COMPONENT
 // ============================================
 export default function App() {
-  const [isOpen, setIsOpen] = useState(true);
-  const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
     <BrowserRouter>
@@ -526,7 +511,7 @@ export default function App() {
         <Route
           path="/profile"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Profile />
             </MainLayout>
           }
@@ -535,7 +520,7 @@ export default function App() {
         <Route
           path="/profile/:userId"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Profile />
             </MainLayout>
           }
@@ -544,7 +529,7 @@ export default function App() {
         <Route
           path="/edit-profile"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <EditProfile />
             </MainLayout>
           }
@@ -555,7 +540,7 @@ export default function App() {
         <Route
           path="/"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed>
               <DashboardPage />
             </MainLayout>
           }
@@ -565,7 +550,7 @@ export default function App() {
         <Route
           path="/leaderboards"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <UserLeaderboards />
             </MainLayout>
           }
@@ -576,7 +561,7 @@ export default function App() {
         <Route
           path="/events"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <EventsPage />
             </MainLayout>
           }
@@ -584,7 +569,7 @@ export default function App() {
         <Route
           path="/events/codenigma"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Codenigma />
             </MainLayout>
           }
@@ -592,7 +577,7 @@ export default function App() {
         <Route
           path="/events/genesys"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Genesys />
             </MainLayout>
           }
@@ -602,7 +587,7 @@ export default function App() {
         <Route
           path="/about/faculty"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <FacultyInfo />
             </MainLayout>
           }
@@ -610,7 +595,7 @@ export default function App() {
         <Route
           path="/about/staff"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <StaffInfo />
             </MainLayout>
           }
@@ -618,7 +603,7 @@ export default function App() {
         <Route
           path="/about/syllabus"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Syllabus />
             </MainLayout>
           }
@@ -628,7 +613,7 @@ export default function App() {
         <Route
           path="/alumni"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Alumni />
             </MainLayout>
           }
@@ -638,7 +623,7 @@ export default function App() {
         <Route
           path="/achievements"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <UserAchievements />
             </MainLayout>
           }
@@ -648,7 +633,7 @@ export default function App() {
         <Route
           path="/connect"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <ConnectPage />
             </MainLayout>
           }
@@ -658,7 +643,7 @@ export default function App() {
         <Route
           path="/projects"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <ProjectsPage />
             </MainLayout>
           }
@@ -668,7 +653,7 @@ export default function App() {
         <Route
           path="/team-info"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar} fullBleed={true}>
+            <MainLayout fullBleed={true}>
               <TeamInfo />
             </MainLayout>
           }
@@ -678,7 +663,7 @@ export default function App() {
         <Route
           path="/association-members"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <AssociationMembers />
             </MainLayout>
           }
@@ -694,7 +679,7 @@ export default function App() {
           path="/posts"
           element={
             <ProtectedRoute>
-              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <MainLayout>
                 <PostsPage />
               </MainLayout>
             </ProtectedRoute>
@@ -704,7 +689,7 @@ export default function App() {
           path="/posts/:postId"
           element={
             <ProtectedRoute>
-              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <MainLayout>
                 <PostDetailPage />
               </MainLayout>
             </ProtectedRoute>
@@ -715,7 +700,7 @@ export default function App() {
           path="/question-bank"
           element={
             <ProtectedRoute>
-              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <MainLayout>
                 <QuestionBank />
               </MainLayout>
             </ProtectedRoute>

@@ -1,4 +1,7 @@
 import React, { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
+import Tabs from "../components/ui/Tabs";
+import Button from "../components/ui/Button";
 
 const DATA = {
   "Semester 1": {
@@ -110,7 +113,7 @@ const DATA = {
     ],
   },
 
-  "Semester 3": { 
+  "Semester 3": {
     theory: [
       {
         title: "Artificial Intelligence",
@@ -142,10 +145,9 @@ const DATA = {
         pdfPage: null,
         url: "https://image2url.com/r2/default/documents/1767581553278-3128de84-a365-4d34-bc0f-226a0be1716c.pdf",
       },
-      ],
-          lab:
-            [
-              {
+    ],
+    lab: [
+      {
         title: "Artificial Intelligence Laboratory",
         pdfPage: 45,
         url: "https://image2url.com/r2/default/documents/1767584698430-03706bc9-1b03-4494-adba-0565732f2384.pdf",
@@ -162,7 +164,7 @@ const DATA = {
       },
     ],
   },
-  "Semester 4": { 
+  "Semester 4": {
     theory: [
       {
         title: "Probability and Statistics",
@@ -200,8 +202,8 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767621929822-6f42ffdc-e9c8-4eeb-ac64-41359da9b286.pdf",
       },
     ],
-      lab: [
-        {
+    lab: [
+      {
         title: "Data Science and Analytics Laboratory",
         pdfPage: null,
         url: "https://image2url.com/r2/default/documents/1767621949046-5774cd96-288e-40ec-add7-a863718ac586.pdf",
@@ -211,12 +213,10 @@ const DATA = {
         pdfPage: null,
         url: "https://image2url.com/r2/default/documents/1767621986810-eafeedff-524f-465f-8223-0d40bf4e061d.pdf",
       },
-        ],
+    ],
   },
-  "Semester 5": 
-  { 
-    theory: 
-      [
+  "Semester 5": {
+    theory: [
       {
         title: "Deep Learning",
         pdfPage: 42,
@@ -238,8 +238,7 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767623836728-1b4b6549-b316-4aac-918b-34d7507a6eab.pdf",
       },
     ],
-  lab:
-    [
+    lab: [
       {
         title: "Deep Learning Laboratory",
         pdfPage: 45,
@@ -250,13 +249,11 @@ const DATA = {
         pdfPage: 45,
         url: "https://image2url.com/r2/default/documents/1767626242087-d5b1811b-6aa1-4760-8eb8-af06cf16283e.pdf",
       },
-      ],
+    ],
   },
-  "Semester 6": 
-  { 
-    theory:
-    [
-    {
+  "Semester 6": {
+    theory: [
+      {
         title: "Embedded Systems and IoT",
         pdfPage: 44,
         url: "https://image2url.com/r2/default/documents/1767626987911-62e78fa9-b840-4971-9c65-d005c5c5b110.pdf",
@@ -267,27 +264,27 @@ const DATA = {
         url: "https://image2url.com/r2/default/documents/1767627017061-aa9c2f10-6d27-40ef-b712-43fdadb7b1a6.pdf",
       },
     ],
-  lab: null },
-  "Semester 7": 
-  {  
-    theory:
-    [
-    {
+    lab: null,
+  },
+  "Semester 7": {
+    theory: [
+      {
         title: "Human Values and Ethics",
         pdfPage: 44,
         url: "https://image2url.com/r2/default/documents/1767631557269-c13d082d-3712-47ce-8cab-f46eeb798b95.pdf",
       },
-      ],
-    lab: null },
-  "Semester 8": { theory: null, 
-     lab:
-     [
-     {
-          title: "Project Work/Internship",
-          pdfPage: 45,
-          url: "https://image2url.com/r2/default/documents/1767630502465-b9ab6e18-fe60-424b-ba88-963b9d8a24b0.pdf",
+    ],
+    lab: null,
+  },
+  "Semester 8": {
+    theory: null,
+    lab: [
+      {
+        title: "Project Work/Internship",
+        pdfPage: 45,
+        url: "https://image2url.com/r2/default/documents/1767630502465-b9ab6e18-fe60-424b-ba88-963b9d8a24b0.pdf",
       },
-      ],
+    ],
   },
 };
 
@@ -322,180 +319,169 @@ export default function Syllabus() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 flex justify-center p-10">
-      {/* Decorative background elements */}
-      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
-      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-yellow-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
+    <div>
+      <Tabs className="mb-8 -mt-2">
+        <Link to="/about/faculty"><Tabs.Tab>Faculty</Tabs.Tab></Link>
+        <Link to="/about/staff"><Tabs.Tab>Staff</Tabs.Tab></Link>
+        <Tabs.Tab active>Syllabus</Tabs.Tab>
+      </Tabs>
 
-      <div className="w-full max-w-3xl text-black relative z-10">
-        <h2 className="text-3xl font-bold mb-6 text-gray-900">AI & DS - Syllabus Portal</h2>
-
-        {/* SEARCH BAR */}
-        <input
-          value={q}
-          onChange={(e) => {
-            const value = e.target.value;
-            setQ(value);
-            setInvalidSearch(value.trim() && filteredSubjects.length === 0);
-          }}
-          placeholder="Search subjects..."
-          className="w-full p-3 rounded-xl bg-gray-200 border border-gray-300 text-black mb-6"
-        />
-
-        {/* SEARCH RESULTS */}
-        {q.trim() !== "" && filteredSubjects.length > 0 && (
-          <div className="mb-4">
-            <strong>Results:</strong>
-            <div className="mt-2 space-y-2">
-              {filteredSubjects.map((s, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 bg-white rounded-lg shadow cursor-pointer hover:bg-gray-50"
-                  onClick={() => {
-                    setOpenSem(semesters.indexOf(s.sem));
-                    setOpenGroup({ [s.sem]: s.group });
-                    setOpenSubject(s);
-                  }}
-                >
-                  {s.sem} → {s.group} → <b>{s.title}</b>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* SEMESTER CARDS */}
-        {semesters.map((sem, index) => {
-          const hasTheory = Array.isArray(DATA[sem].theory);
-          const hasLab = Array.isArray(DATA[sem].lab);
-
-          return (
-            <div
-              key={sem}
-              className="bg-white p-5 rounded-2xl shadow mb-6"
-            >
-              <button
-                onClick={() =>
-                  setOpenSem(openSem === index ? null : index)
-                }
-                className="w-full text-left flex justify-between font-semibold text-lg"
-              >
-                {sem}
-                <span>{openSem === index ? "▲" : "▼"}</span>
-              </button>
-
-              {openSem === index && (
-                <div className="mt-3 overflow-hidden">
-                  {/* THEORY / LAB BUTTONS */}
-                  <div className="flex gap-3 mb-3">
-                    <button
-                      onClick={() => {
-                        if (!hasTheory) return setOpenMessage("Content will be updated soon.");
-                        setOpenGroup({ [sem]: "theory" });
-                      }}
-                      className={`p-2 rounded-lg border w-full ${
-                        openGroup[sem] === "theory"
-                          ? "bg-blue-100 border-blue-300"
-                          : "bg-white border-gray-300"
-                      }`}
-                    >
-                      Theory
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (!hasLab) return setOpenMessage("Content will be updated soon.");
-                        setOpenGroup({ [sem]: "lab" });
-                      }}
-                      className={`p-2 rounded-lg border w-full ${
-                        openGroup[sem] === "lab"
-                          ? "bg-blue-100 border-blue-300"
-                          : "bg-white border-gray-300"
-                      }`}
-                    >
-                      Lab
-                    </button>
-                  </div>
-
-                  {/* SUBJECT LIST */}
-                  {openGroup[sem] &&
-                    Array.isArray(DATA[sem][openGroup[sem]]) &&
-                    DATA[sem][openGroup[sem]].map((subject, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 bg-gray-100 rounded-xl flex justify-between items-center mb-2"
-                      >
-                        <div>{subject.title}</div>
-                        <button
-                          onClick={() => setOpenSubject(subject)}
-                          className="px-3 py-1 border rounded-lg bg-white hover:bg-gray-200"
-                        >
-                          View
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {/* POPUPS */}
-
-        {/* INVALID SEARCH */}
-        {invalidSearch && (
-          <div
-            className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
-            onClick={() => setInvalidSearch(false)}
-          >
-            <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
-              Enter a valid subject name
-            </div>
-          </div>
-        )}
-
-        {/* ALERT MESSAGE */}
-        {openMessage && (
-          <div
-            className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
-            onClick={() => setOpenMessage(null)}
-          >
-            <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
-              {openMessage}
-            </div>
-          </div>
-        )}
-
-        {/* PDF MODAL */}
-        {openSubject && (
-          <div
-            className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-[999]"
-          >
-            <div
-              className="bg-white w-[90%] h-[90%] rounded-xl overflow-hidden shadow-xl flex flex-col"
-            >
-              <div className="p-3 border-b flex justify-between">
-                <strong>{openSubject.title}</strong>
-                <button
-                  onClick={() => setOpenSubject(null)}
-                  className="px-3 py-1 bg-red-500 text-white rounded-lg"
-                >
-                  Close
-                </button>
-              </div>
-
-              <iframe
-                src={
-                  openSubject.url
-                    ? `${openSubject.url}#page=${openSubject.pdfPage || 1}`
-                    : `https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`
-                }
-                className="w-full h-full"
-              />
-            </div>
-          </div>
-        )}
+      <div className="mb-8">
+        <span className="text-kicker tracking-kicker uppercase text-ds-red">B.Tech · AI &amp; DS</span>
+        <h1 className="text-page-heading text-navy mt-2.5">Syllabus</h1>
       </div>
+
+      {/* SEARCH BAR */}
+      <input
+        value={q}
+        onChange={(e) => {
+          const value = e.target.value;
+          setQ(value);
+          setInvalidSearch(value.trim() && filteredSubjects.length === 0);
+        }}
+        placeholder="Search subjects…"
+        className="w-full border border-ds-edge px-4 py-3 text-body text-ds-ink placeholder:text-ds-ink-faint focus:outline-none focus:border-navy mb-6"
+      />
+
+      {/* SEARCH RESULTS */}
+      {q.trim() !== "" && filteredSubjects.length > 0 && (
+        <div className="mb-6">
+          <span className="text-label font-semibold tracking-label uppercase text-ds-ink-soft">Results</span>
+          <div className="mt-2 border border-ds-edge divide-y divide-ds-row">
+            {filteredSubjects.map((s, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-white cursor-pointer hover:bg-ds-ground text-body text-ds-ink"
+                onClick={() => {
+                  setOpenSem(semesters.indexOf(s.sem));
+                  setOpenGroup({ [s.sem]: s.group });
+                  setOpenSubject(s);
+                }}
+              >
+                {s.sem} → {s.group} → <b className="text-navy">{s.title}</b>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* SEMESTER CARDS */}
+      {semesters.map((sem, index) => {
+        const hasTheory = Array.isArray(DATA[sem].theory);
+        const hasLab = Array.isArray(DATA[sem].lab);
+
+        return (
+          <div key={sem} className="border border-ds-edge -mt-px">
+            <button
+              onClick={() => setOpenSem(openSem === index ? null : index)}
+              className="w-full text-left flex justify-between items-center px-5 py-4 text-card-title text-navy"
+            >
+              {sem}
+              <span className="text-label text-ds-ink-faint">{openSem === index ? "▲" : "▼"}</span>
+            </button>
+
+            {openSem === index && (
+              <div className="px-5 pb-5">
+                {/* THEORY / LAB BUTTONS */}
+                <div className="flex gap-2.5 mb-4">
+                  <button
+                    onClick={() => {
+                      if (!hasTheory) return setOpenMessage("Content will be updated soon.");
+                      setOpenGroup({ [sem]: "theory" });
+                    }}
+                    className={`px-4 py-2 text-label font-medium border w-full ${
+                      openGroup[sem] === "theory"
+                        ? "bg-navy text-white border-navy"
+                        : "bg-white text-ds-ink-soft border-ds-edge"
+                    }`}
+                  >
+                    Theory
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (!hasLab) return setOpenMessage("Content will be updated soon.");
+                      setOpenGroup({ [sem]: "lab" });
+                    }}
+                    className={`px-4 py-2 text-label font-medium border w-full ${
+                      openGroup[sem] === "lab"
+                        ? "bg-navy text-white border-navy"
+                        : "bg-white text-ds-ink-soft border-ds-edge"
+                    }`}
+                  >
+                    Lab
+                  </button>
+                </div>
+
+                {/* SUBJECT LIST */}
+                {openGroup[sem] &&
+                  Array.isArray(DATA[sem][openGroup[sem]]) &&
+                  DATA[sem][openGroup[sem]].map((subject, idx) => (
+                    <div
+                      key={idx}
+                      className="px-4 py-3 bg-ds-ground flex justify-between items-center mb-1.5 gap-4"
+                    >
+                      <span className="text-body text-ds-ink">{subject.title}</span>
+                      <Button variant="secondary" onClick={() => setOpenSubject(subject)}>
+                        View
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* POPUPS */}
+
+      {/* INVALID SEARCH */}
+      {invalidSearch && (
+        <div
+          className="fixed inset-0 bg-navy/60 flex justify-center items-center z-[999]"
+          onClick={() => setInvalidSearch(false)}
+        >
+          <div className="bg-white border border-ds-edge p-5 text-body text-ds-ink">
+            Enter a valid subject name
+          </div>
+        </div>
+      )}
+
+      {/* ALERT MESSAGE */}
+      {openMessage && (
+        <div
+          className="fixed inset-0 bg-navy/60 flex justify-center items-center z-[999]"
+          onClick={() => setOpenMessage(null)}
+        >
+          <div className="bg-white border border-ds-edge p-5 text-body text-ds-ink">
+            {openMessage}
+          </div>
+        </div>
+      )}
+
+      {/* PDF MODAL */}
+      {openSubject && (
+        <div className="fixed inset-0 bg-navy/70 flex justify-center items-center p-4 z-[999]">
+          <div className="bg-white border-2 border-navy w-[90%] h-[90%] overflow-hidden flex flex-col">
+            <div className="px-5 py-3.5 border-b-2 border-navy flex justify-between items-center bg-navy">
+              <strong className="text-card-title text-white">{openSubject.title}</strong>
+              <Button variant="primary" onClick={() => setOpenSubject(null)}>
+                Close
+              </Button>
+            </div>
+
+            <iframe
+              title={openSubject.title}
+              src={
+                openSubject.url
+                  ? `${openSubject.url}#page=${openSubject.pdfPage || 1}`
+                  : `https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`
+              }
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

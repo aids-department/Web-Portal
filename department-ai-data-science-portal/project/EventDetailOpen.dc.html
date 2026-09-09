@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-13d8e993-daee-46a8-821d-891a801dbb61/styles.css">
+<script src="_ds/modernist-13d8e993-daee-46a8-821d-891a801dbb61/_ds_bundle.js"></script>
+</helmet>
+<div style="background:#fff;font-family:Archivo,system-ui,sans-serif">
+<div style="padding:16px 48px;border-bottom:1px solid #d7d3d3;font:400 11.5px/1 Archivo,sans-serif;color:#7d7979">Events / Upcoming / <span style="color:#0e1c3d">{{ title }}</span></div>
+<div style="display:grid;grid-template-columns:1fr 360px">
+  <div style="border-right:1px solid #d7d3d3">
+    <div style="height:300px;background:#0e1c3d;display:grid;place-items:center;filter:grayscale(1)"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8c9ab5">Event banner photograph</span></div>
+    <div style="padding:36px 44px 48px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="padding:4px 8px;font:600 9.5px/1 Archivo,sans-serif;letter-spacing:.12em;text-transform:uppercase;background:{{ tagBg }};color:{{ tagFg }}">{{ type }}</span>
+        <span style="font:400 11.5px/1 Archivo,sans-serif;color:#9b9797">Posted by the department · 02 Sep 2026</span>
+      </div>
+      <h1 style="margin:0;font:600 42px/1.06 Archivo,sans-serif;letter-spacing:-.02em;color:#0e1c3d;max-width:20ch">{{ title }}</h1>
+      <div style="height:2px;background:#0e1c3d"></div>
+      <p style="margin:0;font:400 15px/1.7 Archivo,sans-serif;color:#3a3838;max-width:70ch">{{ intro }}</p>
+      <p style="margin:0;font:400 15px/1.7 Archivo,sans-serif;color:#3a3838;max-width:70ch">{{ body }}</p>
+      <h3 style="margin:14px 0 0;font:600 17px/1.2 Archivo,sans-serif;color:#0e1c3d">Schedule</h3>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ schedule }}" as="s" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:96px 1fr;gap:18px;padding:11px 0;border-bottom:1px solid #eae7e7">
+            <span style="font:500 13px/1.4 Archivo,sans-serif;color:#1b3a6b;font-variant-numeric:tabular-nums">{{ s.time }}</span>
+            <span style="font:400 13.5px/1.4 Archivo,sans-serif;color:#3a3838">{{ s.what }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <h3 style="margin:14px 0 0;font:600 17px/1.2 Archivo,sans-serif;color:#0e1c3d">Who can attend</h3>
+      <p style="margin:0;font:400 15px/1.7 Archivo,sans-serif;color:#3a3838;max-width:70ch">{{ who }}</p>
+    </div>
+  </div>
+  <aside style="padding:32px 28px;display:flex;flex-direction:column;gap:22px;background:#f3f2f2">
+    <div style="border:1px solid #d7d3d3;background:#fff;padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:5px"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Date</span><span style="font:500 14px/1.3 Archivo,sans-serif;color:#0e1c3d;font-variant-numeric:tabular-nums">{{ date }}</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Venue</span><span style="font:500 14px/1.3 Archivo,sans-serif;color:#0e1c3d">{{ venue }}</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Organised by</span><span style="font:500 14px/1.3 Archivo,sans-serif;color:#0e1c3d">{{ organiser }}</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Contact</span><span style="font:400 13px/1.4 Archivo,sans-serif;color:#1b3a6b">{{ contact }}</span></div>
+    </div>
+    <sc-if value="{{ register }}" hint-placeholder-val="{{ true }}">
+      <div style="border:2px solid #dd2b0f;background:#fff;padding:20px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;flex-direction:column;gap:5px"><span style="font:600 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#dd2b0f">Registration open</span><span style="font:400 13px/1.5 Archivo,sans-serif;color:#3a3838">62 of 120 seats taken. Closes 10 Oct, 23:59.</span></div>
+        <div style="height:6px;background:#eae7e7"><div style="width:52%;height:6px;background:#dd2b0f"></div></div>
+        <a href="#" style="padding:14px 18px;background:#dd2b0f;color:#fff;font:600 13px/1 Archivo,sans-serif;text-decoration:none;text-align:left">Register for this event</a>
+        <span style="font:400 11.5px/1.4 Archivo,sans-serif;color:#7d7979">You will need to be signed in with your department address.</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noRegister }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px solid #bab6b6;background:#fff;padding:20px;display:flex;flex-direction:column;gap:8px">
+        <span style="font:600 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#1b3a6b">Open to all</span>
+        <span style="font:400 13px/1.5 Archivo,sans-serif;color:#3a3838">No registration. Seating is first come, first served — doors open fifteen minutes before the start.</span>
+        <a href="#" style="font:500 12.5px/1 Archivo,sans-serif;color:#1b3a6b;text-decoration:none;border-bottom:2px solid #dd2b0f;align-self:flex-start;padding-bottom:3px;margin-top:6px">Add to my calendar</a>
+      </div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font:500 10.5px/1 Archivo,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#0e1c3d">Also this month</span>
+      <a href="#" style="border-top:1px solid #d7d3d3;padding-top:11px;font:500 13px/1.35 Archivo,sans-serif;color:#0e1c3d;text-decoration:none">Deploying models on constrained hardware<span style="display:block;font:400 11.5px/1 Archivo,sans-serif;color:#9b9797;padding-top:5px">21 Oct</span></a>
+      <a href="#" style="border-top:1px solid #d7d3d3;padding-top:11px;font:500 13px/1.35 Archivo,sans-serif;color:#0e1c3d;text-decoration:none">Project Expo — final year showcase<span style="display:block;font:400 11.5px/1 Archivo,sans-serif;color:#9b9797;padding-top:5px">07 Nov</span></a>
+    </div>
+  </aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:1200},&quot;register&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const reg = false
+    return reg ? {
+      register: true, noRegister: false,
+      type: "Contest", tagBg: "#ffe0d9", tagFg: "#ae1800",
+      title: "DataFest 2026 — 24-hour datathon",
+      intro: "DataFest is the department's flagship modelling contest. Teams of three receive a live retail demand dataset at nine in the morning and have twenty-four hours to produce forecasts, a short write-up and a defence of their modelling choices.",
+      body: "Scoring is two-part. Seventy per cent comes from weighted absolute percentage error against the held-out weeks, and thirty per cent from a five-minute defence in front of the panel. Baseline notebooks, the evaluation harness and last year's winning submissions are published in the question bank a week before the start.",
+      schedule: [
+        { time: "09:00", what: "Dataset release and rules briefing" },
+        { time: "12:30", what: "Mentor clinic — two faculty, two alumni engineers" },
+        { time: "20:00", what: "Interim leaderboard freeze" },
+        { time: "09:00 +1", what: "Submissions close, defences begin" }
+      ],
+      who: "Open to all second, third and final year students of the department. First years may join as a fourth observer on any team. Cross-department teams are allowed if at least two members are from AI and DS.",
+      date: "14–15 Oct 2026, 09:00", venue: "Seminar Hall, Block C", organiser: "Data Science Club with the department", contact: "datafest@aids.dept"
+    } : {
+      register: false, noRegister: true,
+      type: "Talk", tagBg: "#e4eaf4", tagFg: "#1b3a6b",
+      title: "Deploying models on constrained hardware",
+      intro: "A visiting engineer walks through what happens to a model between the notebook and a device with two gigabytes of memory and no reliable network.",
+      body: "The session covers quantisation and its accuracy cost, latency budgets that hold under load, the failure modes that only appear on real hardware, and how teams decide when a smaller model is the correct answer rather than a compromise. Slides and the demo repository are shared afterwards.",
+      schedule: [
+        { time: "15:30", what: "Talk" },
+        { time: "16:20", what: "Live demo on a development board" },
+        { time: "16:40", what: "Questions" },
+        { time: "17:00", what: "Informal discussion in the lab" }
+      ],
+      who: "Open to every year and to students from other departments. No prior deployment experience assumed, though the demo will make more sense if you have trained a model before.",
+      date: "21 Oct 2026, 15:30", venue: "Lecture Theatre 2", organiser: "Department of AI and Data Science", contact: "seminars@aids.dept"
+    }
+  }
+}
+</script>
+</body>
+</html>

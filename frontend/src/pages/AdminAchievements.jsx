@@ -54,8 +54,8 @@ export default function AdminAchievements() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="ml-3 text-gray-600">Loading achievements...</p>
+        <div className="animate-spin  h-8 w-8 border-b-2 border-navy"></div>
+        <p className="ml-3 text-ds-ink-soft">Loading achievements...</p>
       </div>
     );
   }
@@ -64,23 +64,23 @@ export default function AdminAchievements() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-orange-100 rounded-lg">
-          <Trophy className="w-6 h-6 text-orange-600" />
+        <div className="p-3 bg-ds-red-tint ">
+          <Trophy className="w-6 h-6 text-ds-red-deep" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manage Achievements</h1>
-          <p className="text-gray-600">Review and approve pending achievement submissions</p>
+          <h1 className="text-2xl font-bold text-navy">Manage Achievements</h1>
+          <p className="text-ds-ink-soft">Review and approve pending achievement submissions</p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4   border border-ds-edge">
           <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5 text-yellow-600" />
+            <Clock className="w-5 h-5 text-ds-red" />
             <div>
-              <p className="text-sm text-gray-600">Pending Review</p>
-              <p className="text-xl font-bold text-gray-900">{pending.length}</p>
+              <p className="text-sm text-ds-ink-soft">Pending Review</p>
+              <p className="text-xl font-bold text-navy">{pending.length}</p>
             </div>
           </div>
         </div>
@@ -88,21 +88,21 @@ export default function AdminAchievements() {
 
       {/* Content */}
       {pending.length === 0 ? (
-        <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
-          <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Pending Achievements</h3>
-          <p className="text-gray-600">All achievement submissions have been reviewed.</p>
+        <div className="bg-white p-12   border border-ds-edge text-center">
+          <Trophy className="w-12 h-12 text-ds-ink-faint mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-navy mb-2">No Pending Achievements</h3>
+          <p className="text-ds-ink-soft">All achievement submissions have been reviewed.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {pending.map(achievement => (
-            <div key={achievement._id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div key={achievement._id} className="bg-white p-6   border border-ds-edge hover: transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{achievement.title}</h3>
-                  <p className="text-gray-700 mb-4">{achievement.description}</p>
+                  <h3 className="text-lg font-semibold text-navy mb-2">{achievement.title}</h3>
+                  <p className="text-ds-ink mb-4">{achievement.description}</p>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-ds-ink-soft">
                     <div className="flex items-center gap-1">
                       <User className="w-4 h-4" />
                       <span>{achievement.userId.fullName}</span>
@@ -115,14 +115,14 @@ export default function AdminAchievements() {
                 <div className="flex gap-2 ml-4">
                   <button 
                     onClick={() => approveAchievement(achievement._id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors border border-green-200"
+                    className="flex items-center gap-2 px-4 py-2 bg-ds-blue-tint hover:bg-ds-blue-tint text-ds-blue  transition-colors border border-ds-edge"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Approve
                   </button>
                   <button 
                     onClick={() => rejectAchievement(achievement._id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors border border-red-200"
+                    className="flex items-center gap-2 px-4 py-2 bg-ds-red-tint hover:bg-ds-red-tint text-ds-red-deep  transition-colors border border-ds-red/30"
                   >
                     <XCircle className="w-4 h-4" />
                     Reject

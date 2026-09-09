@@ -5,6 +5,8 @@ import {
   Pencil, Trash2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Field from '../components/ui/Field';
+import Button from '../components/ui/Button';
 //http://localhost:5173/
 const BASE_URL = 'https://web-portal-760h.onrender.com';
 //const BASE_URL = 'https://web-portal-760h.onrender.com';
@@ -318,16 +320,14 @@ const PostsPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-xl text-gray-600">Loading posts...</div>
+        <div className="text-xl text-ds-ink-soft">Loading posts...</div>
       </div>
     );
   }
 
   if (selectedPost) {
     return (
-      <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 overflow-hidden min-h-[80vh]">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl" />
+      <div className="relative bg-white border border-ds-edge overflow-hidden min-h-[80vh]">
         <div className="relative z-10">
           <PostDetailPage
             post={selectedPost}
@@ -351,7 +351,7 @@ const PostsPage = () => {
           <>
             <div className="fixed inset-0 z-[999] bg-black/50" onClick={() => setIsProfileModalOpen(false)} />
             <div
-              className="absolute z-[1000] bg-white rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto"
+              className="absolute z-[1000] bg-white border-2 border-navy w-full max-w-sm max-h-[90vh] overflow-y-auto"
               style={{
                 top:       Math.min(profilePosition.top, window.innerHeight - 500),
                 left:      window.innerWidth < 768 ? '50%' : Math.min(profilePosition.left, window.innerWidth - 320),
@@ -368,15 +368,13 @@ const PostsPage = () => {
 
   return (
     <>
-      <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 min-h-[80vh]">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl" />
+      <div className="relative bg-white border border-ds-edge p-4 md:p-8 min-h-[80vh]">
 
         <div className="relative z-10">
           <div className="text-center mb-6 md:mb-8 pt-2">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#111828] mb-2 leading-tight">Community Posts</h1>
-            <div className="w-16 h-1 bg-[#111828] mx-auto rounded-full mb-3" />
-            <p className="text-sm text-gray-500 max-w-xl mx-auto">Discuss, share, and connect with the community</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-navy mb-2 leading-tight">Community Posts</h1>
+            <div className="w-16 h-1 bg-navy mx-auto  mb-3" />
+            <p className="text-sm text-ds-ink-soft max-w-xl mx-auto">Discuss, share, and connect with the community</p>
           </div>
 
           <div className="flex gap-6 items-start w-full">
@@ -384,18 +382,18 @@ const PostsPage = () => {
             <div className="flex-1 min-w-0 flex flex-col">
               <div className="mb-4 flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-ds-ink-faint" size={18} />
                   <input
                     type="text"
                     placeholder="Search posts..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#111828]/20 text-sm shadow-sm"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-ds-edge focus:outline-none focus:border-navy text-sm"
                   />
                 </div>
                 <button
                   onClick={() => setIsPostModalOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#111828] text-white rounded-xl font-semibold hover:bg-[#1e2a3a] transition shadow-sm text-sm shrink-0"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-navy text-white  font-semibold hover:bg-navy-deep transition  text-sm shrink-0"
                 >
                   <Plus size={16} /> Create Post
                 </button>
@@ -403,9 +401,9 @@ const PostsPage = () => {
 
               <div className="space-y-3 pb-8">
                 {filteredPosts.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-16 text-center shadow-sm border border-gray-200">
-                    <MessageCircle className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                    <p className="text-base font-semibold text-gray-500">
+                  <div className="bg-white  p-16 text-center  border border-ds-edge">
+                    <MessageCircle className="w-12 h-12 mx-auto text-ds-ink-faint mb-4" />
+                    <p className="text-base font-semibold text-ds-ink-soft">
                       {showMyPosts ? "You haven't posted anything yet." : 'No posts yet. Be the first to post!'}
                     </p>
                   </div>
@@ -431,8 +429,8 @@ const PostsPage = () => {
 
             {/* RIGHT: Sidebar */}
             <div className="w-72 shrink-0 hidden lg:flex flex-col gap-4 sticky top-4">
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">View</h4>
+              <div className="bg-white  border border-ds-edge  p-4">
+                <h4 className="text-xs font-bold text-ds-ink-soft uppercase tracking-wider mb-3">View</h4>
                 <div className="space-y-1">
                   {[
                     [false, 'All Posts'],
@@ -441,25 +439,25 @@ const PostsPage = () => {
                     <button
                       key={label}
                       onClick={() => setShowMyPosts(val)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition ${showMyPosts === val ? 'bg-[#111828] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                      className={`w-full text-left px-3 py-2  text-sm font-medium transition ${showMyPosts === val ? 'bg-navy text-white' : 'text-ds-ink-soft hover:bg-ds-ground'}`}
                     >
                       {label}
                       {val && showMyPosts && (
-                        <span className="ml-2 text-xs bg-white/20 px-1.5 py-0.5 rounded-full">{filteredPosts.length}</span>
+                        <span className="ml-2 text-xs bg-white/20 px-1.5 py-0.5 ">{filteredPosts.length}</span>
                       )}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Sort By</h4>
+              <div className="bg-white  border border-ds-edge  p-4">
+                <h4 className="text-xs font-bold text-ds-ink-soft uppercase tracking-wider mb-3">Sort By</h4>
                 <div className="space-y-1">
                   {[['newest','Newest'],['popular','Most Upvoted'],['discussed','Most Discussed']].map(([val, label]) => (
                     <button
                       key={val}
                       onClick={() => setSortBy(val)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === val ? 'bg-[#111828] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                      className={`w-full text-left px-3 py-2  text-sm font-medium transition ${sortBy === val ? 'bg-navy text-white' : 'text-ds-ink-soft hover:bg-ds-ground'}`}
                     >
                       {label}
                     </button>
@@ -468,14 +466,14 @@ const PostsPage = () => {
               </div>
 
               {savedPosts.length > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Saved Posts</h4>
+                <div className="bg-white  border border-ds-edge  p-4">
+                  <h4 className="text-xs font-bold text-ds-ink-soft uppercase tracking-wider mb-3">Saved Posts</h4>
                   <div className="space-y-2">
                     {posts.filter(p => savedPosts.includes(p._id)).slice(0, 3).map(p => (
                       <button
                         key={p._id}
                         onClick={() => handleOpenPost(p)}
-                        className="w-full text-left text-xs text-gray-700 hover:text-[#111828] font-medium truncate block hover:underline"
+                        className="w-full text-left text-xs text-ds-ink hover:text-navy font-medium truncate block hover:underline"
                       >
                         {p.title}
                       </button>
@@ -508,7 +506,7 @@ const PostsPage = () => {
         <>
           <div className="fixed inset-0 z-[999] bg-black/50" onClick={() => setIsProfileModalOpen(false)} />
           <div
-            className="absolute z-[1000] bg-white rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto"
+            className="absolute z-[1000] bg-white   w-full max-w-sm max-h-[90vh] overflow-y-auto"
             style={{
               top:       Math.min(profilePosition.top, window.innerHeight - 500),
               left:      window.innerWidth < 768 ? '50%' : Math.min(profilePosition.left, window.innerWidth - 320),
@@ -534,10 +532,10 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
   const createdAt   = new Date(post.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white   border border-ds-edge hover: transition-shadow duration-200">
       <div className="p-5">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-lg shrink-0 overflow-hidden">
+          <div className="w-12 h-12  bg-ds-edge flex items-center justify-center text-ds-ink font-semibold text-lg shrink-0 overflow-hidden">
             {(post.author?.profile?.profileImage?.url || post.author?.profileImage?.url) ? (
               <img
                 src={post.author?.profile?.profileImage?.url || post.author?.profileImage?.url}
@@ -545,11 +543,11 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
                 className="w-full h-full object-cover"
                 onError={e => {
                   e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = `<div class="w-full h-full bg-[#111828] flex items-center justify-center text-white font-bold">${displayName[0].toUpperCase()}</div>`;
+                  e.target.parentElement.innerHTML = `<div class="w-full h-full bg-navy flex items-center justify-center text-white font-bold">${displayName[0].toUpperCase()}</div>`;
                 }}
               />
             ) : (
-              <div className="w-full h-full bg-[#111828] flex items-center justify-center text-white font-bold">
+              <div className="w-full h-full bg-navy flex items-center justify-center text-white font-bold">
                 {displayName[0].toUpperCase()}
               </div>
             )}
@@ -559,16 +557,16 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
               {!post.isAnonymous ? (
                 <button
                   onClick={e => onProfileClick(post.author, e)}
-                  className="font-semibold text-gray-900 text-sm hover:text-blue-600 transition-colors text-left"
+                  className="font-semibold text-navy text-sm hover:text-ds-blue transition-colors text-left"
                 >
                   {displayName}
                 </button>
               ) : (
-                <h4 className="font-semibold text-gray-900 text-sm">{displayName}</h4>
+                <h4 className="font-semibold text-navy text-sm">{displayName}</h4>
               )}
-              {post.isAnonymous && <span className="text-xs text-gray-500">• Anonymous</span>}
+              {post.isAnonymous && <span className="text-xs text-ds-ink-soft">• Anonymous</span>}
             </div>
-            <p className="text-xs text-gray-500">{createdAt}</p>
+            <p className="text-xs text-ds-ink-soft">{createdAt}</p>
           </div>
 
           {/* Edit / Delete — shown for owner including anonymous posts */}
@@ -576,14 +574,14 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
             <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={onEdit}
-                className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 transition"
+                className="p-1.5  hover:bg-ds-blue-tint text-ds-blue transition"
                 title="Edit post"
               >
                 <Pencil size={15} />
               </button>
               <button
                 onClick={onDelete}
-                className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition"
+                className="p-1.5  hover:bg-ds-red-tint text-ds-red transition"
                 title="Delete post"
               >
                 <Trash2 size={15} />
@@ -594,15 +592,15 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
       </div>
 
       <div className="px-5 pb-4">
-        <h3 className="text-base font-semibold text-gray-900 mb-2">{post.title}</h3>
-        <p className="text-sm text-gray-700 leading-relaxed">{post.content}</p>
+        <h3 className="text-base font-semibold text-navy mb-2">{post.title}</h3>
+        <p className="text-sm text-ds-ink leading-relaxed">{post.content}</p>
       </div>
 
       {post.images && post.images.length > 0 && (
         <div className="px-5 pb-4">
           <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
             {post.images.slice(0, 4).map((img, i) => (
-              <div key={i} className="relative aspect-video bg-gray-100 rounded overflow-hidden border border-gray-200">
+              <div key={i} className="relative aspect-video bg-ds-ground  overflow-hidden border border-ds-edge">
                 <img src={img.url} alt="" className="w-full h-full object-cover" />
                 {i === 3 && post.images.length > 4 && (
                   <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
@@ -615,30 +613,30 @@ const PostCard = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUse
         </div>
       )}
 
-      <div className="px-3 py-2 border-t border-gray-200 flex items-center">
+      <div className="px-3 py-2 border-t border-ds-edge flex items-center">
         <button
           onClick={onUpvote}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-gray-100 transition text-sm font-medium ${hasUpvoted ? 'text-[#111828]' : 'text-gray-600'}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5  hover:bg-ds-ground transition text-sm font-medium ${hasUpvoted ? 'text-navy' : 'text-ds-ink-soft'}`}
         >
           <ArrowUp size={18} />
           {(post.upvotes?.length ?? 0) > 0 && <span className="text-xs font-semibold">{post.upvotes.length}</span>}
         </button>
         <button
           onClick={onOpen}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-gray-100 transition text-sm font-medium text-gray-600"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5  hover:bg-ds-ground transition text-sm font-medium text-ds-ink-soft"
         >
           <MessageCircle size={18} />
           {(post.comments?.length ?? 0) > 0 && <span className="text-xs font-semibold">{post.comments.length}</span>}
         </button>
         <button
           onClick={onShare}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-gray-100 transition text-sm font-medium text-gray-600"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5  hover:bg-ds-ground transition text-sm font-medium text-ds-ink-soft"
         >
           <Share2 size={18} /> Share
         </button>
         <button
           onClick={onSave}
-          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg hover:bg-gray-100 transition text-sm font-medium ${isSaved ? 'text-[#111828]' : 'text-gray-600'}`}
+          className={`flex items-center justify-center gap-2 py-2.5 px-3  hover:bg-ds-ground transition text-sm font-medium ${isSaved ? 'text-navy' : 'text-ds-ink-soft'}`}
         >
           {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
         </button>
@@ -663,44 +661,34 @@ const EditPostModal = ({ post, onClose, onSubmit }) => {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:9998, background:'rgba(17,24,40,0.6)', backdropFilter:'blur(6px)' }} />
-      <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', zIndex:9999, width:'90vw', maxWidth:'520px', maxHeight:'88vh', display:'flex', flexDirection:'column', background:'#fff', borderRadius:'18px', boxShadow:'0 40px 100px rgba(0,0,0,0.3)', overflow:'hidden' }}>
-        <div style={{ background:'#111828', padding:'20px 24px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+      <div onClick={onClose} className="fixed inset-0 z-[9998] bg-navy/60" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90vw] max-w-[520px] max-h-[88vh] flex flex-col bg-white border-2 border-navy overflow-hidden">
+        <div className="bg-navy px-6 py-5 flex items-center justify-between">
           <div>
-            <h2 style={{ color:'#fff', fontSize:'16px', fontWeight:700, margin:0 }}>Edit Post</h2>
-            <p style={{ color:'#6b7280', fontSize:'12px', margin:'3px 0 0' }}>Update your post details</p>
+            <h2 className="text-card-title text-white">Edit post</h2>
+            <p className="text-label text-on-navy-muted mt-1">Update your post details</p>
           </div>
-          <button onClick={onClose} style={{ background:'rgba(255,255,255,0.1)', border:'none', borderRadius:'8px', width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#9ca3af' }}>
+          <button onClick={onClose} className="text-on-navy-muted hover:text-white">
             <X size={16} />
           </button>
         </div>
-        <div style={{ padding:'24px' }}>
-          <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label style={{ display:'block', fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'6px' }}>Title</label>
-              <input required value={title} onChange={e => setTitle(e.target.value)}
-                style={{ width:'100%', padding:'11px 14px', border:'1.5px solid #e5e7eb', borderRadius:'10px', fontSize:'14px', color:'#111828', background:'#f9fafb', outline:'none', boxSizing:'border-box', fontFamily:'inherit' }}
-                onFocus={e => { e.target.style.borderColor='#111828'; e.target.style.background='#fff'; }}
-                onBlur={e => { e.target.style.borderColor='#e5e7eb'; e.target.style.background='#f9fafb'; }}
-              />
+              <Field.Label htmlFor="edit-title">Title</Field.Label>
+              <Field.Input id="edit-title" required value={title} onChange={e => setTitle(e.target.value)} />
             </div>
             <div>
-              <label style={{ display:'block', fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'6px' }}>Content</label>
-              <textarea required value={content} onChange={e => setContent(e.target.value)} rows={5}
-                style={{ width:'100%', padding:'11px 14px', border:'1.5px solid #e5e7eb', borderRadius:'10px', fontSize:'14px', color:'#111828', background:'#f9fafb', outline:'none', resize:'none', boxSizing:'border-box', fontFamily:'inherit' }}
-                onFocus={e => { e.target.style.borderColor='#111828'; e.target.style.background='#fff'; }}
-                onBlur={e => { e.target.style.borderColor='#e5e7eb'; e.target.style.background='#f9fafb'; }}
-              />
+              <Field.Label htmlFor="edit-content">Content</Field.Label>
+              <Field.Textarea id="edit-content" required value={content} onChange={e => setContent(e.target.value)} rows={5} />
             </div>
-            <div style={{ display:'flex', gap:'10px' }}>
-              <button type="button" onClick={onClose}
-                style={{ flex:1, padding:'12px', border:'1.5px solid #e5e7eb', borderRadius:'10px', fontSize:'14px', fontWeight:600, color:'#374151', background:'#fff', cursor:'pointer' }}>
+            <div className="flex gap-2.5">
+              <Button type="button" variant="secondary" onClick={onClose} className="flex-1 justify-center">
                 Cancel
-              </button>
-              <button type="submit"
-                style={{ flex:1, padding:'12px', border:'none', borderRadius:'10px', fontSize:'14px', fontWeight:700, color:'#fff', background:'#111828', cursor:'pointer' }}>
-                Save Changes
-              </button>
+              </Button>
+              <Button type="submit" variant="navy" className="flex-1 justify-center">
+                Save changes
+              </Button>
             </div>
           </form>
         </div>
@@ -734,74 +722,71 @@ const PostModal = ({ onClose, onSubmit }) => {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:9998, background:'rgba(17,24,40,0.6)', backdropFilter:'blur(6px)' }} />
-      <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', zIndex:9999, width:'90vw', maxWidth:'520px', maxHeight:'88vh', display:'flex', flexDirection:'column', background:'#fff', borderRadius:'18px', boxShadow:'0 40px 100px rgba(0,0,0,0.35)', overflow:'hidden' }}>
-        <div style={{ background:'#111828', padding:'20px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
+      <div onClick={onClose} className="fixed inset-0 z-[9998] bg-navy/60" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90vw] max-w-[520px] max-h-[88vh] flex flex-col bg-white border-2 border-navy overflow-hidden">
+        <div className="bg-navy px-6 py-5 flex items-center justify-between shrink-0">
           <div>
-            <h2 style={{ color:'#fff', fontSize:'16px', fontWeight:700, margin:0 }}>Create Post</h2>
-            <p style={{ color:'#6b7280', fontSize:'12px', margin:'3px 0 0' }}>Share something with the community</p>
+            <h2 className="text-card-title text-white">Create post</h2>
+            <p className="text-label text-on-navy-muted mt-1">Share something with the community</p>
           </div>
-          <button onClick={onClose} style={{ background:'rgba(255,255,255,0.1)', border:'none', borderRadius:'8px', width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#9ca3af' }}>
+          <button onClick={onClose} className="text-on-navy-muted hover:text-white">
             <X size={16} />
           </button>
         </div>
 
-        <div style={{ flex:1, overflowY:'auto', padding:'24px' }}>
-          <div style={{ display:'flex', background:'#f3f4f6', borderRadius:'12px', padding:'4px', marginBottom:'20px' }}>
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex border border-ds-edge mb-5">
             {['Public','Anonymous'].map(m => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex:1, padding:'9px', border:'none', borderRadius:'9px', fontSize:'13px', fontWeight:600, cursor:'pointer', background: mode===m ? '#111828' : 'transparent', color: mode===m ? '#fff' : '#9ca3af' }}>
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`flex-1 py-2.5 text-label font-medium ${mode === m ? 'bg-navy text-white' : 'bg-white text-ds-ink-faint'}`}
+              >
                 {m}
               </button>
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label style={{ display:'block', fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'6px' }}>Title</label>
-              <input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Give your post a title..."
-                style={{ width:'100%', padding:'11px 14px', border:'1.5px solid #e5e7eb', borderRadius:'10px', fontSize:'14px', color:'#111828', background:'#f9fafb', outline:'none', boxSizing:'border-box', fontFamily:'inherit' }}
-                onFocus={e => { e.target.style.borderColor='#111828'; e.target.style.background='#fff'; }}
-                onBlur={e => { e.target.style.borderColor='#e5e7eb'; e.target.style.background='#f9fafb'; }}
-              />
+              <Field.Label htmlFor="post-title">Title</Field.Label>
+              <Field.Input id="post-title" required value={title} onChange={e => setTitle(e.target.value)} placeholder="Give your post a title…" />
             </div>
             <div>
-              <label style={{ display:'block', fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'6px' }}>Content</label>
-              <textarea required value={content} onChange={e => setContent(e.target.value)} placeholder="What's on your mind?" rows={4}
-                style={{ width:'100%', padding:'11px 14px', border:'1.5px solid #e5e7eb', borderRadius:'10px', fontSize:'14px', color:'#111828', background:'#f9fafb', outline:'none', resize:'none', boxSizing:'border-box', fontFamily:'inherit' }}
-                onFocus={e => { e.target.style.borderColor='#111828'; e.target.style.background='#fff'; }}
-                onBlur={e => { e.target.style.borderColor='#e5e7eb'; e.target.style.background='#f9fafb'; }}
-              />
+              <Field.Label htmlFor="post-content">Content</Field.Label>
+              <Field.Textarea id="post-content" required value={content} onChange={e => setContent(e.target.value)} placeholder="What's on your mind?" rows={4} />
             </div>
             <div>
-              <label style={{ display:'block', fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'6px' }}>Images</label>
+              <Field.Label>Images</Field.Label>
               {images.length > 0 && (
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'8px', marginBottom:'10px' }}>
+                <div className="grid grid-cols-3 gap-2 mb-2.5">
                   {images.map((img,i) => (
-                    <div key={i} style={{ position:'relative', borderRadius:'8px', overflow:'hidden' }}>
-                      <img src={img.preview} style={{ width:'100%', height:'80px', objectFit:'cover' }} alt="" />
-                      <button type="button" onClick={() => removeImage(i)}
-                        style={{ position:'absolute', top:'4px', right:'4px', background:'#ef4444', border:'none', borderRadius:'50%', width:'20px', height:'20px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', padding:0 }}>
+                    <div key={i} className="relative">
+                      <img src={img.preview} className="w-full h-20 object-cover" alt="" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute top-1 right-1 bg-ds-red text-white w-5 h-5 flex items-center justify-center"
+                      >
                         <XCircle size={13} />
                       </button>
                     </div>
                   ))}
                 </div>
               )}
-              <label style={{ display:'flex', alignItems:'center', gap:'10px', border:'1.5px dashed #d1d5db', borderRadius:'10px', padding:'13px 16px', cursor:'pointer' }}>
-                <Upload size={17} color="#9ca3af" />
-                <span style={{ fontSize:'13px', color:'#6b7280' }}>Click to attach images</span>
-                <input type="file" multiple accept="image/*" onChange={handleFileChange} style={{ display:'none' }} />
+              <label className="flex items-center gap-2.5 border-2 border-dashed border-ds-edge px-4 py-3.5 cursor-pointer">
+                <Upload size={16} className="text-ds-ink-faint" />
+                <span className="text-body text-ds-ink-soft">Click to attach images</span>
+                <input type="file" multiple accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
             </div>
-            <div style={{ display:'flex', gap:'10px' }}>
-              <button type="button" onClick={onClose}
-                style={{ flex:1, padding:'12px', border:'1.5px solid #e5e7eb', borderRadius:'10px', fontSize:'14px', fontWeight:600, color:'#374151', background:'#fff', cursor:'pointer' }}>
+            <div className="flex gap-2.5">
+              <Button type="button" variant="secondary" onClick={onClose} className="flex-1 justify-center">
                 Cancel
-              </button>
-              <button type="submit"
-                style={{ flex:1, padding:'12px', border:'none', borderRadius:'10px', fontSize:'14px', fontWeight:700, color:'#fff', background:'#111828', cursor:'pointer' }}>
-                Publish Post
-              </button>
+              </Button>
+              <Button type="submit" variant="primary" className="flex-1 justify-center">
+                Publish post
+              </Button>
             </div>
           </form>
         </div>
@@ -835,45 +820,45 @@ const PostDetailPage = ({
 
   return (
     <div className="min-h-[80vh] bg-transparent">
-      <div className="px-4 md:px-8 py-4 border-b border-gray-200 bg-white/60 backdrop-blur-sm flex items-center gap-3">
-        <button onClick={onBack} className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition px-3 py-1.5 rounded-lg hover:bg-gray-100">
+      <div className="px-4 md:px-8 py-4 border-b border-ds-edge bg-white/60  flex items-center gap-3">
+        <button onClick={onBack} className="flex items-center gap-2 text-sm font-semibold text-ds-ink-soft hover:text-ds-blue transition px-3 py-1.5  hover:bg-ds-ground">
           <ArrowUp size={16} className="rotate-[-90deg]" /> Back to Posts
         </button>
-        <span className="text-gray-300">|</span>
-        <span className="text-xs text-gray-400">
-          <span className="text-[#111828] font-semibold">Community Posts</span> • Posted by <span className="font-semibold text-gray-700">{displayName}</span>
+        <span className="text-ds-ink-faint">|</span>
+        <span className="text-xs text-ds-ink-faint">
+          <span className="text-navy font-semibold">Community Posts</span> • Posted by <span className="font-semibold text-ds-ink">{displayName}</span>
         </span>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-0 lg:gap-6 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* LEFT: Post */}
         <div className="lg:w-[42%] lg:sticky lg:top-4 lg:self-start">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white   border border-ds-edge overflow-hidden">
             <div className="flex gap-3 p-5">
               <div className="flex flex-col items-center gap-1 shrink-0 pt-1">
-                <button onClick={onUpvote} className={`p-2 rounded-full hover:bg-orange-50 transition ${hasUpvoted ? 'text-orange-500' : 'text-gray-400 hover:text-orange-500'}`}>
+                <button onClick={onUpvote} className={`p-2  hover:bg-ds-red-tint transition ${hasUpvoted ? 'text-ds-red' : 'text-ds-ink-faint hover:text-ds-red'}`}>
                   <ArrowUp size={22} />
                 </button>
-                <span className={`text-sm font-bold ${hasUpvoted ? 'text-orange-500' : 'text-gray-700'}`}>{post.upvotes?.length || 0}</span>
+                <span className={`text-sm font-bold ${hasUpvoted ? 'text-ds-red' : 'text-ds-ink'}`}>{post.upvotes?.length || 0}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#111828] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  <div className="w-7 h-7  overflow-hidden bg-navy flex items-center justify-center text-white text-xs font-bold shrink-0">
                     {(post.author?.profile?.profileImage?.url || post.author?.profileImage?.url)
                       ? <img src={post.author?.profile?.profileImage?.url || post.author?.profileImage?.url} alt={displayName} className="w-full h-full object-cover" />
                       : displayName[0].toUpperCase()}
                   </div>
                   {!post.isAnonymous
-                    ? <button onClick={e => onProfileClick(post.author, e)} className="text-xs font-semibold text-gray-700 hover:text-blue-600 transition">{displayName}</button>
-                    : <span className="text-xs font-semibold text-gray-700">{displayName}</span>}
-                  <span className="text-xs text-gray-400">• {createdAt}</span>
+                    ? <button onClick={e => onProfileClick(post.author, e)} className="text-xs font-semibold text-ds-ink hover:text-ds-blue transition">{displayName}</button>
+                    : <span className="text-xs font-semibold text-ds-ink">{displayName}</span>}
+                  <span className="text-xs text-ds-ink-faint">• {createdAt}</span>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-3 leading-snug">{post.title}</h2>
-                <p className="text-sm text-gray-700 leading-relaxed mb-4">{post.content}</p>
+                <h2 className="text-xl font-bold text-navy mb-3 leading-snug">{post.title}</h2>
+                <p className="text-sm text-ds-ink leading-relaxed mb-4">{post.content}</p>
                 {post.images && post.images.length > 0 && (
-                  <div className={`grid gap-1 mb-4 rounded-xl overflow-hidden ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  <div className={`grid gap-1 mb-4  overflow-hidden ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     {post.images.slice(0, 4).map((img, i) => (
-                      <div key={i} className="relative aspect-video bg-gray-100 overflow-hidden">
+                      <div key={i} className="relative aspect-video bg-ds-ground overflow-hidden">
                         <img src={img.url} alt="" className="w-full h-full object-cover" />
                         {i === 3 && post.images.length > 4 && (
                           <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
@@ -886,14 +871,14 @@ const PostDetailPage = ({
                 )}
               </div>
             </div>
-            <div className="px-3 py-2 border-t border-gray-100 flex items-center">
-              <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-100 transition text-xs font-semibold text-gray-500">
+            <div className="px-3 py-2 border-t border-ds-edge flex items-center">
+              <button className="flex-1 flex items-center justify-center gap-2 py-2  hover:bg-ds-ground transition text-xs font-semibold text-ds-ink-soft">
                 <MessageCircle size={15} /> {post.comments?.length || 0} Comments
               </button>
-              <button onClick={onShare} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-100 transition text-xs font-semibold text-gray-500">
+              <button onClick={onShare} className="flex-1 flex items-center justify-center gap-2 py-2  hover:bg-ds-ground transition text-xs font-semibold text-ds-ink-soft">
                 <Share2 size={15} /> Share
               </button>
-              <button onClick={onSave} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-100 transition text-xs font-semibold ${isSaved ? 'text-blue-600' : 'text-gray-500'}`}>
+              <button onClick={onSave} className={`flex-1 flex items-center justify-center gap-2 py-2  hover:bg-ds-ground transition text-xs font-semibold ${isSaved ? 'text-ds-blue' : 'text-ds-ink-soft'}`}>
                 {isSaved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />} {isSaved ? 'Saved' : 'Save'}
               </button>
             </div>
@@ -903,14 +888,14 @@ const PostDetailPage = ({
         {/* RIGHT: Comments */}
         <div className="lg:w-[58%] mt-4 lg:mt-0 flex flex-col" style={{ height:'50vh' }}>
           {/* Comment composer */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-4 shrink-0">
-            <p className="text-xs text-gray-500 mb-3 font-medium">
-              Comment as <span className="text-[#111828] font-semibold">{currentUser.username || 'You'}</span>
+          <div className="bg-white   border border-ds-edge p-4 mb-4 shrink-0">
+            <p className="text-xs text-ds-ink-soft mb-3 font-medium">
+              Comment as <span className="text-navy font-semibold">{currentUser.username || 'You'}</span>
             </p>
             <div className="flex gap-2 mb-3">
               {['Public','Anonymous'].map(m => (
                 <button key={m} onClick={() => setMode(m)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${mode===m ? 'bg-[#111828] text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                  className={`px-3 py-1.5  text-xs font-semibold transition ${mode===m ? 'bg-navy text-white shadow' : 'bg-ds-ground text-ds-ink-soft hover:bg-ds-edge'}`}>
                   {m}
                 </button>
               ))}
@@ -920,9 +905,9 @@ const PostDetailPage = ({
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 placeholder="What are your thoughts?"
-                className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition text-sm"
+                className="flex-1 px-4 py-2.5 border-2 border-ds-edge  focus:outline-none focus:border-navy transition text-sm"
               />
-              <button type="submit" className="px-5 py-2.5 bg-[#111828] text-white rounded-xl hover:bg-[#1e2a3a] transition font-semibold text-sm shadow">
+              <button type="submit" className="px-5 py-2.5 bg-navy text-white  hover:bg-navy-deep transition font-semibold text-sm shadow">
                 Comment
               </button>
             </form>
@@ -931,9 +916,9 @@ const PostDetailPage = ({
           {/* Comments list */}
           <div className="flex-1 overflow-y-auto pr-1 space-y-1.5">
             {!post.comments || post.comments.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-200 text-center py-16">
-                <MessageCircle className="w-10 h-10 mx-auto text-gray-300 mb-3" />
-                <p className="text-gray-500 text-sm font-medium">No comments yet. Be the first!</p>
+              <div className="bg-white  border border-ds-edge text-center py-16">
+                <MessageCircle className="w-10 h-10 mx-auto text-ds-ink-faint mb-3" />
+                <p className="text-ds-ink-soft text-sm font-medium">No comments yet. Be the first!</p>
               </div>
             ) : (
               post.comments.map(comment => (
@@ -991,9 +976,9 @@ const CommentCard = ({
   // "[deleted]" placeholder — content was soft-deleted on backend
   if (comment.content === '[deleted]') {
     return (
-      <div className={depth > 0 ? 'ml-4 border-l-2 border-gray-200 pl-3 mt-2' : 'mt-2'}>
-        <div className="bg-gray-50 rounded-lg px-3 py-2 border border-gray-100">
-          <p className="text-xs text-gray-400 italic">[deleted]</p>
+      <div className={depth > 0 ? 'ml-4 border-l-2 border-ds-edge pl-3 mt-2' : 'mt-2'}>
+        <div className="bg-ds-ground  px-3 py-2 border border-ds-edge">
+          <p className="text-xs text-ds-ink-faint italic">[deleted]</p>
           {/* Still render replies so the thread isn't broken */}
           {comment.replies && comment.replies.length > 0 && (
             <div className="mt-2 space-y-2">
@@ -1018,21 +1003,21 @@ const CommentCard = ({
   }
 
   return (
-    <div className={depth > 0 ? 'ml-4 border-l-2 border-gray-200 pl-3 mt-2' : 'mt-2'}>
-      <div className="bg-white rounded-lg px-3 py-2 border border-gray-100 hover:border-gray-200 transition">
+    <div className={depth > 0 ? 'ml-4 border-l-2 border-ds-edge pl-3 mt-2' : 'mt-2'}>
+      <div className="bg-white  px-3 py-2 border border-ds-edge hover:border-ds-edge transition">
         {/* Author row */}
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-blue-600">{displayName}</span>
-            <span className="text-xs text-gray-400">•</span>
-            <span className="text-xs text-gray-400">{comment.upvotes?.length || 0} upvotes</span>
-            {comment.isEdited && <span className="text-xs text-gray-400 italic">(edited)</span>}
+            <span className="text-xs font-semibold text-ds-blue">{displayName}</span>
+            <span className="text-xs text-ds-ink-faint">•</span>
+            <span className="text-xs text-ds-ink-faint">{comment.upvotes?.length || 0} upvotes</span>
+            {comment.isEdited && <span className="text-xs text-ds-ink-faint italic">(edited)</span>}
           </div>
 
           {isOwner && (
             <button
               onClick={() => depth === 0 ? onDeleteComment(comment._id) : onDeleteReply(comment._id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-700 transition text-xs font-semibold border border-red-100"
+              className="flex items-center gap-1.5 px-3 py-1.5  bg-ds-red-tint hover:bg-ds-red-tint text-ds-red hover:text-ds-red-deep transition text-xs font-semibold border border-ds-red/30"
               title="Delete"
             >
               <Trash2 size={13} /> Delete
@@ -1040,13 +1025,13 @@ const CommentCard = ({
           )}
         </div>
 
-        <p className="text-sm text-gray-800 mb-2 leading-snug">{comment.content}</p>
+        <p className="text-sm text-ds-ink mb-2 leading-snug">{comment.content}</p>
 
         {/* Actions */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => depth === 0 ? onUpvoteComment(comment._id) : onUpvoteReply(comment._id)}
-            className={`flex items-center gap-1 text-xs font-semibold transition ${hasUpvoted ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'}`}
+            className={`flex items-center gap-1 text-xs font-semibold transition ${hasUpvoted ? 'text-ds-blue' : 'text-ds-ink-faint hover:text-ds-blue'}`}
           >
             <ArrowUp size={13} /> {hasUpvoted ? 'Upvoted' : 'Upvote'}
           </button>
@@ -1054,7 +1039,7 @@ const CommentCard = ({
           {depth === 0 && (
             <button
               onClick={() => setShowReply(!showReply)}
-              className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-[#111828] transition"
+              className="flex items-center gap-1 text-xs font-semibold text-ds-ink-faint hover:text-navy transition"
             >
               <MessageCircle size={13} /> Reply
             </button>
@@ -1066,7 +1051,7 @@ const CommentCard = ({
             <div className="flex gap-1.5 mb-2">
               {['Public','Anonymous'].map(m => (
                 <button key={m} onClick={() => setMode(m)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-semibold ${mode===m ? 'bg-[#111828] text-white' : 'bg-gray-100 text-gray-600'}`}>
+                  className={`px-2.5 py-1  text-xs font-semibold ${mode===m ? 'bg-navy text-white' : 'bg-ds-ground text-ds-ink-soft'}`}>
                   {m}
                 </button>
               ))}
@@ -1076,9 +1061,9 @@ const CommentCard = ({
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
                 placeholder="Write a reply..."
-                className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-xs"
+                className="flex-1 px-3 py-1.5 border border-ds-edge  focus:outline-none focus:border-navy transition text-xs"
               />
-              <button type="submit" className="px-3 py-1.5 bg-[#111828] text-white rounded-lg hover:bg-[#1e2a3a] transition font-semibold text-xs">
+              <button type="submit" className="px-3 py-1.5 bg-navy text-white  hover:bg-navy-deep transition font-semibold text-xs">
                 Send
               </button>
             </form>
@@ -1114,53 +1099,53 @@ const CommentCard = ({
 const ProfileModalContent = ({ selectedProfile, onClose }) => (
   <div className="p-6">
     <div className="flex justify-between items-center mb-6">
-      <h3 className="font-bold text-gray-900 text-lg">Profile</h3>
-      <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full transition"><X size={20} /></button>
+      <h3 className="font-bold text-navy text-lg">Profile</h3>
+      <button onClick={onClose} className="p-1 hover:bg-ds-ground  transition"><X size={20} /></button>
     </div>
     <div className="text-center mb-6">
-      <div className="w-24 h-24 rounded-full bg-[#111828] mx-auto mb-4 overflow-hidden flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+      <div className="w-24 h-24  bg-navy mx-auto mb-4 overflow-hidden flex items-center justify-center text-white text-3xl font-bold ">
         {selectedProfile.profileImage?.url
           ? <img src={selectedProfile.profileImage.url} alt="" className="w-full h-full object-cover" />
           : selectedProfile.name?.[0]?.toUpperCase() || selectedProfile.username?.[0]?.toUpperCase() || 'U'}
       </div>
-      <h4 className="font-bold text-xl text-gray-900 mb-1">{selectedProfile.name || selectedProfile.username}</h4>
-      <p className="text-sm text-gray-600 mb-2">{selectedProfile.year ? `${selectedProfile.year} Year Student` : 'Student'}</p>
-      {selectedProfile.registerNumber && <p className="text-xs text-gray-500 mb-2">Reg: {selectedProfile.registerNumber}</p>}
-      {selectedProfile.dob && <p className="text-xs text-gray-500">DOB: {new Date(selectedProfile.dob).toLocaleDateString()}</p>}
+      <h4 className="font-bold text-xl text-navy mb-1">{selectedProfile.name || selectedProfile.username}</h4>
+      <p className="text-sm text-ds-ink-soft mb-2">{selectedProfile.year ? `${selectedProfile.year} Year Student` : 'Student'}</p>
+      {selectedProfile.registerNumber && <p className="text-xs text-ds-ink-soft mb-2">Reg: {selectedProfile.registerNumber}</p>}
+      {selectedProfile.dob && <p className="text-xs text-ds-ink-soft">DOB: {new Date(selectedProfile.dob).toLocaleDateString()}</p>}
     </div>
     {selectedProfile.bio && (
       <div className="mb-6">
-        <h5 className="font-semibold text-gray-900 mb-2">About</h5>
-        <p className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-lg">{selectedProfile.bio}</p>
+        <h5 className="font-semibold text-navy mb-2">About</h5>
+        <p className="text-sm text-ds-ink leading-relaxed bg-ds-ground p-3 ">{selectedProfile.bio}</p>
       </div>
     )}
     {selectedProfile.skills?.length > 0 && (
       <div className="mb-6">
-        <h5 className="font-semibold text-gray-900 mb-3">Skills</h5>
+        <h5 className="font-semibold text-navy mb-3">Skills</h5>
         <div className="flex flex-wrap gap-2">
           {selectedProfile.skills.map((skill, i) => (
-            <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">{skill}</span>
+            <span key={i} className="px-3 py-1 bg-ds-blue-tint text-ds-blue text-xs font-medium ">{skill}</span>
           ))}
         </div>
       </div>
     )}
     {selectedProfile.socialLinks && (
       <div className="mb-6">
-        <h5 className="font-semibold text-gray-900 mb-3">Connect</h5>
+        <h5 className="font-semibold text-navy mb-3">Connect</h5>
         <div className="space-y-2">
           {selectedProfile.socialLinks.github && (
-            <a href={selectedProfile.socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition p-2 hover:bg-gray-50 rounded-lg">
-              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"><span className="text-xs font-bold">GH</span></div>GitHub Profile
+            <a href={selectedProfile.socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-ds-ink hover:text-ds-blue transition p-2 hover:bg-ds-ground ">
+              <div className="w-8 h-8 bg-ds-ground  flex items-center justify-center"><span className="text-xs font-bold">GH</span></div>GitHub Profile
             </a>
           )}
           {selectedProfile.socialLinks.leetcode && (
-            <a href={selectedProfile.socialLinks.leetcode} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition p-2 hover:bg-gray-50 rounded-lg">
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center"><span className="text-xs font-bold text-orange-600">LC</span></div>LeetCode Profile
+            <a href={selectedProfile.socialLinks.leetcode} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-ds-ink hover:text-ds-blue transition p-2 hover:bg-ds-ground ">
+              <div className="w-8 h-8 bg-ds-red-tint  flex items-center justify-center"><span className="text-xs font-bold text-ds-red-deep">LC</span></div>LeetCode Profile
             </a>
           )}
           {selectedProfile.socialLinks.linkedin && (
-            <a href={selectedProfile.socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition p-2 hover:bg-gray-50 rounded-lg">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-xs font-bold text-blue-600">in</span></div>LinkedIn Profile
+            <a href={selectedProfile.socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-ds-ink hover:text-ds-blue transition p-2 hover:bg-ds-ground ">
+              <div className="w-8 h-8 bg-ds-blue-tint  flex items-center justify-center"><span className="text-xs font-bold text-ds-blue">in</span></div>LinkedIn Profile
             </a>
           )}
         </div>
@@ -1168,28 +1153,28 @@ const ProfileModalContent = ({ selectedProfile, onClose }) => (
     )}
     {selectedProfile.achievements?.length > 0 && (
       <div className="mb-6">
-        <h5 className="font-semibold text-gray-900 mb-3">Achievements</h5>
+        <h5 className="font-semibold text-navy mb-3">Achievements</h5>
         <div className="space-y-3">
           {selectedProfile.achievements.slice(0, 3).map(a => (
-            <div key={a._id} className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-lg border border-yellow-200">
-              <h6 className="font-semibold text-gray-900 text-sm mb-1">{a.title}</h6>
-              {a.description && <p className="text-xs text-gray-700 mb-2">{a.description}</p>}
+            <div key={a._id} className="bg-ds-red-tint p-3 border-t-2 border-ds-red">
+              <h6 className="font-semibold text-navy text-sm mb-1">{a.title}</h6>
+              {a.description && <p className="text-xs text-ds-ink mb-2">{a.description}</p>}
               {a.certificate?.url && (
-                <a href={a.certificate.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                <a href={a.certificate.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-ds-blue hover:underline">
                   <FileText size={12} /> View Certificate
                 </a>
               )}
             </div>
           ))}
           {selectedProfile.achievements.length > 3 && (
-            <p className="text-xs text-gray-500 text-center">+{selectedProfile.achievements.length - 3} more achievements</p>
+            <p className="text-xs text-ds-ink-soft text-center">+{selectedProfile.achievements.length - 3} more achievements</p>
           )}
         </div>
       </div>
     )}
     {selectedProfile.resume?.url && (
       <div className="border-t pt-4">
-        <a href={selectedProfile.resume.url} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#111828] text-white rounded-lg hover:bg-[#1e2a3a] transition font-semibold text-sm">
+        <a href={selectedProfile.resume.url} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-navy text-white  hover:bg-navy-deep transition font-semibold text-sm">
           <FileText size={16} /> View Resume
         </a>
       </div>

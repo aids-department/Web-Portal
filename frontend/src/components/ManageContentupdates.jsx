@@ -51,14 +51,14 @@ export default function UpdateContent() {
     return (
         <div className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
             {/* Post Update Form */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="bg-white   border border-ds-edge p-6">
                 <div className="flex items-center gap-2 mb-4">
-                    <Plus className="w-5 h-5 text-blue-600" />
-                    <h2 className="text-xl font-bold text-gray-800">Post Recent Update</h2>
+                    <Plus className="w-5 h-5 text-ds-blue" />
+                    <h2 className="text-xl font-bold text-ds-ink">Post Recent Update</h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-3">
                     <textarea
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all min-h-[120px]"
+                        className="w-full p-3 border border-ds-edge   focus:border-navy outline-none transition-all min-h-[120px]"
                         placeholder="Enter update message (e.g., Results are out!)..."
                         value={updateText}
                         onChange={(e) => setUpdateText(e.target.value)}
@@ -66,7 +66,7 @@ export default function UpdateContent() {
                     />
                     <button
                         type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 transition-all shadow-md"
+                        className="w-full py-3 bg-navy text-white font-medium hover:bg-navy-deep transition-all"
                     >
                         Publish Update
                     </button>
@@ -74,22 +74,22 @@ export default function UpdateContent() {
             </div>
 
             {/* Existing Updates List */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="bg-white   border border-ds-edge p-6">
                 <div className="flex items-center gap-2 mb-4">
-                    <MessageSquare className="w-5 h-5 text-gray-600" />
-                    <h2 className="text-lg font-bold text-gray-800">Current Updates</h2>
+                    <MessageSquare className="w-5 h-5 text-ds-ink-soft" />
+                    <h2 className="text-lg font-bold text-ds-ink">Current Updates</h2>
                 </div>
                 <div className="space-y-3">
                     {updates.length > 0 ? (
                         updates.map((u) => (
-                            <div key={u._id} className="flex justify-between items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div key={u._id} className="flex justify-between items-center p-3 border border-ds-edge  hover:bg-ds-ground transition-colors">
                                 <div>
-                                    <p className="text-gray-900 font-medium text-sm">{u.title}</p>
-                                    <p className="text-gray-400 text-xs">ID: {u._id}</p>
+                                    <p className="text-navy font-medium text-sm">{u.title}</p>
+                                    <p className="text-ds-ink-faint text-xs">ID: {u._id}</p>
                                 </div>
                                 <button
                                     onClick={() => handleDelete(u._id)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="p-2 text-ds-red hover:bg-ds-red-tint  transition-colors"
                                     title="Delete update"
                                 >
                                     <Trash2 size={16} />
@@ -97,7 +97,7 @@ export default function UpdateContent() {
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500 italic text-center text-sm">No updates found in database.</p>
+                        <p className="text-ds-ink-soft italic text-center text-sm">No updates found in database.</p>
                     )}
                 </div>
             </div>

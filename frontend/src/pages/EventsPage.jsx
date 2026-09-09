@@ -1,11 +1,12 @@
 // frontend/src/pages/EventsPage.jsx
 import React, { useState, useEffect } from 'react';
-import { Search, CalendarDays } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 
 import UpcomingEventCard from '../components/UpcomingEventCard';
 import PastEventCard from '../components/PastEventCard';
 import EventCalendar from '../components/EventCalendar';
 import EventDetails from '../components/EventDetails';
+import Field from '../components/ui/Field';
 
 const EventsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,107 +34,70 @@ const EventsPage = () => {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 overflow-hidden min-h-[80vh]">
+    <div>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8 pb-6 border-b-2 border-navy">
+        <div>
+          <span className="text-kicker tracking-kicker uppercase text-ds-red">Department calendar</span>
+          <h1 className="text-page-heading text-navy mt-2.5">Events</h1>
+        </div>
+        <div className="flex">
+          <button
+            onClick={() => setActiveTab('upcoming')}
+            className={`px-4.5 py-2.5 text-label font-medium border ${
+              activeTab === 'upcoming'
+                ? 'bg-navy text-white border-navy'
+                : 'bg-white text-ds-ink-soft border-ds-edge'
+            }`}
+          >
+            Upcoming · {upcomingEvents.length}
+          </button>
+          <button
+            onClick={() => setActiveTab('past')}
+            className={`px-4.5 py-2.5 text-label font-medium border border-l-0 ${
+              activeTab === 'past'
+                ? 'bg-navy text-white border-navy'
+                : 'bg-white text-ds-ink-soft border-ds-edge'
+            }`}
+          >
+            Past · {pastEvents.length}
+          </button>
+        </div>
+      </div>
 
-      {/* Decorative orbs */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
+      {/* Search */}
+      <div className="mb-8 max-w-md">
+        <Field.Input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search events…"
+        />
+      </div>
 
-      <div className="relative z-10">
-
-        {/* Header */}
-        <div className="text-center mb-6 md:mb-12">
-          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-3 md:mb-4 font-cursive">
-            Events & Workshops
-          </h1>
-          <div className="w-24 md:w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-3 md:mb-4"></div>
-          <p className="text-sm md:text-lg text-gray-700 max-w-2xl mx-auto px-4">
-            Discover upcoming opportunities and relive our past events
-          </p>
+      {/* Layout */}
+      <div className="grid lg:grid-cols-[1fr_340px] gap-8">
+        <div className="flex flex-col gap-5">
+          {displayedEvents.length === 0 ? (
+            <div className="border border-ds-edge p-10 text-center">
+              <CalendarDays className="w-8 h-8 mx-auto text-ds-ink-faint mb-3" />
+              <h3 className="text-card-title text-navy mb-1.5">No events found</h3>
+              <p className="text-body text-ds-ink-soft">Try adjusting your search or check back later.</p>
+            </div>
+          ) : (
+            displayedEvents
+              .filter(e =>
+                (e.eventName || '').toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map(event => (
+                activeTab === 'upcoming'
+                  ? <UpcomingEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
+                  : <PastEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
+              ))
+          )}
         </div>
 
-        {/* Search & Tabs */}
-        <div className="grid lg:grid-cols-3 gap-6 md:gap-10 mb-6 md:mb-12">
-          <div className="lg:col-span-2 space-y-4">
-              {/* Search Bar */}
-            <div className="relative w-full">
-              <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search events..."
-                className="
-                  w-full pl-10 md:pl-12 pr-4 md:pr-6 py-3 md:py-4 rounded-2xl text-sm md:text-base
-                  bg-white/70 backdrop-blur-md
-                  border border-gray-300
-                  shadow-sm
-                  focus:ring-2 focus:ring-blue-400/40
-                  focus:border-gray-300
-                  outline-none
-                  transition-all duration-200
-                "
-              />
-            </div>
-
-            {/* Tab Toggle Buttons */}
-            <div className="flex space-x-2 md:space-x-4">
-              <button
-                onClick={() => setActiveTab('upcoming')}
-                className={`px-6 py-2.5 rounded-2xl font-semibold text-sm md:text-base transition-all duration-200 ${
-                  activeTab === 'upcoming'
-                    ? 'bg-white text-blue-600 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1)] border border-gray-100'
-                    : 'bg-transparent text-slate-600 hover:bg-white/40 hover:text-slate-800'
-                }`}
-              >
-                Upcoming Events
-              </button>
-              <button
-                onClick={() => setActiveTab('past')}
-                className={`px-6 py-2.5 rounded-2xl font-semibold text-sm md:text-base transition-all duration-200 ${
-                  activeTab === 'past'
-                    ? 'bg-white text-blue-600 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.1)] border border-gray-100'
-                    : 'bg-transparent text-slate-600 hover:bg-white/40 hover:text-slate-800'
-                }`}
-              >
-                Past Events
-              </button>
-            </div>
-          </div>
-        </div>
-
-
-
-        {/* Layout */}
-        <div className="grid lg:grid-cols-3 gap-6 md:gap-10">
-          <div className="lg:col-span-2 space-y-4 md:space-y-6">
-            {displayedEvents.length === 0 ? (
-              <div className="bg-white/70 backdrop-blur-md rounded-3xl p-8 md:p-12 text-center shadow-lg border border-white/40">
-                <CalendarDays className="w-12 h-12 md:w-16 md:h-16 mx-auto text-gray-400 mb-4 md:mb-6" />
-                <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2 md:mb-3">
-                  No events found
-                </h3>
-                <p className="text-sm md:text-base text-gray-600">
-                  Try adjusting your search or check back later.
-                </p>
-              </div>
-            ) : (
-              displayedEvents
-                .filter(e =>
-                  (e.eventName || '').toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map(event => (
-                  <div key={event._id} className="hover:scale-[1.015] transition">
-                    {activeTab === 'upcoming'
-                      ? <UpcomingEventCard event={event} onOpenModal={setSelectedEvent} />
-                      : <PastEventCard event={event} onOpenModal={setSelectedEvent} />}
-                  </div>
-                ))
-            )}
-          </div>
-
-          <div className="hidden lg:block sticky top-8">
-            <EventCalendar />
-          </div>
+        <div className="hidden lg:block sticky top-24 h-fit">
+          <EventCalendar />
         </div>
       </div>
     </div>

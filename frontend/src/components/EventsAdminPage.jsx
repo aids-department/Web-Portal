@@ -240,11 +240,11 @@ export default function EventsAdminPage() {
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-6 px-4">
+    <div className="min-h-screen bg-ds-ground py-6 px-4">
 
       <div className="max-w-5xl mx-auto">
 
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+        <h1 className="text-2xl font-bold text-center text-ds-ink mb-6">
           Events Admin Panel
         </h1>
 
@@ -252,10 +252,10 @@ export default function EventsAdminPage() {
 
           <button
             onClick={()=>setActiveTab("upcoming")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
+            className={`flex items-center gap-2 px-6 py-2  font-medium ${
               activeTab==="upcoming"
-              ? "bg-blue-600 text-white"
-              : "bg-white text-gray-700"
+              ? "bg-navy text-white"
+              : "bg-white text-ds-ink"
             }`}
           >
             <Plus className="w-4 h-4"/>
@@ -264,10 +264,10 @@ export default function EventsAdminPage() {
 
           <button
             onClick={()=>setActiveTab("manage")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
+            className={`flex items-center gap-2 px-6 py-2  font-medium ${
               activeTab==="manage"
-              ? "bg-purple-600 text-white"
-              : "bg-white text-gray-700"
+              ? "bg-navy text-white"
+              : "bg-white text-ds-ink"
             }`}
           >
             <Users className="w-4 h-4"/>
@@ -278,32 +278,32 @@ export default function EventsAdminPage() {
 
         {activeTab==="manage" && (
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white   p-6">
 
             <h2 className="font-bold text-lg mb-4">Existing Events</h2>
 
             <div className="space-y-3">
 
               {events.map(ev=>(
-                <div key={ev._id} className="flex justify-between items-center border p-3 rounded">
+                <div key={ev._id} className="flex justify-between items-center border p-3 ">
 
                   <div>
                     <p className="font-semibold">{ev.eventName}</p>
-                    <p className="text-sm text-gray-500">{ev.eventType}</p>
+                    <p className="text-sm text-ds-ink-soft">{ev.eventType}</p>
                   </div>
 
                   <div className="flex gap-2">
 
                     <button
                       onClick={()=>handleEdit(ev)}
-                      className="p-2 bg-blue-500 text-white rounded"
+                      className="p-2 bg-ds-blue-tint0 text-white "
                     >
                       <Pencil size={16}/>
                     </button>
 
                     <button
                       onClick={()=>handleDelete(ev._id)}
-                      className="p-2 bg-red-500 text-white rounded"
+                      className="p-2 bg-ds-red-tint0 text-white "
                     >
                       <Trash size={16}/>
                     </button>
@@ -321,7 +321,7 @@ export default function EventsAdminPage() {
 
         {activeTab==="upcoming" && (
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white   p-6">
 
             {step==="category" ? (
 
@@ -334,7 +334,7 @@ export default function EventsAdminPage() {
                 <select
                   value={selectedCategory}
                   onChange={(e)=>setSelectedCategory(e.target.value)}
-                  className="w-full max-w-md mx-auto p-3 border rounded-lg"
+                  className="w-full max-w-md mx-auto p-3 border "
                 >
                   <option value="">Choose category...</option>
                   {categories.map(cat=>(
@@ -344,7 +344,7 @@ export default function EventsAdminPage() {
 
                 <button
                   onClick={()=>selectedCategory && setStep("form")}
-                  className="mt-6 px-8 py-3 bg-blue-600 text-white rounded-lg flex items-center gap-2 mx-auto"
+                  className="mt-6 px-8 py-3 bg-navy text-white  flex items-center gap-2 mx-auto"
                 >
                   Next
                   <ArrowRight size={16}/>
@@ -357,35 +357,35 @@ export default function EventsAdminPage() {
 
                 <div className="grid md:grid-cols-2 gap-4">
 
-                  <input name="name" required placeholder="Event Name" className="p-3 border rounded-lg" value={eventData.name} onChange={handleEventChange}/>
+                  <input name="name" required placeholder="Event Name" className="p-3 border " value={eventData.name} onChange={handleEventChange}/>
 
-                  <select name="mode" required className="p-3 border rounded-lg" value={eventData.mode} onChange={handleEventChange}>
+                  <select name="mode" required className="p-3 border " value={eventData.mode} onChange={handleEventChange}>
                     <option value="">Mode</option>
                     <option>Online</option>
                     <option>Offline</option>
                   </select>
 
-                  <input name="venue" required placeholder="Venue" className="p-3 border rounded-lg" value={eventData.venue} onChange={handleEventChange}/>
+                  <input name="venue" required placeholder="Venue" className="p-3 border " value={eventData.venue} onChange={handleEventChange}/>
 
-                  <input name="contact" required placeholder="Contact Info" className="p-3 border rounded-lg" value={eventData.contact} onChange={handleEventChange}/>
+                  <input name="contact" required placeholder="Contact Info" className="p-3 border " value={eventData.contact} onChange={handleEventChange}/>
 
-                  <input type="date" name="startDate" required className="p-3 border rounded-lg" value={eventData.startDate} onChange={handleEventChange}/>
+                  <input type="date" name="startDate" required className="p-3 border " value={eventData.startDate} onChange={handleEventChange}/>
 
-                  <input type="date" name="endDate" required className="p-3 border rounded-lg" value={eventData.endDate} onChange={handleEventChange}/>
+                  <input type="date" name="endDate" required className="p-3 border " value={eventData.endDate} onChange={handleEventChange}/>
 
-                  <input type="time" name="startTime" required className="p-3 border rounded-lg" value={eventData.startTime} onChange={handleEventChange}/>
+                  <input type="time" name="startTime" required className="p-3 border " value={eventData.startTime} onChange={handleEventChange}/>
 
-                  <input type="time" name="endTime" className="p-3 border rounded-lg" value={eventData.endTime} onChange={handleEventChange}/>
+                  <input type="time" name="endTime" className="p-3 border " value={eventData.endTime} onChange={handleEventChange}/>
 
-                  <input type="date" name="deadlines" required className="p-3 border rounded-lg" value={eventData.deadlines} onChange={handleEventChange}/>
+                  <input type="date" name="deadlines" required className="p-3 border " value={eventData.deadlines} onChange={handleEventChange}/>
 
-                  <input name="registrationLink" placeholder="Registration Link" className="p-3 border rounded-lg" value={eventData.registrationLink} onChange={handleEventChange}/>
+                  <input name="registrationLink" placeholder="Registration Link" className="p-3 border " value={eventData.registrationLink} onChange={handleEventChange}/>
 
                 </div>
 
-                <textarea name="description" placeholder="Description" className="w-full p-3 border rounded-lg" rows={3} value={eventData.description} onChange={handleEventChange}/>
+                <textarea name="description" placeholder="Description" className="w-full p-3 border " rows={3} value={eventData.description} onChange={handleEventChange}/>
 
-                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg flex items-center gap-2">
+                <button className="px-8 py-3 bg-navy text-white  flex items-center gap-2">
                   <Save size={16}/>
                   {editingEventId ? "Update Event":"Save Event"}
                 </button>

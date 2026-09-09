@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Upload, Search, FileText, Download, Eye, BookOpen, FileQuestion, X, CheckCircle, AlertCircle, Filter, ChevronDown, CheckSquare, Square, User, NotebookPen } from "lucide-react";
+import Field from "../components/ui/Field";
+import Button from "../components/ui/Button";
+import Tag from "../components/ui/Tag";
+import Tabs from "../components/ui/Tabs";
 
 /* =====================================================
    ANNA UNIVERSITY R2021 – AI & DS SUBJECT LIST
@@ -53,15 +57,15 @@ const FILTER_OPTIONS = ["Semester", "Internal 1", "Internal 2", "Question Bank",
 export default function QuestionBank() {
   const [tab, setTab] = useState("upload");
   const [semester, setSemester] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState({}); 
+  const [selectedSubject, setSelectedSubject] = useState({});
   const [manualSubjectName, setManualSubjectName] = useState("");
   const [manualSubjectCode, setManualSubjectCode] = useState("");
-  
-  const [resourceType, setResourceType] = useState("paper"); 
-  const [examSelection, setExamSelection] = useState("Internal 1"); 
+
+  const [resourceType, setResourceType] = useState("paper");
+  const [examSelection, setExamSelection] = useState("Internal 1");
 
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -98,7 +102,7 @@ export default function QuestionBank() {
   };
 
   const toggleFilter = (option) => {
-    setSelectedFilters((prev) => 
+    setSelectedFilters((prev) =>
       prev.includes(option)
         ? prev.filter((item) => item !== option)
         : [...prev, option]
@@ -112,10 +116,10 @@ export default function QuestionBank() {
       data = data.filter((u) => selectedFilters.includes(u.examType));
     }
 
-    const typeOrder = { 
-      "Semester": 1, 
-      "Internal 1": 2, 
-      "Internal 2": 3, 
+    const typeOrder = {
+      "Semester": 1,
+      "Internal 1": 2,
+      "Internal 2": 3,
       "Question Bank": 4,
       "Notes": 5
     };
@@ -147,7 +151,7 @@ export default function QuestionBank() {
 
     const finalName = manualSubjectName || (selectedSubject && selectedSubject.name);
     const finalCode = manualSubjectCode || (selectedSubject && selectedSubject.code);
-    
+
     // Determine final exam type based on resource selection
     let finalExamType;
     if (resourceType === "bank") {
@@ -177,14 +181,14 @@ export default function QuestionBank() {
         method: "POST",
         body: formData,
       });
-      
+
       const result = await res.json();
 
       if (res.ok && result.success) {
         showToast("Uploaded successfully!", "success");
         setTab("search");
         fetchPapers();
-        
+
         setSemester("");
         setSelectedSubject({});
         setManualSubjectName("");
@@ -201,81 +205,77 @@ export default function QuestionBank() {
     }
   };
 
+  const resourceTag = (examType) => {
+    if (examType === "Question Bank") return "workshop";
+    if (examType === "Notes") return "outline";
+    return "question-paper";
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6 font-sans text-gray-800 relative" onClick={() => setIsFilterOpen(false)}>
-      
+    <div onClick={() => setIsFilterOpen(false)}>
+
       {/* TOAST */}
       {toast.show && (
-        <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl animate-in fade-in slide-in-from-top-5 duration-300 ${
-          toast.type === "success" ? "bg-green-600 text-white" : "bg-red-500 text-white"
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-4 border-t-2 ${
+          toast.type === "success" ? "bg-navy text-white border-ds-blue" : "bg-ds-red text-white border-ds-red-deep"
         }`}>
-          {toast.type === "success" ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
+          {toast.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider">{toast.type === "success" ? "Success" : "Error"}</h4>
-            <p className="font-medium text-base">{toast.message}</p>
+            <h4 className="text-kicker tracking-kicker uppercase">{toast.type === "success" ? "Success" : "Error"}</h4>
+            <p className="text-body">{toast.message}</p>
           </div>
           <button onClick={() => setToast({ ...toast, show: false })} className="ml-4 opacity-80 hover:opacity-100">
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
       )}
 
       {/* HEADER */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Resource Repository</h1>
-        <p className="text-gray-500">Access previous year question papers, question banks, and study notes</p>
+      <div className="mb-8 pb-6 border-b-2 border-navy">
+        <span className="text-kicker tracking-kicker uppercase text-ds-red">Student contributed</span>
+        <h1 className="text-page-heading text-navy mt-2.5">Question bank</h1>
+        <p className="text-body text-ds-ink-soft mt-2">Past question papers, question banks and study notes.</p>
       </div>
 
       {/* TABS */}
-      <div className="flex justify-center mb-8">
-        <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
-          <button
-            onClick={() => setTab("upload")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
-              tab === "upload" ? "bg-blue-900 text-white shadow-md" : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <Upload size={18} /> Upload
-          </button>
-          <button
-            onClick={() => setTab("search")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
-              tab === "search" ? "bg-blue-900 text-white shadow-md" : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <Search size={18} /> Search
-          </button>
-        </div>
-      </div>
+      <Tabs className="mb-8">
+        <Tabs.Tab active={tab === "upload"} onClick={() => setTab("upload")}>
+          <span className="inline-flex items-center gap-2"><Upload size={15} /> Upload</span>
+        </Tabs.Tab>
+        <Tabs.Tab active={tab === "search"} onClick={() => setTab("search")}>
+          <span className="inline-flex items-center gap-2"><Search size={15} /> Search</span>
+        </Tabs.Tab>
+      </Tabs>
 
       {/* UPLOAD SECTION */}
       {tab === "upload" && (
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-200" onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">Upload New Resource</h2>
+        <div className="max-w-2xl border border-ds-edge p-7" onClick={(e) => e.stopPropagation()}>
+          <h2 className="text-card-title text-navy mb-6 pb-3 border-b border-ds-row">Upload a new resource</h2>
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Select Semester</label>
-            <select
-              className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+          <div className="mb-5">
+            <Field.Label htmlFor="qb-semester">Semester</Field.Label>
+            <Field.Select
+              id="qb-semester"
               value={semester}
               onChange={(e) => {
                 setSemester(e.target.value);
                 setSelectedSubject({});
               }}
             >
-              <option value="">-- Select Semester --</option>
+              <option value="">Select semester</option>
               {Object.keys(SUBJECTS || {}).map((sem) => (
                 <option key={sem} value={sem}>Semester {sem}</option>
               ))}
-            </select>
+            </Field.Select>
           </div>
 
           {semester && (
-            <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Select Subject</label>
-              <select
-                className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none mb-3 transition"
-                value={selectedSubject?.code || ""} 
+            <div className="mb-5">
+              <Field.Label htmlFor="qb-subject">Subject</Field.Label>
+              <Field.Select
+                id="qb-subject"
+                className="mb-3"
+                value={selectedSubject?.code || ""}
                 onChange={(e) => {
                   const val = e.target.value;
                   if (val === "") {
@@ -288,29 +288,29 @@ export default function QuestionBank() {
                   setManualSubjectCode("");
                 }}
               >
-                <option value="">-- Choose from List --</option>
+                <option value="">Choose from list</option>
                 {SUBJECTS[semester] && SUBJECTS[semester].map((sub) => (
                   <option key={sub.code} value={sub.code}>
                     {sub.code} – {sub.name}
                   </option>
                 ))}
-              </select>
+              </Field.Select>
 
               {!selectedSubject?.code && (
-                <div className="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
-                  <p className="text-xs text-center text-gray-500 mb-2 font-bold uppercase tracking-wider">Or Enter Manually</p>
+                <div className="bg-ds-ground p-4 border border-dashed border-ds-edge">
+                  <p className="text-kicker tracking-kicker uppercase text-ds-ink-faint mb-2">Or enter manually</p>
                   <div className="flex gap-2">
-                    <input
+                    <Field.Input
                       type="text"
-                      placeholder="Subject Name"
-                      className="w-2/3 p-2 text-sm border rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                      placeholder="Subject name"
+                      className="w-2/3"
                       value={manualSubjectName}
                       onChange={(e) => setManualSubjectName(e.target.value)}
                     />
-                    <input
+                    <Field.Input
                       type="text"
                       placeholder="Code"
-                      className="w-1/3 p-2 text-sm border rounded focus:ring-1 focus:ring-blue-500 outline-none"
+                      className="w-1/3"
                       value={manualSubjectCode}
                       onChange={(e) => setManualSubjectCode(e.target.value)}
                     />
@@ -321,64 +321,56 @@ export default function QuestionBank() {
           )}
 
           {((selectedSubject && selectedSubject.code) || manualSubjectName) && (
-            <form onSubmit={handleUpload} className="animate-in fade-in slide-in-from-top-4 duration-500">
-              
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Resource Type</label>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <label 
-                  className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${
-                    resourceType === 'paper' ? 'bg-blue-50 border-blue-500 text-blue-700 ring-2 ring-blue-500' : 'bg-white border-gray-200 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setResourceType('paper')}
-                >
-                  <FileQuestion size={20} />
-                  <span className="font-medium text-sm">Question Paper</span>
-                </label>
+            <form onSubmit={handleUpload}>
 
-                <label 
-                  className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${
-                    resourceType === 'bank' ? 'bg-purple-50 border-purple-500 text-purple-700 ring-2 ring-purple-500' : 'bg-white border-gray-200 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setResourceType('bank')}
-                >
-                  <BookOpen size={20} />
-                  <span className="font-medium text-sm">Question Bank</span>
-                </label>
-
-                <label 
-                  className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${
-                    resourceType === 'notes' ? 'bg-green-50 border-green-500 text-green-700 ring-2 ring-green-500' : 'bg-white border-gray-200 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setResourceType('notes')}
-                >
-                  <NotebookPen size={20} />
-                  <span className="font-medium text-sm">Notes</span>
-                </label>
+              <Field.Label>Resource type</Field.Label>
+              <div className="flex mb-5">
+                {[
+                  { key: 'paper', label: 'Question paper', icon: FileQuestion },
+                  { key: 'bank', label: 'Question bank', icon: BookOpen },
+                  { key: 'notes', label: 'Notes', icon: NotebookPen },
+                ].map(({ key, label, icon: Icon }, i) => (
+                  <label
+                    key={key}
+                    className={`flex-1 cursor-pointer border py-3 flex flex-col items-center justify-center gap-2 ${i > 0 ? 'border-l-0' : ''} ${
+                      resourceType === key ? 'bg-navy border-navy text-white' : 'bg-white border-ds-edge text-ds-ink-soft'
+                    }`}
+                    onClick={() => setResourceType(key)}
+                  >
+                    <Icon size={18} />
+                    <span className="text-label font-medium">{label}</span>
+                  </label>
+                ))}
               </div>
 
               {resourceType === 'paper' && (
-                <div className="mb-4">
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Exam Category</label>
-                  <select 
-                    className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                <div className="mb-5">
+                  <Field.Label htmlFor="qb-exam">Exam category</Field.Label>
+                  <Field.Select
+                    id="qb-exam"
                     value={examSelection}
                     onChange={(e) => setExamSelection(e.target.value)}
                   >
                     <option>Internal 1</option>
                     <option>Internal 2</option>
                     <option>Semester</option>
-                  </select>
+                  </Field.Select>
                 </div>
               )}
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Upload PDF File</label>
-                <input type="file" id="qpFile" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-gray-300 rounded-lg p-1" accept=".pdf" />
+                <Field.Label htmlFor="qpFile">Upload PDF file</Field.Label>
+                <input
+                  type="file"
+                  id="qpFile"
+                  className="block w-full text-body text-ds-ink-soft file:mr-4 file:py-2.5 file:px-4 file:border-0 file:text-label file:font-medium file:bg-navy file:text-white cursor-pointer border border-ds-edge p-1"
+                  accept=".pdf"
+                />
               </div>
 
-              <button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition-all shadow-md ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-900 hover:bg-blue-800 hover:shadow-lg"}`}>
-                {loading ? "Uploading..." : "Submit Resource"}
-              </button>
+              <Button type="submit" variant="primary" disabled={loading} className="w-full justify-center">
+                {loading ? "Uploading…" : "Submit resource"}
+              </Button>
             </form>
           )}
         </div>
@@ -386,16 +378,14 @@ export default function QuestionBank() {
 
       {/* SEARCH SECTION */}
       {tab === "search" && (
-        <div className="max-w-4xl mx-auto" onClick={(e) => e.stopPropagation()}>
-          
+        <div onClick={(e) => e.stopPropagation()}>
+
           {/* SEARCH & FILTER BAR */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
+          <div className="flex flex-col md:flex-row gap-3 mb-8">
+            <div className="flex-1">
+              <Field.Input
                 type="text"
-                placeholder="Search by subject name or code..."
-                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none text-base"
+                placeholder="Search by subject name or code…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -403,49 +393,51 @@ export default function QuestionBank() {
 
             {/* MULTI-SELECT FILTER DROPDOWN */}
             <div className="relative min-w-[220px]">
-              
+
               <button
                 onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
-                className={`w-full flex items-center justify-between pl-12 pr-4 py-3 border rounded-xl shadow-sm transition-all ${
-                  isFilterOpen || selectedFilters.length > 0 ? "bg-blue-50 border-blue-500 text-blue-800" : "bg-white border-gray-200 text-gray-700"
+                className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 border ${
+                  isFilterOpen || selectedFilters.length > 0 ? "bg-ds-blue-tint border-ds-blue text-ds-blue" : "bg-white border-ds-edge text-ds-ink-soft"
                 }`}
               >
-                <Filter className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${selectedFilters.length > 0 ? "text-blue-600" : "text-gray-400"}`} size={18} />
-                <span className="font-medium truncate">
-                  {selectedFilters.length === 0 ? "Filter Type" : `Filters (${selectedFilters.length})`}
+                <span className="flex items-center gap-2">
+                  <Filter size={15} />
+                  <span className="text-label font-medium truncate">
+                    {selectedFilters.length === 0 ? "Filter type" : `Filters (${selectedFilters.length})`}
+                  </span>
                 </span>
-                <ChevronDown size={16} className={`transition-transform ${isFilterOpen ? "rotate-180" : ""}`} />
+                <ChevronDown size={14} className={`transition-transform ${isFilterOpen ? "rotate-180" : ""}`} />
               </button>
 
               {isFilterOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                  <div className="p-2 space-y-1">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-ds-edge z-20">
+                  <div className="p-2">
                     {FILTER_OPTIONS.map((option) => {
                       const isSelected = selectedFilters.includes(option);
                       return (
-                        <div 
-                          key={option} 
+                        <div
+                          key={option}
                           onClick={() => toggleFilter(option)}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
-                            isSelected ? "bg-blue-50 text-blue-800" : "hover:bg-gray-50 text-gray-700"
+                          className={`flex items-center gap-2.5 px-3 py-2 cursor-pointer ${
+                            isSelected ? "bg-ds-blue-tint text-ds-blue" : "hover:bg-ds-ground text-ds-ink"
                           }`}
                         >
                           {isSelected ? (
-                            <CheckSquare size={18} className="text-blue-600 fill-blue-50" />
+                            <CheckSquare size={16} className="text-ds-blue" />
                           ) : (
-                            <Square size={18} className="text-gray-400" />
+                            <Square size={16} className="text-ds-ink-faint" />
                           )}
-                          <span className="text-sm font-medium">{option}</span>
+                          <span className="text-label font-medium">{option}</span>
                         </div>
                       );
                     })}
                   </div>
                   {selectedFilters.length > 0 && (
-                    <div 
+                    <div
                       onClick={() => setSelectedFilters([])}
-                      className="border-t border-gray-100 p-2 text-center text-xs font-bold text-red-500 cursor-pointer hover:bg-red-50 transition-colors"
+                      className="border-t border-ds-edge p-2 text-center text-kicker tracking-kicker uppercase text-ds-red cursor-pointer hover:bg-ds-red-tint"
                     >
-                      CLEAR ALL
+                      Clear all
                     </div>
                   )}
                 </div>
@@ -454,100 +446,71 @@ export default function QuestionBank() {
           </div>
 
           {processedUploads.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
-              <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="text-gray-400" size={32} />
-              </div>
-              <p className="text-gray-500 font-medium">No resources found.</p>
+            <div className="text-center py-16 border border-dashed border-ds-edge">
+              <FileText className="text-ds-ink-faint mx-auto mb-4" size={32} />
+              <p className="text-body text-ds-ink-soft">No resources found.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-px bg-ds-edge border border-ds-edge">
               {processedUploads.map((u) => {
                 const niceName = `${u.subjectCode}_${u.examType}_Sem${u.semester}`;
-                const isBank = u.examType === "Question Bank";
                 const isNotes = u.examType === "Notes";
-                
-                // Determine color scheme based on resource type
-                let colorScheme = {
-                  bgColor: 'bg-blue-100',
-                  textColor: 'text-blue-600',
-                  badgeBg: 'bg-blue-50',
-                  badgeText: 'text-blue-700'
-                };
-                
-                if (isBank) {
-                  colorScheme = {
-                    bgColor: 'bg-purple-100',
-                    textColor: 'text-purple-600',
-                    badgeBg: 'bg-purple-50',
-                    badgeText: 'text-purple-700'
-                  };
-                } else if (isNotes) {
-                  colorScheme = {
-                    bgColor: 'bg-green-100',
-                    textColor: 'text-green-600',
-                    badgeBg: 'bg-green-50',
-                    badgeText: 'text-green-700'
-                  };
-                }
-                
-                // Choose icon based on type
+                const isBank = u.examType === "Question Bank";
                 const IconComponent = isNotes ? NotebookPen : (isBank ? BookOpen : FileText);
-                
+
                 return (
-                  <div key={u._id} className="group bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                    
+                  <div key={u._id} className="bg-white p-5">
+
                     {/* Main Content Row */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-3">
                       <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-lg shrink-0 ${colorScheme.bgColor} ${colorScheme.textColor}`}>
-                          <IconComponent size={24} />
+                        <div className="p-3 bg-ds-blue-tint text-ds-blue shrink-0">
+                          <IconComponent size={22} />
                         </div>
                         <div>
-                          <h3 className="font-bold text-lg text-gray-800 leading-tight">
+                          <h3 className="text-card-title text-navy leading-tight">
                             {u.subjectName}
                           </h3>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                             <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span className="font-mono text-label font-semibold text-ds-ink-soft bg-ds-ground px-2 py-0.5">
                               {u.subjectCode}
-                             </span>
-                             <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${colorScheme.badgeBg} ${colorScheme.badgeText}`}>
-                               {u.examType}
-                             </span>
-                             <span className="text-xs text-gray-500 font-medium">
-                               Semester {u.semester}
-                             </span>
+                            </span>
+                            <Tag variant={resourceTag(u.examType)}>{u.examType}</Tag>
+                            <span className="text-label text-ds-ink-faint">
+                              Semester {u.semester}
+                            </span>
                           </div>
-                          <p className="text-xs text-gray-400 mt-1.5">
+                          <p className="text-label text-ds-ink-faint mt-1.5">
                             Added {new Date(u.uploadedAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
-                        <a href={u.fileUrl} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition">
-                          <Eye size={16} /> View
+                      <div className="flex gap-2.5 w-full md:w-auto mt-2 md:mt-0">
+                        <a href={u.fileUrl} target="_blank" rel="noreferrer" className="flex-1 md:flex-none">
+                          <Button variant="secondary" className="w-full justify-center">
+                            <Eye size={15} /> View
+                          </Button>
                         </a>
-                        <a href={getDownloadUrl(u.fileUrl, niceName)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-900 hover:bg-blue-800 transition shadow-sm cursor-pointer">
-                          <Download size={16} /> Download
+                        <a href={getDownloadUrl(u.fileUrl, niceName)} className="flex-1 md:flex-none">
+                          <Button variant="navy" className="w-full justify-center">
+                            <Download size={15} /> Download
+                          </Button>
                         </a>
                       </div>
                     </div>
 
                     {/* Uploader Info Section */}
-                    <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-2 pt-3 border-t border-ds-row">
                       {u.author ? (
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <User size={14} className="text-gray-400" />
-                          <span className="font-medium">Uploaded by:</span>
-                          <span className="font-semibold text-gray-700">
-                            {u.author.fullName || u.author.username || "Unknown"}
-                          </span>
+                        <div className="flex items-center gap-2 text-label text-ds-ink-faint">
+                          <User size={13} />
+                          <span>Uploaded by <span className="font-medium text-ds-ink-soft">{u.author.fullName || u.author.username || "Unknown"}</span></span>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                          <User size={14} className="text-gray-300" />
-                          <span className="font-medium">Uploader information not available</span>
+                        <div className="flex items-center gap-2 text-label text-ds-ink-faint">
+                          <User size={13} />
+                          <span>Uploader information not available</span>
                         </div>
                       )}
                     </div>

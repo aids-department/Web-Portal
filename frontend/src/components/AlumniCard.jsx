@@ -1,16 +1,8 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FaTimes, FaLinkedin } from "react-icons/fa";
-
-/* Skill color palette (cycled) */
-const SKILL_COLORS = [
-  "bg-blue-100 text-blue-800",
-  "bg-indigo-100 text-indigo-800",
-  "bg-purple-100 text-purple-800",
-  "bg-green-100 text-green-800",
-  "bg-teal-100 text-teal-800",
-  "bg-pink-100 text-pink-800",
-];
+import Avatar from "./ui/Avatar";
+import Tag from "./ui/Tag";
 
 export default function AlumniCard({ alumni }) {
   const [open, setOpen] = useState(false);
@@ -23,61 +15,27 @@ export default function AlumniCard({ alumni }) {
     return () => (document.body.style.overflow = "");
   }, [open]);
 
+  const initials = alumni.name?.charAt(0)?.toUpperCase();
+
   return (
     <>
       {/* ================= CARD ================= */}
-      <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden">
-        {/* Banner */}
-        <div className="h-28 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 relative">
-          <div className="absolute -bottom-10 left-6">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-3xl font-bold text-indigo-700 ring-4 ring-white shadow-md group-hover:scale-105 transition">
-              {alumni.name?.charAt(0)?.toUpperCase()}
-            </div>
+      <button
+        onClick={() => setOpen(true)}
+        className="bg-white border border-ds-edge p-5 flex flex-col gap-3.5 text-left w-full"
+      >
+        <div className="flex gap-3.5 items-start">
+          <Avatar initials={initials} size={66} />
+          <div className="flex flex-col gap-1">
+            <span className="text-card-title text-navy">{alumni.name}</span>
+            <span className="text-label text-ds-ink-faint tabular-nums">Batch of {alumni.passOutYear}</span>
           </div>
         </div>
-
-        {/* Content */}
-        <div className="pt-14 px-6 pb-6">
-          <h3 className="text-xl font-extrabold bg-gradient-to-r from-gray-900 to-indigo-800 bg-clip-text text-transparent">
-            {alumni.name}
-          </h3>
-
-          <p className="text-sm font-semibold text-indigo-600">
-            {alumni.role}
-          </p>
-
-          <p className="text-xs text-gray-500 mb-4">
-            {alumni.company || "Company not specified"}
-          </p>
-
-          {/* Skills preview */}
-          <div className="flex flex-wrap gap-2 mb-5">
-            {alumni.skills?.slice(0, 3).map((skill, i) => (
-              <span
-                key={i}
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  SKILL_COLORS[i % SKILL_COLORS.length]
-                }`}
-              >
-                {skill}
-              </span>
-            ))}
-
-            {alumni.skills?.length > 3 && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-                +{alumni.skills.length - 3}
-              </span>
-            )}
-          </div>
-
-          <button
-            onClick={() => setOpen(true)}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-md hover:from-blue-700 hover:to-purple-700 transition"
-          >
-            View Full Profile
-          </button>
+        <div className="border-t border-ds-row pt-2.5 flex justify-between items-center">
+          <span className="text-label font-medium text-ds-blue">{alumni.company || "Company not specified"}</span>
+          <span className="text-label font-medium text-ds-red">View</span>
         </div>
-      </div>
+      </button>
 
       {/* ================= MODAL (PORTAL) ================= */}
       {open &&
@@ -85,93 +43,74 @@ export default function AlumniCard({ alumni }) {
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
+              className="fixed inset-0 bg-navy/60 z-[9999]"
               onClick={() => setOpen(false)}
             />
 
             {/* Modal */}
             <div className="fixed inset-0 z-[10000] flex items-center justify-center px-4">
-              <div className="w-full max-w-4xl max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+              <div className="w-full max-w-2xl max-h-[90vh] bg-white border-2 border-navy flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <div className="p-6 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow">
-                      {alumni.name?.charAt(0)?.toUpperCase()}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-extrabold bg-gradient-to-r from-gray-900 to-indigo-800 bg-clip-text text-transparent">
-                        {alumni.name}
-                      </h2>
-                      <p className="text-sm font-medium text-indigo-600">
-                        {alumni.role}
-                      </p>
+                <div className="bg-navy px-8 py-7 flex items-start justify-between gap-6">
+                  <div className="flex gap-4 items-start">
+                    <Avatar initials={initials} size={72} className="border-blue" />
+                    <div className="flex flex-col gap-1.5">
+                      <h2 className="text-section-heading text-white">{alumni.name}</h2>
+                      <span className="text-label text-on-navy tabular-nums">
+                        Batch of {alumni.passOutYear}
+                      </span>
                     </div>
                   </div>
-
                   <button
                     onClick={() => setOpen(false)}
-                    className="p-2 rounded-full hover:bg-gray-200 transition"
+                    className="text-on-navy-muted hover:text-white"
                   >
-                    <FaTimes size={18} />
+                    <FaTimes size={16} />
                   </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-                    {/* LEFT */}
-                    <Section title="Professional Information" accent="indigo">
-                      <Info label="Current Role" value={alumni.role} />
-                      <Info label="Company" value={alumni.company || "Not specified"} />
-                      <Info label="Pass Out Year" value={alumni.passOutYear} />
-                    </Section>
-
-                    {/* RIGHT */}
-                    <Section title="Technical Skills" accent="blue">
-                      <div className="flex flex-wrap gap-2">
-                        {alumni.skills?.length ? (
-                          alumni.skills.map((skill, i) => (
-                            <span
-                              key={i}
-                              className={`px-4 py-1.5 rounded-full text-sm font-semibold ${
-                                SKILL_COLORS[i % SKILL_COLORS.length]
-                              }`}
-                            >
-                              {skill}
-                            </span>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No skills listed
-                          </p>
-                        )}
-                      </div>
-                    </Section>
-
-                    {alumni.bio && (
-                      <Section title="About" accent="purple">
-                        <p className="text-gray-700 leading-relaxed">
-                          {alumni.bio}
-                        </p>
-                      </Section>
-                    )}
-
-                    {alumni.linkedin && (
-                      <Section title="Connect" accent="blue">
-                        <a
-                          href={alumni.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-                        >
-                          <FaLinkedin size={20} />
-                          LinkedIn Profile
-                        </a>
-                      </Section>
-                    )}
+                <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-ds-edge border border-ds-edge">
+                    <Fact label="Current role" value={alumni.role} />
+                    <Fact label="Company" value={alumni.company || "Not specified"} />
+                    <Fact label="Pass out year" value={alumni.passOutYear} />
                   </div>
+
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-label font-medium tracking-label uppercase text-navy">Skills</span>
+                    <div className="flex flex-wrap gap-2">
+                      {alumni.skills?.length ? (
+                        alumni.skills.map((skill, i) => (
+                          <span key={i} className="px-2.5 py-1.5 border border-ds-edge text-label text-ds-ink">
+                            {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <p className="text-body text-ds-ink-faint">No skills listed</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {alumni.bio && (
+                    <div className="flex flex-col gap-2.5 border-t-2 border-navy pt-5">
+                      <span className="text-label font-medium tracking-label uppercase text-navy">About</span>
+                      <p className="text-body text-ds-ink-soft">{alumni.bio}</p>
+                    </div>
+                  )}
+
+                  {alumni.linkedin && (
+                    <a
+                      href={alumni.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-navy text-white text-label font-medium self-start"
+                    >
+                      <FaLinkedin size={16} />
+                      LinkedIn profile
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -182,36 +121,11 @@ export default function AlumniCard({ alumni }) {
   );
 }
 
-/* ================= UI HELPERS ================= */
-
-function Section({ title, accent = "indigo", children }) {
-  const accentMap = {
-    indigo: "text-indigo-700",
-    blue: "text-blue-700",
-    purple: "text-purple-700",
-  };
-
+function Fact({ label, value }) {
   return (
-    <div>
-      <h3 className={`text-lg font-bold mb-4 ${accentMap[accent]}`}>
-        {title}
-      </h3>
-      <div className="bg-gray-50 rounded-2xl p-5 space-y-3">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Info({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
-        {label}
-      </p>
-      <p className="text-sm font-semibold text-gray-900">
-        {value}
-      </p>
+    <div className="bg-white p-4 flex flex-col gap-1">
+      <span className="text-kicker tracking-kicker uppercase text-ds-ink-faint">{label}</span>
+      <span className="text-label font-medium text-navy">{value}</span>
     </div>
   );
 }

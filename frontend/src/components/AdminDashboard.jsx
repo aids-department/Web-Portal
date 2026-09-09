@@ -117,28 +117,28 @@ export default function AdminDashboard() {
   };
 
   const StatCard = ({ icon: Icon, title, value, change, color }) => (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="bg-white p-6   border border-ds-edge hover: transition-shadow">
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg bg-gradient-to-r ${color}`}>
+        <div className={`p-3  ${color}`}>
           <Icon className="w-6 h-6 text-white" />
         </div>
-        <span className="text-green-600 text-sm font-medium bg-green-50 px-2 py-1 rounded-full">+{change}%</span>
+        <span className="text-ds-blue text-sm font-medium bg-ds-blue-tint px-2 py-1 ">+{change}%</span>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-1">{value}</h3>
-      <p className="text-gray-600 text-sm">{title}</p>
+      <h3 className="text-2xl font-bold text-navy mb-1">{value}</h3>
+      <p className="text-ds-ink-soft text-sm">{title}</p>
     </div>
   );
 
   const QuickAction = ({ icon: Icon, title, description, color, onClick }) => (
     <button 
       onClick={onClick}
-      className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow text-left w-full"
+      className="bg-white p-6   border border-ds-edge hover: transition-shadow text-left w-full"
     >
-      <div className={`p-3 rounded-lg bg-gradient-to-r ${color} mb-4 w-fit`}>
+      <div className={`p-3  ${color} mb-4 w-fit`}>
         <Icon className="w-5 h-5 text-white" />
       </div>
-      <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm">{description}</p>
+      <h3 className="font-semibold text-navy mb-2">{title}</h3>
+      <p className="text-ds-ink-soft text-sm">{description}</p>
     </button>
   );
 
@@ -146,11 +146,11 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-navy mb-4">
           Admin Dashboard
         </h1>
-        <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
-        <p className="text-lg text-gray-600">
+        <div className="w-24 h-1 bg-navy mx-auto  mb-6"></div>
+        <p className="text-lg text-ds-ink-soft">
           Monitor and manage your web portal analytics
         </p>
       </div>
@@ -162,35 +162,35 @@ export default function AdminDashboard() {
           title="Total Users" 
           value={stats.loading ? '...' : stats.totalUsers} 
           change={stats.userChange} 
-          color="from-blue-500 to-blue-600"
+          color="bg-navy"
         />
         <StatCard 
           icon={FileText} 
           title="Total Posts" 
           value={stats.loading ? '...' : stats.totalPosts} 
           change={stats.postChange} 
-          color="from-green-500 to-green-600"
+          color="bg-navy"
         />
         <StatCard 
           icon={Calendar} 
           title="Events" 
           value={stats.loading ? '...' : stats.totalEvents} 
           change={stats.eventChange} 
-          color="from-purple-500 to-purple-600"
+          color="bg-navy"
         />
         <StatCard 
           icon={Trophy} 
           title="Achievements" 
           value={stats.loading ? '...' : stats.totalAchievements} 
           change={stats.achievementChange} 
-          color="from-orange-500 to-orange-600"
+          color="bg-navy"
         />
         <StatCard 
           icon={BookOpen} 
           title="Question Papers" 
           value={stats.loading ? '...' : stats.questionPapers} 
           change={stats.qpChange} 
-          color="from-indigo-500 to-indigo-600"
+          color="bg-navy"
         />
       </div>
 
@@ -198,18 +198,18 @@ export default function AdminDashboard() {
       {/* Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Post Activity Timeline */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6   border border-ds-edge">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
+            <h3 className="text-xl font-bold text-navy flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-ds-blue" />
               Post Activity Timeline
             </h3>
-            <span className="text-sm text-gray-500">Last 7 days</span>
+            <span className="text-sm text-ds-ink-soft">Last 7 days</span>
           </div>
-          <div className="h-64 relative bg-gray-50 rounded-lg p-4 overflow-hidden">
+          <div className="h-64 relative bg-ds-ground  p-4 overflow-hidden">
             {stats.loading ? (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin  h-8 w-8 border-b-2 border-navy"></div>
               </div>
             ) : (
               <svg className="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
@@ -239,18 +239,18 @@ export default function AdminDashboard() {
                     <>
                       {/* Grid lines */}
                       {[0, 1, 2, 3, 4].map(i => (
-                        <line key={i} x1="40" y1={40 + i * 25} x2="380" y2={40 + i * 25} stroke="#e5e7eb" strokeWidth="1" />
+                        <line key={i} x1="40" y1={40 + i * 25} x2="380" y2={40 + i * 25} stroke="#d7d3d3" strokeWidth="1" />
                       ))}
                       
                       {/* Line path */}
-                      <path d={pathData} fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d={pathData} fill="none" stroke="#0e1c3d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       
                       {/* Data points */}
                       {points.map((point, index) => (
                         <g key={index}>
-                          <circle cx={point.x} cy={point.y} r="3" fill="#3b82f6" stroke="white" strokeWidth="2" />
-                          <text x={point.x} y="185" textAnchor="middle" className="text-xs fill-gray-600">{point.day}</text>
-                          <text x={point.x} y={point.y - 8} textAnchor="middle" className="text-xs fill-gray-700 font-medium">{point.count}</text>
+                          <circle cx={point.x} cy={point.y} r="3" fill="#0e1c3d" stroke="white" strokeWidth="2" />
+                          <text x={point.x} y="185" textAnchor="middle" className="text-xs fill-current text-ds-ink-soft">{point.day}</text>
+                          <text x={point.x} y={point.y - 8} textAnchor="middle" className="text-xs fill-current text-ds-ink font-medium">{point.count}</text>
                         </g>
                       ))}
                     </>
@@ -263,59 +263,59 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Posts */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6   border border-ds-edge">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-green-600" />
+            <h3 className="text-xl font-bold text-navy flex items-center gap-2">
+              <FileText className="w-5 h-5 text-ds-blue" />
               Recent Posts
             </h3>
-            <span className="text-sm text-gray-500">{stats.totalPosts} total</span>
+            <span className="text-sm text-ds-ink-soft">{stats.totalPosts} total</span>
           </div>
           <div className="space-y-3">
             {stats.loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
+                <div className="animate-spin  h-6 w-6 border-b-2 border-navy mx-auto"></div>
               </div>
             ) : stats.recentPosts.length > 0 ? (
               stats.recentPosts.map((post, index) => (
-                <div key={post._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 truncate">{post.title}</p>
-                  <p className="text-xs text-gray-600">
+                <div key={post._id || index} className="p-3 bg-ds-ground ">
+                  <p className="text-sm font-medium text-navy truncate">{post.title}</p>
+                  <p className="text-xs text-ds-ink-soft">
                     by {post.author?.fullName || 'Anonymous'} • {new Date(post.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent posts</p>
+              <p className="text-ds-ink-soft text-center py-4">No recent posts</p>
             )}
           </div>
         </div>
 
         {/* Recent Users */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6   border border-ds-edge">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-purple-600" />
+            <h3 className="text-xl font-bold text-navy flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-ds-blue" />
               New Users
             </h3>
-            <span className="text-sm text-gray-500">{stats.totalUsers} total</span>
+            <span className="text-sm text-ds-ink-soft">{stats.totalUsers} total</span>
           </div>
           <div className="space-y-3">
             {stats.loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto"></div>
+                <div className="animate-spin  h-6 w-6 border-b-2 border-navy mx-auto"></div>
               </div>
             ) : stats.recentUsers.length > 0 ? (
               stats.recentUsers.map((user, index) => (
-                <div key={user._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">{user.fullName || user.name || 'Anonymous'}</p>
-                  <p className="text-xs text-gray-600">
+                <div key={user._id || index} className="p-3 bg-ds-ground ">
+                  <p className="text-sm font-medium text-navy">{user.fullName || user.name || 'Anonymous'}</p>
+                  <p className="text-xs text-ds-ink-soft">
                     {user.year || 'N/A'} Year • {user.email || 'No email'}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent users</p>
+              <p className="text-ds-ink-soft text-center py-4">No recent users</p>
             )}
           </div>
         </div>
@@ -324,59 +324,59 @@ export default function AdminDashboard() {
       {/* Recent Events & Updates */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Updates */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6   border border-ds-edge">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-xl font-bold text-navy flex items-center gap-2">
+              <Activity className="w-5 h-5 text-ds-blue" />
               Recent Updates
             </h3>
-            <span className="text-sm text-gray-500">{stats.recentUpdates.length} updates</span>
+            <span className="text-sm text-ds-ink-soft">{stats.recentUpdates.length} updates</span>
           </div>
           <div className="space-y-3">
             {stats.loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+                <div className="animate-spin  h-6 w-6 border-b-2 border-navy mx-auto"></div>
               </div>
             ) : stats.recentUpdates.length > 0 ? (
               stats.recentUpdates.map((update, index) => (
-                <div key={update._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">{update.title}</p>
-                  <p className="text-xs text-gray-600">
+                <div key={update._id || index} className="p-3 bg-ds-ground ">
+                  <p className="text-sm font-medium text-navy">{update.title}</p>
+                  <p className="text-xs text-ds-ink-soft">
                     {new Date(update.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent updates</p>
+              <p className="text-ds-ink-soft text-center py-4">No recent updates</p>
             )}
           </div>
         </div>
 
         {/* Recent Events */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6   border border-ds-edge">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-orange-600" />
+            <h3 className="text-xl font-bold text-navy flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-ds-red-deep" />
               Recent Events
             </h3>
-            <span className="text-sm text-gray-500">{stats.totalEvents} total</span>
+            <span className="text-sm text-ds-ink-soft">{stats.totalEvents} total</span>
           </div>
           <div className="space-y-3">
             {stats.loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600 mx-auto"></div>
+                <div className="animate-spin  h-6 w-6 border-b-2 border-navy mx-auto"></div>
               </div>
             ) : stats.recentEvents.length > 0 ? (
               stats.recentEvents.map((event, index) => (
-                <div key={event._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">{event.eventName}</p>
-                  <p className="text-xs text-gray-600">
+                <div key={event._id || index} className="p-3 bg-ds-ground ">
+                  <p className="text-sm font-medium text-navy">{event.eventName}</p>
+                  <p className="text-xs text-ds-ink-soft">
                     {event.venue} • {new Date(event.startDate).toLocaleDateString()}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent events</p>
+              <p className="text-ds-ink-soft text-center py-4">No recent events</p>
             )}
           </div>
         </div>
@@ -384,8 +384,8 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <Plus className="w-6 h-6 text-blue-600" />
+        <h2 className="text-2xl font-bold text-navy mb-6 flex items-center gap-2">
+          <Plus className="w-6 h-6 text-ds-blue" />
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -393,28 +393,28 @@ export default function AdminDashboard() {
             icon={Calendar}
             title="Create Event"
             description="Add new events to the portal"
-            color="from-blue-500 to-blue-600"
+            color="bg-navy"
             onClick={() => window.location.href = '/adminpage/events'}
           />
           <QuickAction 
             icon={Trophy}
             title="Manage Achievements"
             description="Review pending achievements"
-            color="from-green-500 to-green-600"
+            color="bg-navy"
             onClick={() => window.location.href = '/adminpage/achievements'}
           />
           <QuickAction 
             icon={Users}
             title="User Management"
             description="View and manage users"
-            color="from-purple-500 to-purple-600"
+            color="bg-navy"
             onClick={() => window.location.href = '/adminpage/leaderboard'}
           />
           <QuickAction 
             icon={FileText}
             title="Content Updates"
             description="Manage recent updates"
-            color="from-orange-500 to-orange-600"
+            color="bg-navy"
             onClick={() => window.location.href = '/adminpage/manage-content-updates'}
           />
         </div>

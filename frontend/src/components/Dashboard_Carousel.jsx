@@ -30,7 +30,7 @@ export default function Carousel({ slides: propSlides = [], onSelect }) {
   const nextSlide = () => setCurrent((c) => (c === slides.length - 1 ? 0 : c + 1));
 
   return (
-    <div className="relative w-full h-64 overflow-hidden rounded-2xl shadow-lg bg-gray-50">
+    <div className="relative w-full h-64 overflow-hidden border border-ds-edge bg-ds-blue-tint">
 
       {/* Slides */}
       <div
@@ -62,7 +62,7 @@ export default function Carousel({ slides: propSlides = [], onSelect }) {
       <button
         onClick={prevSlide}
         aria-label="Previous"
-        className="absolute top-1/2 left-3 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white p-3 rounded-full"
+        className="absolute top-1/2 left-3 -translate-y-1/2 bg-navy/70 hover:bg-navy text-white w-8 h-8 flex items-center justify-center"
       >
         ‹
       </button>
@@ -71,18 +71,18 @@ export default function Carousel({ slides: propSlides = [], onSelect }) {
       <button
         onClick={nextSlide}
         aria-label="Next"
-        className="absolute top-1/2 right-3 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white p-3 rounded-full"
+        className="absolute top-1/2 right-3 -translate-y-1/2 bg-navy/70 hover:bg-navy text-white w-8 h-8 flex items-center justify-center"
       >
         ›
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrent(index)}
-            className={`w-3 h-3 rounded-full ${
+            className={`w-2.5 h-2.5 ${
               index === current ? "bg-white" : "bg-white/40"
             }`}
             aria-label={`Go to slide ${index + 1}`}

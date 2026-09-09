@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import FacultyCard from "../components/FacultyCard";
+import Tabs from "../components/ui/Tabs";
 
 const FacultyInfo = () => {
   const hod = {
@@ -96,114 +98,56 @@ const FacultyInfo = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-6 md:p-12">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <div>
+      <Tabs className="mb-8 -mt-2">
+        <Tabs.Tab active>Faculty</Tabs.Tab>
+        <Link to="/about/staff"><Tabs.Tab>Staff</Tabs.Tab></Link>
+        <Link to="/about/syllabus"><Tabs.Tab>Syllabus</Tabs.Tab></Link>
+      </Tabs>
 
-        <h1 className="text-center text-5xl font-bold text-gray-900">
-          Faculty Information
-        </h1>
-
-        {/* HOD */}
-        <section className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-10 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-center mb-10 text-black">
-              Head of Department
-            </h2>
-
-          <div className="flex flex-col md:flex-row items-center gap-10">
-            <img
-              src={hod.imageUrl}
-              alt={hod.name}
-              className="h-56 w-56 rounded-full object-cover border-4 shadow-lg"
-              onError={(e) => {
-                e.currentTarget.src =
-                  "https://via.placeholder.com/224x224?text=No+Image";
-              }}
-            />
-
-            <div className="text-center md:text-left">
-              <h3 className="text-3xl font-bold">{hod.name}</h3>
-              <p className="text-xl text-gray-600 mb-4">{hod.title}</p>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {hod.specialization.split(", ").map((s) => (
-                  <span
-                    key={s}
-                    className="bg-blue-100 text-blue-800 px-4 py-1 rounded-full"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-
-              <a
-                href={`mailto:${hod.email}`}
-                className="text-blue-600 font-medium block mb-4"
-              >
-                {hod.email}
-              </a>
-
-              <div className="flex gap-4 flex-wrap">
-                {hod.googleSite && (
-                  <a
-                    href={hod.googleSite}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-primary"
-                  >
-                    Google Site
-                  </a>
-                )}
-                {hod.googleScholar && (
-                  <a
-                    href={hod.googleScholar}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-success"
-                  >
-                    Scholar
-                  </a>
-                )}
-                {hod.orcid && (
-                  <a
-                    href={hod.orcid}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-warning"
-                  >
-                    ORCID
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-          </div>
-        </section>
-
-        {/* Faculty Grid */}
-        <section className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-10 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
-              Our Faculty
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-              {faculty.map((f) => (
-                <FacultyCard key={f.email} faculty={f} />
-              ))}
-            </div>
-          </div>
-        </section>
-
+      <div className="mb-10">
+        <span className="text-kicker tracking-kicker uppercase text-ds-red">
+          {faculty.length + 1} members
+        </span>
+        <h1 className="text-page-heading text-navy mt-2.5">Faculty</h1>
       </div>
+
+      {/* HOD */}
+      <section className="border border-ds-edge grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 p-6 mb-12">
+        <div className="h-[250px] bg-ds-blue-tint overflow-hidden grid place-items-center">
+          <img
+            src={hod.imageUrl}
+            alt={hod.name}
+            className="w-full h-full object-cover grayscale"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        </div>
+        <div className="flex flex-col gap-3">
+          <span className="text-kicker tracking-kicker uppercase text-ds-red">Head of department</span>
+          <h2 className="text-section-heading text-navy">{hod.name}</h2>
+          <span className="text-label font-medium text-ds-blue">{hod.title}</span>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {hod.specialization.split(", ").map((s) => (
+              <span key={s} className="px-2.5 py-1 border border-ds-edge text-label text-ds-ink">
+                {s}
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-6 pt-2 border-t border-ds-row mt-2">
+            <a href={`mailto:${hod.email}`} className="text-label text-ds-blue">{hod.email}</a>
+            {hod.googleSite && <a href={hod.googleSite} target="_blank" rel="noreferrer" className="text-label font-medium text-ds-red">Site</a>}
+            {hod.googleScholar && <a href={hod.googleScholar} target="_blank" rel="noreferrer" className="text-label font-medium text-ds-red">Scholar</a>}
+            {hod.orcid && <a href={hod.orcid} target="_blank" rel="noreferrer" className="text-label font-medium text-ds-red">ORCID</a>}
+          </div>
+        </div>
+      </section>
+
+      {/* Faculty Grid */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-ds-edge border border-ds-edge">
+        {faculty.map((f) => (
+          <FacultyCard key={f.email} faculty={f} />
+        ))}
+      </section>
     </div>
   );
 };

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-13d8e993-daee-46a8-821d-891a801dbb61/styles.css">
+<script src="_ds/modernist-13d8e993-daee-46a8-821d-891a801dbb61/_ds_bundle.js"></script>
+<script src="./doc-page.js"></script>
+<style>
+body{margin:0;font-family:Archivo,system-ui,sans-serif}
+doc-page:not(:defined){visibility:hidden}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+*{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}
+a{color:#1b3a6b}a:hover{color:#dd2b0f}
+</style>
+</helmet>
+<doc-page margin="0.6in">
+
+<div style="background:#0e1c3d;padding:34px 32px 32px;display:flex;flex-direction:column;gap:18px;break-inside:avoid">
+  <div style="display:flex;align-items:center;gap:11px">
+    <div style="width:26px;height:26px;background:#fff;display:grid;place-items:center"><div style="width:9px;height:9px;background:#dd2b0f"></div></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font:700 13px/1 Archivo,sans-serif;letter-spacing:.14em;color:#fff">AI &amp; DS</span>
+      <span style="font:400 9px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#8c9ab5">Department</span>
+    </div>
+  </div>
+  <h1 style="margin:0;font:600 40px/1.04 Archivo,sans-serif;letter-spacing:-.02em;color:#fff;max-width:20ch">Brand and interface template</h1>
+  <p style="margin:0;max-width:62ch;font:400 15px/1.65 Archivo,sans-serif;color:#b6c2d8">Everything needed to build a new page that matches the rest of the portal: the palette with its intended roles, the type scale, the layout rules, and specimens of every recurring component. Copy the values from here rather than sampling a screenshot.</p>
+  <div style="display:flex;gap:30px;border-top:1px solid #23345c;padding-top:20px;margin-top:6px">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8c9ab5">Type</span><span style="font:500 13.5px/1 Archivo,sans-serif;color:#fff">Archivo, one family</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8c9ab5">Corner radius</span><span style="font:500 13.5px/1 Archivo,sans-serif;color:#fff">0 everywhere</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8c9ab5">Alignment</span><span style="font:500 13.5px/1 Archivo,sans-serif;color:#fff">Flush left, always</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8c9ab5">Imagery</span><span style="font:500 13.5px/1 Archivo,sans-serif;color:#fff">Black and white</span></div>
+  </div>
+</div>
+
+<section style="padding:30px 0 24px;border-bottom:2px solid #0e1c3d">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px">
+    <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#dd2b0f">01</span>
+    <h2 style="margin:0;font:600 30px/1 Archivo,sans-serif;letter-spacing:-.01em;color:#0e1c3d">Palette</h2>
+  </div>
+  <p style="margin:0 0 26px;max-width:74ch;font:400 14px/1.7 Archivo,sans-serif;color:#605d5d">Navy is the structural colour: headers, hero grounds, rules, table heads. Warm red is the signal — one primary action per view, kickers, the active tab marker. The tints exist for fills and quiet chrome, never for text.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:#d7d3d3;border:1px solid #d7d3d3">
+    <sc-for list="{{ colors }}" as="c" hint-placeholder-count="10">
+      <div style="background:#fff;display:flex;flex-direction:column">
+        <div style="height:82px;background:{{ c.hex }};border-bottom:1px solid #eae7e7"></div>
+        <div style="padding:14px 15px 16px;display:flex;flex-direction:column;gap:6px">
+          <span style="font:600 13px/1.3 Archivo,sans-serif;color:#0e1c3d">{{ c.name }}</span>
+          <span style="font:400 12px/1 ui-monospace,Menlo,monospace;color:#7d7979;text-transform:uppercase">{{ c.hex }}</span>
+          <span style="font:400 12px/1.5 Archivo,sans-serif;color:#605d5d">{{ c.use }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="margin-top:24px;border-left:3px solid #dd2b0f;padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:6px">
+    <span style="font:600 12px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#dd2b0f">Rule</span>
+    <p style="margin:0;max-width:72ch;font:400 13.5px/1.7 Archivo,sans-serif;color:#3a3838">Red never fills a large area except one poster-scale statement per page. Body copy is never set in red or in a tint — use ink #201e1d, #3a3838 or #605d5d.</p>
+  </div>
+</section>
+
+<section style="padding:30px 0 24px;border-bottom:2px solid #0e1c3d">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px">
+    <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#dd2b0f">02</span>
+    <h2 style="margin:0;font:600 30px/1 Archivo,sans-serif;letter-spacing:-.01em;color:#0e1c3d">Type scale</h2>
+  </div>
+  <p style="margin:0 0 26px;max-width:74ch;font:400 14px/1.7 Archivo,sans-serif;color:#605d5d">One family, four weights: 400 for prose, 500 for labels and interface text, 600 for headings, 700 only for the wordmark. Display sizes take a slight negative tracking; small uppercase labels take wide positive tracking. Figures in tables, scores and stats set tabular.</p>
+  <div style="display:flex;flex-direction:column;border-top:1px solid #d7d3d3">
+    <sc-for list="{{ typeRows }}" as="t" hint-placeholder-count="7">
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:24px;align-items:baseline;padding:18px 0;border-bottom:1px solid #eae7e7">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 Archivo,sans-serif;color:#0e1c3d">{{ t.role }}</span>
+          <span style="font:400 11.5px/1.4 ui-monospace,Menlo,monospace;color:#7d7979">{{ t.spec }}</span>
+        </div>
+        <div style="font:{{ t.font }};letter-spacing:{{ t.ls }};color:{{ t.fg }};text-transform:{{ t.tt }}">{{ t.sample }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="padding:30px 0 24px;border-bottom:2px solid #0e1c3d">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px">
+    <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#dd2b0f">03</span>
+    <h2 style="margin:0;font:600 30px/1 Archivo,sans-serif;letter-spacing:-.01em;color:#0e1c3d">Layout and rules</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:26px">
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Page gutter</span>
+      <p style="margin:0;font:400 13.5px/1.7 Archivo,sans-serif;color:#605d5d">48px on desktop, 20px on mobile. Every section starts at the same left edge — headings, copy, tables and cards align to it with no indents.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Dividers</span>
+      <p style="margin:0;font:400 13.5px/1.7 Archivo,sans-serif;color:#605d5d">2px navy between major sections and above table heads. 1px #d7d3d3 for structural edges, 1px #eae7e7 between table rows. Never soften a 2px rule into whitespace.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Grids and gaps</span>
+      <p style="margin:0;font:400 13.5px/1.7 Archivo,sans-serif;color:#605d5d">Equal-width cells. Card grids use a 1px gap on a #d7d3d3 background so the gap reads as a rule; free-standing groups use 20 or 26px.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Kicker, heading, copy</span>
+      <p style="margin:0;font:400 13.5px/1.7 Archivo,sans-serif;color:#605d5d">Every page opens with a red uppercase kicker, a 40 to 62px heading, then copy at a 74ch measure. That triad is the signature — keep it on new pages.</p>
+    </div>
+  </div>
+  <div style="margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:#d7d3d3;border:1px solid #d7d3d3">
+    <div style="background:#fff;padding:18px"><div style="height:2px;background:#0e1c3d"></div><span style="display:block;padding-top:11px;font:400 12px/1.4 Archivo,sans-serif;color:#605d5d">2px #0e1c3d — section break</span></div>
+    <div style="background:#fff;padding:18px"><div style="height:1px;background:#d7d3d3"></div><span style="display:block;padding-top:12px;font:400 12px/1.4 Archivo,sans-serif;color:#605d5d">1px #d7d3d3 — structural edge</span></div>
+    <div style="background:#fff;padding:18px"><div style="height:1px;background:#eae7e7"></div><span style="display:block;padding-top:12px;font:400 12px/1.4 Archivo,sans-serif;color:#605d5d">1px #eae7e7 — row rule</span></div>
+    <div style="background:#fff;padding:18px"><div style="height:3px;background:#dd2b0f;width:44px"></div><span style="display:block;padding-top:10px;font:400 12px/1.4 Archivo,sans-serif;color:#605d5d">3px #dd2b0f — active marker</span></div>
+  </div>
+</section>
+
+<section style="padding:30px 0 24px;border-bottom:2px solid #0e1c3d;break-before:page">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:26px">
+    <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#dd2b0f">04</span>
+    <h2 style="margin:0;font:600 30px/1 Archivo,sans-serif;letter-spacing:-.01em;color:#0e1c3d">Components</h2>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:26px">
+    <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Buttons — labels flush left, no radius</span>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <span style="padding:13px 19px;background:#dd2b0f;color:#fff;font:600 12.5px/1 Archivo,sans-serif">Primary action</span>
+        <span style="padding:13px 19px;background:#0e1c3d;color:#fff;font:600 12.5px/1 Archivo,sans-serif">Navy action</span>
+        <span style="padding:13px 19px;border:1px solid #0e1c3d;color:#0e1c3d;font:500 12.5px/1 Archivo,sans-serif">Secondary</span>
+        <span style="padding:13px 19px;border:1px solid #bab6b6;color:#605d5d;font:500 12.5px/1 Archivo,sans-serif">Quiet</span>
+        <span style="padding:13px 19px;border:1px solid #4a5a7a;background:#0e1c3d;color:#fff;font:500 12.5px/1 Archivo,sans-serif">On navy</span>
+      </div>
+      <p style="margin:0;max-width:74ch;font:400 13px/1.7 Archivo,sans-serif;color:#605d5d">One red button per view. A wide button keeps its label at the left padding edge.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Tags and status</span>
+      <div style="display:flex;flex-wrap:wrap;gap:9px">
+        <span style="padding:5px 10px;font:600 10px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;background:#dd2b0f;color:#fff">Live</span>
+        <span style="padding:5px 10px;font:600 10px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;background:#ffe0d9;color:#ae1800">Question paper</span>
+        <span style="padding:5px 10px;font:600 10px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;background:#e4eaf4;color:#1b3a6b">Workshop</span>
+        <span style="padding:5px 10px;font:600 10px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;background:#eae7e7;color:#444141">Past</span>
+        <span style="padding:5px 10px;font:500 10px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;border:1px solid #bab6b6;color:#605d5d">Outline</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px">
+      <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+        <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Card</span>
+        <div style="border:1px solid #d7d3d3;background:#fff;display:flex;flex-direction:column">
+          <div style="height:120px;background:#1b3a6b;display:grid;place-items:center;filter:grayscale(1)"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#a8b6cc">Photograph</span></div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:9px">
+            <span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#dd2b0f">Kicker</span>
+            <h3 style="margin:0;font:600 17px/1.3 Archivo,sans-serif;color:#0e1c3d">Card title sits at 17px</h3>
+            <p style="margin:0;font:400 13px/1.65 Archivo,sans-serif;color:#605d5d">Body copy at 13px with generous leading. Cards are surface-filled, bordered, never shadowed.</p>
+            <div style="border-top:1px solid #eae7e7;padding-top:11px;display:flex;justify-content:space-between"><span style="font:400 11.5px/1 Archivo,sans-serif;color:#605d5d">Meta line</span><span style="font:600 11.5px/1 Archivo,sans-serif;color:#dd2b0f">Action</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+        <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Fields</span>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:7px"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Label</span><div style="border:1px solid #bab6b6;padding:12px 13px;font:400 13.5px/1 Archivo,sans-serif;color:#9b9797">Placeholder text</div></div>
+          <div style="display:flex;flex-direction:column;gap:7px"><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Dropdown</span><div style="border:1px solid #bab6b6;padding:12px 13px;display:flex;justify-content:space-between"><span style="font:400 13.5px/1 Archivo,sans-serif;color:#0e1c3d">Selected value</span><span style="font:400 10px/1 Archivo,sans-serif;color:#9b9797">▾</span></div></div>
+          <div style="display:flex;gap:18px">
+            <label style="display:flex;align-items:center;gap:9px;font:400 13px/1 Archivo,sans-serif;color:#201e1d"><span style="width:14px;height:14px;border:1px solid #0e1c3d;background:#0e1c3d"></span>Checked</label>
+            <label style="display:flex;align-items:center;gap:9px;font:400 13px/1 Archivo,sans-serif;color:#201e1d"><span style="width:14px;height:14px;border:1px solid #bab6b6"></span>Unchecked</label>
+            <label style="display:flex;align-items:center;gap:9px;font:400 13px/1 Archivo,sans-serif;color:#201e1d"><span style="width:13px;height:13px;border:4px solid #0e1c3d;border-radius:50%"></span>Radio</label>
+          </div>
+          <div style="display:flex;align-items:stretch;border:2px solid #0e1c3d">
+            <span style="padding:0 13px;display:grid;place-items:center;font:400 12.5px/1 Archivo,sans-serif;color:#7d7979">Search</span>
+            <span style="flex:1;padding:13px 0;font:400 13.5px/1 Archivo,sans-serif;color:#9b9797">Search field carries a 2px navy border</span>
+            <span style="padding:0 18px;display:grid;place-items:center;background:#0e1c3d;color:#fff;font:600 12px/1 Archivo,sans-serif">Go</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Table</span>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid #0e1c3d">
+          <th style="text-align:left;padding:11px 12px 11px 0;font:600 10.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Column</th>
+          <th style="text-align:left;padding:11px 12px;font:600 10.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Linked value</th>
+          <th style="text-align:left;padding:11px 12px;font:600 10.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Secondary</th>
+          <th style="text-align:left;padding:11px 0 11px 12px;font:600 10.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Figure</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #eae7e7">
+            <td style="padding:13px 12px 13px 0"><span style="display:inline-block;min-width:26px;padding:4px 7px;text-align:center;font:600 12.5px/1 Archivo,sans-serif;background:#dd2b0f;color:#fff;font-variant-numeric:tabular-nums">1</span></td>
+            <td style="padding:13px 12px"><a href="#" style="font:500 14px/1 Archivo,sans-serif;color:#1b3a6b;text-decoration:none;border-bottom:1px solid #c3cfe3">Hyperlinked name</a></td>
+            <td style="padding:13px 12px;font:400 13px/1 Archivo,sans-serif;color:#605d5d">Supporting detail</td>
+            <td style="padding:13px 0 13px 12px;font:600 13.5px/1 Archivo,sans-serif;color:#0e1c3d;font-variant-numeric:tabular-nums">980</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eae7e7">
+            <td style="padding:13px 12px 13px 0"><span style="display:inline-block;min-width:26px;padding:4px 7px;text-align:center;font:600 12.5px/1 Archivo,sans-serif;background:#e4eaf4;color:#0e1c3d;font-variant-numeric:tabular-nums">2</span></td>
+            <td style="padding:13px 12px"><a href="#" style="font:500 14px/1 Archivo,sans-serif;color:#1b3a6b;text-decoration:none;border-bottom:1px solid #c3cfe3">Hyperlinked name</a></td>
+            <td style="padding:13px 12px;font:400 13px/1 Archivo,sans-serif;color:#605d5d">Supporting detail</td>
+            <td style="padding:13px 0 13px 12px;font:600 13.5px/1 Archivo,sans-serif;color:#0e1c3d;font-variant-numeric:tabular-nums">955</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eae7e7">
+            <td style="padding:13px 12px 13px 0"><span style="display:inline-block;min-width:26px;padding:4px 7px;text-align:center;font:600 12.5px/1 Archivo,sans-serif;color:#0e1c3d;font-variant-numeric:tabular-nums">3</span></td>
+            <td style="padding:13px 12px"><a href="#" style="font:500 14px/1 Archivo,sans-serif;color:#1b3a6b;text-decoration:none;border-bottom:1px solid #c3cfe3">Hyperlinked name</a></td>
+            <td style="padding:13px 12px;font:400 13px/1 Archivo,sans-serif;color:#605d5d">Supporting detail</td>
+            <td style="padding:13px 0 13px 12px;font:600 13.5px/1 Archivo,sans-serif;color:#0e1c3d;font-variant-numeric:tabular-nums">940</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px">
+      <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+        <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Tabs and filters</span>
+        <div style="display:flex;gap:24px;border-bottom:2px solid #0e1c3d">
+          <span style="padding:14px 0;font:600 12.5px/1 Archivo,sans-serif;color:#0e1c3d;box-shadow:inset 0 -3px 0 #dd2b0f">Active</span>
+          <span style="padding:14px 0;font:500 12.5px/1 Archivo,sans-serif;color:#605d5d">Inactive</span>
+          <span style="padding:14px 0;font:500 12.5px/1 Archivo,sans-serif;color:#605d5d">Inactive</span>
+        </div>
+        <div style="display:flex;gap:9px;padding-top:6px">
+          <span style="padding:9px 14px;font:600 12px/1 Archivo,sans-serif;background:#0e1c3d;color:#fff">Selected</span>
+          <span style="padding:9px 14px;font:500 12px/1 Archivo,sans-serif;border:1px solid #d7d3d3;color:#605d5d">Filter</span>
+          <span style="padding:9px 14px;font:500 12px/1 Archivo,sans-serif;border:1px solid #d7d3d3;color:#605d5d">Filter</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+        <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Statistic and notice</span>
+        <div style="display:flex;gap:30px;background:#0e1c3d;padding:20px 22px">
+          <div style="display:flex;flex-direction:column;gap:7px"><span style="font:600 28px/1 Archivo,sans-serif;color:#fff;font-variant-numeric:tabular-nums">412</span><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8c9ab5">Students</span></div>
+          <div style="display:flex;flex-direction:column;gap:7px"><span style="font:600 28px/1 Archivo,sans-serif;color:#fff;font-variant-numeric:tabular-nums">24</span><span style="font:500 10px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8c9ab5">Faculty</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;background:#ffe0d9;border-bottom:2px solid #0e1c3d;padding:13px 16px">
+          <span style="padding:5px 9px;background:#dd2b0f;color:#fff;font:600 10px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase">Notice</span>
+          <span style="font:400 13px/1.4 Archivo,sans-serif;color:#3b1a12">Announcement strip runs full width under the header.</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:13px;break-inside:avoid">
+      <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Imagery placeholders</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+        <div style="height:120px;background:#1b3a6b;display:grid;place-items:center;filter:grayscale(1)"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#a8b6cc">Photograph — dark</span></div>
+        <div style="height:120px;background:#e4eaf4;border:1px solid #c3cfe3;display:grid;place-items:center;filter:grayscale(1)"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#7d8ba6">Portrait — light</span></div>
+        <div style="height:120px;border:2px dashed #bcc7dc;background:#f7f9fc;display:grid;place-items:center"><span style="font:500 9.5px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#7d8ba6">Empty or upload slot</span></div>
+      </div>
+      <p style="margin:0;max-width:74ch;font:400 13px/1.7 Archivo,sans-serif;color:#605d5d">All photography prints black and white. Real images go in with the same box dimensions and a grayscale filter — no tinting, no rounded corners, no overlay gradients.</p>
+    </div>
+  </div>
+</section>
+
+<section style="padding:30px 0 24px;border-bottom:2px solid #0e1c3d">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px">
+    <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#dd2b0f">05</span>
+    <h2 style="margin:0;font:600 30px/1 Archivo,sans-serif;letter-spacing:-.01em;color:#0e1c3d">Voice</h2>
+  </div>
+  <p style="margin:0 0 22px;max-width:74ch;font:400 14px/1.7 Archivo,sans-serif;color:#605d5d">Plain, specific, unexcited. Sentence case for headings and buttons. No emoji. Dates read 21 Aug 2026; times read 24-hour.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:#d7d3d3;border:1px solid #d7d3d3">
+    <div style="background:#fff;padding:18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#0e1c3d">Write this</span><span style="font:400 13.5px/1.6 Archivo,sans-serif;color:#3a3838">Registration closes 12 Sep. Forty seats.</span></div>
+    <div style="background:#fff;padding:18px;display:flex;flex-direction:column;gap:8px"><span style="font:600 10.5px/1 Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#dd2b0f">Not this</span><span style="font:400 13.5px/1.6 Archivo,sans-serif;color:#7d7979">Don't miss out — grab your spot in our amazing workshop today!</span></div>
+  </div>
+</section>
+
+<section style="padding:30px 0 0;break-before:page">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px">
+    <span style="font:600 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#dd2b0f">06</span>
+    <h2 style="margin:0;font:600 30px/1 Archivo,sans-serif;letter-spacing:-.01em;color:#0e1c3d">Tokens to copy</h2>
+  </div>
+  <p style="margin:0 0 22px;max-width:74ch;font:400 14px/1.7 Archivo,sans-serif;color:#605d5d">Paste this block into any new page and reference the variables instead of retyping hexes.</p>
+  <pre style="margin:0;overflow-x:auto;background:#0b1730;color:#c8d4e8;padding:24px;font:400 11px/1.7 ui-monospace,Menlo,monospace;column-count:2;column-gap:28px;break-inside:auto">{{ tokens }}</pre>
+</section>
+
+</doc-page>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  renderVals() {
+    const colors = [
+      { name: "Navy", hex: "#0e1c3d", use: "Headers, hero grounds, 2px rules, table heads" },
+      { name: "Navy deep", hex: "#0b1730", use: "Canvas behind the hero animation, code blocks" },
+      { name: "Blue mid", hex: "#1b3a6b", use: "Links, subheadings, secondary emphasis" },
+      { name: "Warm red", hex: "#dd2b0f", use: "Primary action, kickers, active marker" },
+      { name: "Red deep", hex: "#ae1800", use: "Red text on a red tint — never the base red" },
+      { name: "Red tint", hex: "#ffe0d9", use: "Notice strips, question-paper tags" },
+      { name: "Blue tint", hex: "#e4eaf4", use: "Portrait grounds, second-place chips, tags" },
+      { name: "Blue on navy", hex: "#b6c2d8", use: "Body copy on navy grounds" },
+      { name: "Slate on navy", hex: "#8c9ab5", use: "Labels and meta on navy grounds" },
+      { name: "Ink", hex: "#201e1d", use: "Default body text" },
+      { name: "Ink soft", hex: "#605d5d", use: "Secondary copy, table cells" },
+      { name: "Ink faint", hex: "#9b9797", use: "Placeholders and disabled text only — too light for copy" },
+      { name: "Edge", hex: "#d7d3d3", use: "1px structural borders and grid gaps" },
+      { name: "Row rule", hex: "#eae7e7", use: "1px table and list separators" },
+      { name: "Ground", hex: "#f3f2f2", use: "Page background behind white surfaces" }
+    ]
+    const T = (role, spec, font, sample, opts) => Object.assign({ role, spec, font, sample, ls: "normal", fg: "#0e1c3d", tt: "none" }, opts || {})
+    const typeRows = [
+      T("Wordmark", "700 · 13px · .14em", "700 13px/1 Archivo,sans-serif", "AI & DS", { ls: ".14em" }),
+      T("Display", "600 · 62px · -.02em", "600 62px/1.02 Archivo,sans-serif", "Artificial Intelligence", { ls: "-.02em" }),
+      T("Page heading", "600 · 42px · -.02em", "600 42px/1 Archivo,sans-serif", "Question bank", { ls: "-.02em" }),
+      T("Section heading", "600 · 24px", "600 24px/1 Archivo,sans-serif", "Upcoming events"),
+      T("Card title", "600 · 17px", "600 17px/1.3 Archivo,sans-serif", "Workshop on graph neural networks"),
+      T("Body", "400 · 14.5px / 1.7", "400 14.5px/1.7 Archivo,sans-serif", "Running copy sits at fourteen and a half over generous leading, measured at about seventy-four characters.", { fg: "#3a3838" }),
+      T("Interface label", "500 · 12.5px", "500 12.5px/1 Archivo,sans-serif", "Sign in", { fg: "#605d5d" }),
+      T("Kicker", "500 · 10.5px · .2em · caps", "500 10.5px/1 Archivo,sans-serif", "Third year · Roll 21AD042", { ls: ".2em", fg: "#dd2b0f", tt: "uppercase" }),
+      T("Table head", "600 · 10.5px · .16em · caps", "600 10.5px/1 Archivo,sans-serif", "Rank", { ls: ".16em", tt: "uppercase" }),
+      T("Figure", "600 · 28px · tabular", "600 28px/1 Archivo,sans-serif", "412")
+    ]
+    const tokens = [
+      ":root {",
+      "  /* structure */",
+      "  --navy: #0e1c3d;",
+      "  --navy-deep: #0b1730;",
+      "  --blue: #1b3a6b;",
+      "  --blue-tint: #e4eaf4;",
+      "  --on-navy: #b6c2d8;",
+      "  --on-navy-muted: #8c9ab5;",
+      "",
+      "  /* signal */",
+      "  --red: #dd2b0f;",
+      "  --red-deep: #ae1800;",
+      "  --red-tint: #ffe0d9;",
+      "",
+      "  /* ink and edges */",
+      "  --ink: #201e1d;",
+      "  --ink-soft: #605d5d;",
+      "  --ink-faint: #9b9797;",
+      "  --edge: #d7d3d3;",
+      "  --row: #eae7e7;",
+      "  --ground: #f3f2f2;",
+      "",
+      "  /* type */",
+      "  --font: Archivo, system-ui, sans-serif;",
+      "  --track-display: -.02em;",
+      "  --track-kicker: .2em;",
+      "  --track-label: .16em;",
+      "",
+      "  /* geometry */",
+      "  --radius: 0;",
+      "  --gutter: 48px;",
+      "  --gutter-mobile: 20px;",
+      "  --rule-strong: 2px solid var(--navy);",
+      "  --rule-edge: 1px solid var(--edge);",
+      "  --rule-row: 1px solid var(--row);",
+      "}"
+    ].join("\n")
+    return { colors, typeRows, tokens }
+  }
+}
+</script>
+</body>
+</html>

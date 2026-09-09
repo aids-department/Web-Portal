@@ -169,7 +169,7 @@ export default function BrickBreakerGame() {
           ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
           ctx.font = 'bold 18px Arial';
           ctx.textAlign = 'center';
-          ctx.fillText('🎮 Click to Launch!', canvas.width / 2, canvas.height / 2);
+          ctx.fillText('Click to launch', canvas.width / 2, canvas.height / 2);
         }
       } else {
         // Draw waiting screen with game elements
@@ -228,61 +228,61 @@ export default function BrickBreakerGame() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 rounded-lg shadow border border-blue-200 max-w-sm mx-auto">
+    <div className="bg-white p-4 border border-ds-edge max-w-sm mx-auto">
       {!isMobile && (
-        <div className="text-center mb-2">
-          <h4 className="text-base font-bold text-gray-800 mb-1">🧱 Mini Game</h4>
-          <div className="flex justify-center items-center gap-2 text-xs">
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">Score: {score}</span>
-            <span className="text-gray-600">Use ← → arrows</span>
+        <div className="text-center mb-3">
+          <h4 className="text-card-title text-navy mb-1.5">Mini game</h4>
+          <div className="flex justify-center items-center gap-2 text-label">
+            <span className="bg-ds-blue-tint text-ds-blue px-2 py-1 font-medium tabular-nums">Score: {score}</span>
+            <span className="text-ds-ink-faint">Use ← → arrows</span>
           </div>
         </div>
       )}
-      
+
       {isMobile ? (
         <div className="text-center py-6">
-          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3">
-            <p className="text-gray-600 text-sm mb-1">📱 Game not available on mobile</p>
-            <p className="text-gray-500 text-xs">Please use a desktop to play</p>
+          <div className="bg-ds-ground border border-ds-edge p-3">
+            <p className="text-body text-ds-ink-soft mb-1">Game not available on mobile</p>
+            <p className="text-label text-ds-ink-faint">Please use a desktop to play</p>
           </div>
         </div>
       ) : (
         <>
-          <canvas 
+          <canvas
             ref={canvasRef}
             width={350}
             height={250}
-            className="border-2 border-white rounded-lg bg-gradient-to-b from-slate-50 to-slate-100 mx-auto block cursor-pointer shadow-inner"
+            className="border border-ds-edge bg-ds-ground mx-auto block cursor-pointer"
           />
-          
-          <div className="text-center mt-2">
+
+          <div className="text-center mt-3">
             {gameState === 'start' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-1">
-                <p className="text-green-800 font-medium text-xs">🚀 Click to Play!</p>
+              <div className="border-t-2 border-ds-red bg-ds-red-tint p-2">
+                <p className="text-label font-medium text-ds-red-deep">Click to play</p>
               </div>
             )}
-            
+
             {gameState === 'playing' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-1">
-                <p className="text-blue-800 text-xs font-medium">🎯 Destroy all bricks!</p>
+              <div className="border-t-2 border-navy bg-ds-blue-tint p-2">
+                <p className="text-label font-medium text-ds-blue">Destroy all bricks</p>
               </div>
             )}
-            
+
             {gameState === 'gameOver' && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-1">
-                <p className="text-red-800 font-bold text-xs mb-1">💥 Game Over!</p>
-                <p className="text-red-600 text-xs mb-1">Score: {score}</p>
-                <p className="text-gray-700 italic text-xs mb-1">"Can't you even win this simple game? 🙄"</p>
-                <p className="text-gray-600 text-xs">Click to retry</p>
+              <div className="border-t-2 border-ds-red bg-ds-red-tint p-2">
+                <p className="text-label font-semibold text-ds-red-deep mb-1">Game over</p>
+                <p className="text-label text-ds-red-deep mb-1 tabular-nums">Score: {score}</p>
+                <p className="text-label text-ds-ink-soft italic mb-1">"Can't you even win this simple game?"</p>
+                <p className="text-label text-ds-ink-faint">Click to retry</p>
               </div>
             )}
-            
+
             {gameState === 'won' && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1">
-                <p className="text-yellow-800 font-bold text-xs mb-1">🎉 You Won!</p>
-                <p className="text-yellow-700 text-xs mb-1">Score: {score}</p>
-                <p className="text-gray-700 italic text-xs mb-1">"Only if you had the same focus on your subjects! 😏"</p>
-                <p className="text-gray-600 text-xs">Click to play again</p>
+              <div className="border-t-2 border-navy bg-ds-blue-tint p-2">
+                <p className="text-label font-semibold text-navy mb-1">You won</p>
+                <p className="text-label text-ds-blue mb-1 tabular-nums">Score: {score}</p>
+                <p className="text-label text-ds-ink-soft italic mb-1">"Only if you had the same focus on your subjects!"</p>
+                <p className="text-label text-ds-ink-faint">Click to play again</p>
               </div>
             )}
           </div>
