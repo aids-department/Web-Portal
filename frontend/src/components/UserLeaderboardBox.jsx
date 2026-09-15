@@ -12,12 +12,17 @@ const formatRows = (rows) => {
   }));
 };
 
+const rankStyle = (rank) => ({
+  bg: rank === 1 ? "#dd2b0f" : rank <= 3 ? "#e4eaf4" : "transparent",
+  fg: rank === 1 ? "#ffffff" : "#0e1c3d",
+});
+
 // --- Enigma Leaderboard Component ---
 const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
   const [firstYearData, setFirstYearData] = useState([]);
   const [nonFirstYearData, setNonFirstYearData] = useState([]);
   const [codenigmaData, setCodenigmaData] = useState([]);
-  const [participationCount, setParticipationCount] = useState(0); // Fixed: Moved inside component
+  const [participationCount, setParticipationCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -37,7 +42,6 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
           "https://web-portal-760h.onrender.com/api/leaderboard/Codenigma"
       )).json();
 
-      // Fixed: Removed extra closing parenthesis
       const stats = await (await fetch(
           "https://web-portal-760h.onrender.com/api/stats"
       )).json();
@@ -67,55 +71,57 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
     "Priya Dharshini D (II Year)",
   ];
 
-  if (loading)
-    return <p className="text-center text-gray-500 font-medium">Loading leaderboard…</p>;
+  if (loading) {
+    return (
+      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
+        <p className="text-brand-ink-soft italic text-[13.5px]">Loading leaderboard…</p>
+      </div>
+    );
+  }
 
   return (
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* TABLE */}
-        <div className="flex-1">
-          {/* Sub Tabs */}
-          <div className="flex gap-3 mb-6">
-            {["first_years", "non_first_years"].map((tab) => (
-                <button
-                    key={tab}
-                    onClick={() => setActiveSubTab(tab)}
-                    className={`px-6 py-2.5 rounded-xl font-semibold transition ${
-                        activeSubTab === tab
-                            ? "bg-white shadow text-blue-700"
-                            : "text-gray-600 hover:text-gray-800"
-                    }`}
-                >
-                  {tab === "first_years" ? "First Years" : "Non First Years"}
-                </button>
-            ))}
-          </div>
+    <div className="font-brand px-5 sm:px-8 lg:px-12 py-6 sm:py-7 lg:py-8 flex flex-col gap-6">
+      <div className="flex gap-2 flex-wrap">
+        {["first_years", "non_first_years"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveSubTab(tab)}
+            className={`px-3.5 py-2 text-[12px] font-semibold ${
+              activeSubTab === tab ? "bg-brand-navy text-white" : "border border-brand-edge text-brand-ink-soft"
+            }`}
+          >
+            {tab === "first_years" ? "First Years" : "Non First Years"}
+          </button>
+        ))}
+      </div>
 
-          <div className="overflow-x-auto bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40">
-            <table className="w-full text-sm">
-              <thead>
-              <tr className="bg-gray-100/60">
-                {["Rank", "Name", "Year", "Score", "Time"].map((h) => (
-                    <th
-                        key={h}
-                        className={`p-4 text-left font-bold text-gray-800 ${
-                            h === "Time" ? "hidden sm:table-cell" : ""
-                        }`}
-                    >
-                      {h}
-                    </th>
-                ))}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(230px,1fr)] gap-6 items-start">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] border-collapse">
+            <thead>
+              <tr className="border-b border-brand-edge">
+                <th className="w-[70px] text-left py-2.5 pr-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Rank</th>
+                <th className="text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Name</th>
+                <th className="w-[100px] text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Year</th>
+                <th className="w-[100px] text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Score</th>
+                <th className="w-[100px] text-left py-2.5 pl-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft hidden sm:table-cell">Time</th>
               </tr>
-              </thead>
-              <tbody>
-              {currentLeaderboard.map((row) => (
-                  <tr
-                      key={row.roll}
-                      className="border-t border-gray-200/60 hover:bg-gray-50/60 transition"
-                  >
-                    <td className="p-4 font-medium text-gray-700">{row.rank}</td>
-                    <td
-                        className="p-4 font-medium text-blue-700 cursor-pointer hover:underline"
+            </thead>
+            <tbody>
+              {currentLeaderboard.map((row) => {
+                const rs = rankStyle(row.rank);
+                return (
+                  <tr key={row.roll} className="border-b border-brand-row">
+                    <td className="py-3.5 pr-3">
+                      <span
+                        className="inline-block min-w-[26px] px-1.5 py-1 text-center text-[12.5px] font-semibold tabular-nums"
+                        style={{ background: rs.bg, color: rs.fg }}
+                      >
+                        {row.rank}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3">
+                      <button
                         onClick={() => {
                           if (row.roll && /^[a-fA-F0-9]{24}$/.test(row.roll)) {
                             navigate(`/profile/${row.roll}`);
@@ -123,58 +129,55 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
                             toast.error("Profile not available");
                           }
                         }}
-                    >
-                      {row.name}
+                        className="text-[14px] font-medium text-brand-blue border-b border-[#c3cfe3]"
+                      >
+                        {row.name}
+                      </button>
                     </td>
-                    <td className="p-4 text-gray-600">{row.yearDisplay}</td>
-                    <td className="p-4 font-medium text-gray-700">{row.score}</td>
-                    <td className="p-4 text-gray-600 hidden sm:table-cell">
+                    <td className="py-3.5 px-3 text-[13px] text-brand-ink-soft">{row.yearDisplay}</td>
+                    <td className="py-3.5 px-3 text-[13.5px] font-semibold text-brand-navy tabular-nums">{row.score}</td>
+                    <td className="py-3.5 pl-3 text-[13px] text-brand-ink-soft tabular-nums hidden sm:table-cell">
                       {row.timeDisplay}
                     </td>
                   </tr>
-              ))}
-              </tbody>
-            </table>
-          </div>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
-        {/* SIDEBAR */}
-        <div className="w-full lg:w-80 space-y-6">
-          {/* PARTICIPATION COUNT BOX */}
+        <aside className="flex flex-col gap-5">
+          <div className="bg-brand-navy px-[18px] py-4 flex flex-col gap-1.5">
+            <span className="text-[26px] leading-none font-semibold text-white tabular-nums">
+              {participationCount}
+            </span>
+            <span className="text-[10px] leading-none tracking-[0.14em] uppercase text-brand-on-navy-muted">
+              Participants
+            </span>
+          </div>
 
-
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Codenigma Winners
-            </h3>
-            <ol className="list-decimal list-inside space-y-1 text-gray-700">
+          <div className="border border-brand-edge p-[18px] flex flex-col gap-2.5">
+            <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
+              Codenigma winners
+            </span>
+            <ol className="m-0 pl-4 flex flex-col gap-1 text-[13px] text-[#3a3838]">
               {codenigmaWinners.map((winner, index) => (
-                  <li key={index}>{winner}</li>
+                <li key={index}>{winner}</li>
               ))}
             </ol>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3">
-              Organizers
-            </h3>
+          <div className="border border-brand-edge p-[18px] flex flex-col gap-2">
+            <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
+              Organisers
+            </span>
             {organizers.map((org, i) => (
-                <p key={i} className="text-gray-700">
-                  {org}
-                </p>
+              <p key={i} className="m-0 text-[13px] text-[#3a3838]">{org}</p>
             ))}
           </div>
-
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1">
-              Total Participants
-            </h3>
-            <p className="text-4xl font-bold text-gray-900">
-              {participationCount}
-            </p>
-          </div>
-        </div>
+        </aside>
       </div>
+    </div>
   );
 };
 
@@ -190,68 +193,81 @@ const GenesisLeaderboard = () => {
 
   const organizers = ["Anto Nickson J (IV Year)", "Kuhan M (IV Year)"];
 
+  const podiumRule = { 1: "#dd2b0f", 2: "#1b3a6b", 3: "#605d5d" };
+
   return (
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-1 overflow-x-auto bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40">
-          <table className="w-full text-sm">
+    <div className="font-brand px-5 sm:px-8 lg:px-12 py-6 sm:py-7 lg:py-8 flex flex-col gap-7">
+      {/* Podium */}
+      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+        {leaderboardData.map((p) => (
+          <div
+            key={p.rank}
+            className="border border-brand-edge p-[22px] flex flex-col gap-2.5"
+            style={{ borderTop: `4px solid ${podiumRule[p.rank]}` }}
+          >
+            <span className="text-[32px] font-semibold tabular-nums" style={{ color: podiumRule[p.rank] }}>
+              {p.rank}
+            </span>
+            <h3 className="m-0 text-[17px] font-semibold leading-[1.25] text-brand-navy">{p.projectName}</h3>
+            <span className="text-[12.5px] font-medium text-brand-blue">{p.team}</span>
+            <span className="text-[12.5px] text-brand-ink-soft">Led by {p.lead}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Full table */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(230px,1fr)] gap-6 items-start">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] border-collapse">
             <thead>
-            <tr className="bg-gray-100/60">
-              {["Rank", "Project", "Year", "Team", "Team Lead"].map((h) => (
-                  <th
-                      key={h}
-                      className={`p-4 text-left font-bold text-gray-800 ${
-                          h === "Team" ? "hidden sm:table-cell" : ""
-                      }`}
-                  >
-                    {h}
-                  </th>
-              ))}
-            </tr>
+              <tr className="border-b-2 border-brand-navy">
+                <th className="w-[70px] text-left py-2.5 pr-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Rank</th>
+                <th className="text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Project</th>
+                <th className="text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy hidden sm:table-cell">Team</th>
+                <th className="w-[90px] text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Year</th>
+                <th className="text-left py-2.5 pl-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Team lead</th>
+              </tr>
             </thead>
             <tbody>
-            {leaderboardData.map((row) => (
-                <tr
-                    key={row.rank}
-                    className="border-t border-gray-200/60 hover:bg-gray-50/60 transition"
-                >
-                  <td className="p-4">{row.rank}</td>
-                  <td className="p-4">{row.projectName}</td>
-                  <td className="p-4">{row.year}</td>
-                  <td className="p-4 hidden sm:table-cell">{row.team}</td>
+              {leaderboardData.map((row) => (
+                <tr key={row.rank} className="border-b border-brand-row">
+                  <td className="py-3.5 pr-3 text-[13px] font-semibold text-brand-navy tabular-nums">{row.rank}</td>
+                  <td className="py-3.5 px-3 text-[14px] font-medium text-brand-navy">{row.projectName}</td>
+                  <td className="py-3.5 px-3 text-[13.5px] text-brand-blue hidden sm:table-cell">{row.team}</td>
+                  <td className="py-3.5 px-3 text-[13px] text-brand-ink-soft">{row.year}</td>
                   <td
-                      className="p-4 relative cursor-pointer font-medium"
-                      onMouseEnter={() => setHoveredLead(row)}
-                      onMouseLeave={() => setHoveredLead(null)}
+                    className="py-3.5 pl-3 relative text-[13.5px] font-medium text-brand-navy cursor-pointer"
+                    onMouseEnter={() => setHoveredLead(row)}
+                    onMouseLeave={() => setHoveredLead(null)}
                   >
                     {row.lead}
                     {hoveredLead?.rank === row.rank && (
-                        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 z-10 w-48 text-sm">
-                          <p className="font-semibold mb-1">Team Members</p>
-                          {row.members.map((m, i) => (
-                              <p key={i}>{m}</p>
-                          ))}
-                        </div>
+                      <div className="absolute top-full left-0 mt-1 bg-white border border-brand-edge shadow-lg p-3 z-10 w-52">
+                        <p className="m-0 mb-1 text-[11px] font-semibold tracking-[0.1em] uppercase text-brand-ink-soft">
+                          Team members
+                        </p>
+                        {row.members.map((m, i) => (
+                          <p key={i} className="m-0 text-[13px] text-[#3a3838]">{m}</p>
+                        ))}
+                      </div>
                     )}
                   </td>
                 </tr>
-            ))}
+              ))}
             </tbody>
           </table>
         </div>
 
-        <div className="w-full lg:w-80">
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3">
-              Organizers
-            </h3>
-            {organizers.map((org, i) => (
-                <p key={i} className="text-gray-700">
-                  {org}
-                </p>
-            ))}
-          </div>
-        </div>
+        <aside className="border border-brand-edge p-[18px] flex flex-col gap-2">
+          <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
+            Organisers
+          </span>
+          {organizers.map((org, i) => (
+            <p key={i} className="m-0 text-[13px] text-[#3a3838]">{org}</p>
+          ))}
+        </aside>
       </div>
+    </div>
   );
 };
 

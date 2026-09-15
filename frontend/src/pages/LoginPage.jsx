@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, UserCircle } from 'lucide-react';
-import Navbar from '../components/Navbar';
+import HeroCanvas from '../components/HeroCanvas';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ const LoginPage = () => {
 
       if (response.ok) {
         // Store user data in localStorage
-        localStorage.setItem('token', data.token); 
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         navigate('/posts');
       } else {
@@ -59,88 +58,93 @@ const LoginPage = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 pt-20">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-        
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gray-900 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <UserCircle className="text-white" size={48} />
+    <div className="font-brand bg-brand-ground px-5 sm:px-8 lg:px-11 py-8 sm:py-9 lg:py-11">
+      <div className="max-w-[940px] mx-auto border border-brand-edge grid grid-cols-1 md:grid-cols-2">
+        {/* Info panel */}
+        <div className="relative bg-brand-navy-deep p-8 flex flex-col justify-between gap-10 min-h-[300px] md:min-h-[420px] overflow-hidden">
+          <div className="relative z-10 flex items-center gap-2.5">
+            <div className="w-6 h-6 bg-white grid place-items-center">
+              <div className="w-2 h-2 bg-brand-red" />
+            </div>
+            <span className="font-bold text-[12.5px] tracking-[0.14em] text-white">AI &amp; DS</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Login to AI & DS Association</p>
+          <div className="absolute inset-0 opacity-80">
+            <HeroCanvas />
+          </div>
+          <div className="relative z-10 flex flex-col gap-3">
+            <h2 className="m-0 text-[28px] leading-[1.15] font-semibold text-white max-w-[16ch]">
+              Members see more of the department
+            </h2>
+            <p className="m-0 max-w-[40ch] text-[13.5px] leading-[1.65] text-brand-on-navy">
+              Posts need an account to keep discussion tied to real members. Everything else stays open to visitors.
+            </p>
+          </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
+        {/* Form panel */}
+        <div className="bg-white p-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h1 className="m-0 text-[30px] font-semibold tracking-[-0.02em] text-brand-navy">Sign in</h1>
+            <span className="text-[13px] text-brand-ink-soft">Login to AI &amp; DS Association</span>
           </div>
-        )}
+          <div className="h-0.5 bg-brand-navy" />
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Username or Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Username or Email
-            </label>
-            <div className="relative">
-              <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          {error && (
+            <div className="bg-brand-red-tint text-brand-red-deep px-3.5 py-3 text-[13px]">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+                Username or email
+              </span>
               <input
                 type="text"
                 name="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                placeholder="Enter username or email"
+                placeholder="you@aids.dept"
+                className="border border-brand-ink-faint px-3 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
               />
             </div>
-          </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+                Password
+              </span>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                placeholder="Enter your password"
+                placeholder="••••••••"
+                className="border border-brand-ink-faint px-3 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
               />
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="text-left px-[18px] py-3.5 bg-brand-red text-white font-semibold text-[13px] disabled:opacity-50"
+            >
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
 
-        {/* Signup Link */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-gray-900 font-semibold hover:underline">
-              Sign up here
+          <div className="mt-auto border-t border-brand-row pt-4 flex justify-between items-center gap-3 flex-wrap">
+            <span className="text-[12.5px] text-brand-ink-soft">New here?</span>
+            <Link
+              to="/signup"
+              className="text-[12.5px] font-semibold text-brand-blue border-b-2 border-brand-red pb-0.5"
+            >
+              Create an account
             </Link>
-          </p>
-        </div>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

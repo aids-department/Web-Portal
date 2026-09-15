@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
+import CommentThread from '../components/CommentThread';
 
 const BASE_URL = 'https://web-portal-760h.onrender.com';
 
@@ -9,31 +11,27 @@ const authHeaders = () => ({
 });
 
 const PostDetailPage = () => {
-  const { postId }   = useParams();   // reads the ID from the URL
-  const navigate     = useNavigate();
-  const currentUser  = JSON.parse(localStorage.getItem('user') || '{}');
+  const { postId } = useParams();
+  const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
-  const [post,    setPost]    = useState(null);
+  const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [error, setError] = useState(null);
   const [commentText, setCommentText] = useState('');
-  const [mode,    setMode]    = useState('Public');
+  const [mode, setMode] = useState('Public');
 
-  // Fetch the post by ID from URL
   const fetchPost = useCallback(async () => {
     try {
-      const res  = await fetch(`${BASE_URL}/api/posts/${postId}`, {
-        headers: { 'Cache-Control': 'no-cache' }
+      const res = await fetch(`${BASE_URL}/api/posts/${postId}`, {
+        headers: { 'Cache-Control': 'no-cache' },
       });
-
       if (!res.ok) {
         setError('Post not found');
         setLoading(false);
         return;
       }
-
       const data = await res.json();
-      // merge post + comments into one object
       setPost({ ...data.post, comments: data.comments });
       setLoading(false);
     } catch (err) {
@@ -47,31 +45,23 @@ const PostDetailPage = () => {
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
-
     await fetch(`${BASE_URL}/api/posts/${postId}/comments`, {
-      method:  'POST',
+      method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({
-        content:     commentText,
-        isAnonymous: mode === 'Anonymous',
-      }),
+      body: JSON.stringify({ content: commentText, isAnonymous: mode === 'Anonymous' }),
     });
-
     setCommentText('');
-    fetchPost(); // refresh
+    fetchPost();
   };
 
   const handleUpvote = async () => {
-    await fetch(`${BASE_URL}/api/posts/${postId}/upvote`, {
-      method:  'POST',
-      headers: authHeaders(),
-    });
+    await fetch(`${BASE_URL}/api/posts/${postId}/upvote`, { method: 'POST', headers: authHeaders() });
     fetchPost();
   };
 
   const handleAddReply = async (commentId, reply) => {
     await fetch(`${BASE_URL}/api/posts/comments/${commentId}/replies`, {
-      method:  'POST',
+      method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify(reply),
     });
@@ -79,33 +69,31 @@ const PostDetailPage = () => {
   };
 
   const handleUpvoteComment = async (commentId) => {
-    await fetch(`${BASE_URL}/api/posts/comments/${commentId}/upvote`, {
-      method:  'POST',
-      headers: authHeaders(),
-    });
+    await fetch(`${BASE_URL}/api/posts/comments/${commentId}/upvote`, { method: 'POST', headers: authHeaders() });
+    fetchPost();
+  };
+
+  // Was missing entirely — replies were previously (incorrectly) upvoted
+  // through the comment endpoint. Fixed to match PostsPage.jsx's inline thread.
+  const handleUpvoteReply = async (replyId) => {
+    await fetch(`${BASE_URL}/api/posts/replies/${replyId}/upvote`, { method: 'POST', headers: authHeaders() });
     fetchPost();
   };
 
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Delete this comment?')) return;
-    await fetch(`${BASE_URL}/api/posts/comments/${commentId}`, {
-      method:  'DELETE',
-      headers: authHeaders(),
-    });
+    await fetch(`${BASE_URL}/api/posts/comments/${commentId}`, { method: 'DELETE', headers: authHeaders() });
     fetchPost();
   };
 
   const handleDeleteReply = async (replyId) => {
     if (!window.confirm('Delete this reply?')) return;
-    await fetch(`${BASE_URL}/api/posts/replies/${replyId}`, {
-      method:  'DELETE',
-      headers: authHeaders(),
-    });
+    await fetch(`${BASE_URL}/api/posts/replies/${replyId}`, { method: 'DELETE', headers: authHeaders() });
     fetchPost();
   };
 
   const handleShare = () => {
-    const url = window.location.href; // this is now the unique post URL
+    const url = window.location.href;
     if (navigator.share) {
       navigator.share({ title: post.title, text: post.content, url });
     } else {
@@ -114,239 +102,130 @@ const PostDetailPage = () => {
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p className="text-gray-500 text-lg">Loading post...</p>
-    </div>
-  );
-
-  if (error) return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-      <p className="text-red-500 text-lg">{error}</p>
-      <button onClick={() => navigate('/posts')} className="px-4 py-2 bg-[#111828] text-white rounded-lg">
-        Back to Posts
-      </button>
-    </div>
-  );
-
-  const displayName = post.isAnonymous ? 'Anonymous' : post.author?.username || 'Unknown';
-  const hasUpvoted  = post.upvotes?.includes(currentUser.id);
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Back bar */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={() => navigate('/posts')}
-          className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
-        >
-          ← Back to Posts
-        </button>
-        <span className="text-gray-300">|</span>
-        <span className="text-xs text-gray-400 truncate">
-          <span className="font-semibold text-[#111828]">Community Posts</span> • {post.title}
-        </span>
-
-        {/* Share button — shares the current URL which is unique per post */}
-        <button
-          onClick={handleShare}
-          className="ml-auto flex items-center gap-2 px-3 py-1.5 bg-[#111828] text-white rounded-lg text-xs font-semibold hover:bg-[#1e2a3a] transition"
-        >
-          Share Post
-        </button>
-      </div>
-
-      <div className="max-w-4xl mx-auto p-4 md:p-8">
-        {/* Post content */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-[#111828] flex items-center justify-center text-white text-xs font-bold">
-              {displayName[0].toUpperCase()}
-            </div>
-            <span className="text-sm font-semibold text-gray-700">{displayName}</span>
-            <span className="text-xs text-gray-400">
-              • {new Date(post.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}
-            </span>
-            {post.isEdited && <span className="text-xs text-gray-400 italic">(edited)</span>}
-          </div>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">{post.title}</h1>
-          <p className="text-gray-700 leading-relaxed mb-4">{post.content}</p>
-
-          {post.images?.length > 0 && (
-            <div className={`grid gap-2 mb-4 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-              {post.images.map((img, i) => (
-                <img key={i} src={img.url} alt="" className="rounded-xl w-full object-cover max-h-96" />
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
-            <button
-              onClick={handleUpvote}
-              className={`flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-lg transition ${hasUpvoted ? 'bg-orange-50 text-orange-500' : 'text-gray-500 hover:bg-gray-100'}`}
-            >
-              ▲ {post.upvotes?.length || 0} Upvotes
-            </button>
-            <span className="text-sm text-gray-400">
-              💬 {post.comments?.length || 0} Comments
-            </span>
-          </div>
-        </div>
-
-        {/* Comment composer */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-4">
-          <p className="text-xs text-gray-500 mb-3 font-medium">
-            Comment as <span className="text-[#111828] font-semibold">{currentUser.username || 'You'}</span>
-          </p>
-          <div className="flex gap-2 mb-3">
-            {['Public', 'Anonymous'].map(m => (
-              <button key={m} onClick={() => setMode(m)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${mode === m ? 'bg-[#111828] text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {m}
-              </button>
-            ))}
-          </div>
-          <form onSubmit={handleAddComment} className="flex gap-2">
-            <input
-              value={commentText}
-              onChange={e => setCommentText(e.target.value)}
-              placeholder="What are your thoughts?"
-              className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm transition"
-            />
-            <button type="submit"
-              className="px-5 py-2.5 bg-[#111828] text-white rounded-xl font-semibold text-sm hover:bg-[#1e2a3a] transition">
-              Comment
-            </button>
-          </form>
-        </div>
-
-        {/* Comments list */}
-        <div className="space-y-3">
-          {post.comments?.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-200 text-center py-12">
-              <p className="text-gray-400 text-sm">No comments yet. Be the first!</p>
-            </div>
-          ) : (
-            post.comments?.map(comment => (
-              <CommentCard
-                key={comment._id}
-                comment={comment}
-                currentUser={currentUser}
-                onAddReply={handleAddReply}
-                onUpvoteComment={handleUpvoteComment}
-                onDeleteComment={handleDeleteComment}
-                onDeleteReply={handleDeleteReply}
-              />
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Comment card — same logic as before
-const CommentCard = ({ comment, currentUser, onAddReply, onUpvoteComment, onDeleteComment, onDeleteReply, depth = 0 }) => {
-  const [showReply, setShowReply] = useState(false);
-  const [replyText, setReplyText] = useState('');
-  const [mode,      setMode]      = useState('Public');
-
-  const displayName = comment.isAnonymous ? 'Anonymous' : comment.author?.username || 'Unknown';
-  const hasUpvoted  = comment.upvotes?.includes(currentUser.id);
-  const isOwner     = !comment.isAnonymous && (
-    comment.author?._id === currentUser.id ||
-    comment.author?.id  === currentUser.id
-  );
-
-  const handleReply = (e) => {
-    e.preventDefault();
-    if (!replyText.trim()) return;
-    onAddReply(comment._id, { content: replyText, isAnonymous: mode === 'Anonymous' });
-    setReplyText('');
-    setShowReply(false);
-  };
-
-  if (comment.content === '[deleted]') {
+  if (loading) {
     return (
-      <div className={depth > 0 ? 'ml-6 border-l-2 border-gray-100 pl-3' : ''}>
-        <div className="bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
-          <p className="text-xs text-gray-400 italic">[deleted]</p>
-          {comment.replies?.map(reply => (
-            <CommentCard key={reply._id} comment={reply} currentUser={currentUser}
-              onAddReply={onAddReply} onUpvoteComment={onUpvoteComment}
-              onDeleteComment={onDeleteComment} onDeleteReply={onDeleteReply}
-              depth={depth + 1} />
-          ))}
-        </div>
+      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
+        <p className="text-brand-ink-soft italic text-[13.5px]">Loading post…</p>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10 flex flex-col items-start gap-4">
+        <p className="text-brand-red-deep text-[13.5px]">{error}</p>
+        <button onClick={() => navigate('/posts')} className="px-[18px] py-2.5 bg-brand-navy text-white text-[12.5px] font-semibold">
+          Back to Posts
+        </button>
+      </div>
+    );
+  }
+
+  const displayName = post.isAnonymous ? 'Anonymous' : post.author?.username || 'Unknown';
+  const hasUpvoted = post.upvotes?.includes(currentUser.id);
+  const when = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+
   return (
-    <div className={depth > 0 ? 'ml-6 border-l-2 border-gray-200 pl-3 mt-2' : ''}>
-      <div className="bg-white rounded-xl px-4 py-3 border border-gray-100 hover:border-gray-200 transition">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-blue-600">{displayName}</span>
-            <span className="text-xs text-gray-400">• {comment.upvotes?.length || 0} upvotes</span>
-            {comment.isEdited && <span className="text-xs text-gray-400 italic">(edited)</span>}
+    <div className="font-brand">
+      <div className="px-5 sm:px-8 lg:px-12 py-4 border-b border-brand-edge flex items-center gap-2 flex-wrap">
+        <button onClick={() => navigate('/posts')} className="text-[12px] font-medium text-brand-blue hover:underline">
+          Posts
+        </button>
+        <span className="text-[12px] text-brand-ink-faint">/</span>
+        <span className="text-[12px] text-brand-ink-soft truncate max-w-[40ch]">{post.title}</span>
+        <button
+          onClick={handleShare}
+          className="ml-auto px-3.5 py-1.5 bg-brand-navy text-white text-[11.5px] font-semibold"
+        >
+          Share
+        </button>
+      </div>
+
+      <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-8 lg:py-9 max-w-[900px] flex flex-col gap-6">
+        <div className="grid grid-cols-[48px_1fr] sm:grid-cols-[64px_1fr] gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <button onClick={handleUpvote} className={`text-[12px] ${hasUpvoted ? 'text-brand-red' : 'text-brand-ink-soft'}`}>
+              ▲
+            </button>
+            <span className="text-[17px] font-semibold text-brand-navy tabular-nums">
+              {post.upvotes?.length || 0}
+            </span>
+            <span className="text-[12px] text-brand-ink-soft">▼</span>
           </div>
-          {isOwner && (
-            <button
-              onClick={() => depth === 0 ? onDeleteComment(comment._id) : onDeleteReply(comment._id)}
-              className="text-xs text-red-400 hover:text-red-600 transition px-1"
-            >
-              🗑
-            </button>
-          )}
-        </div>
-
-        <p className="text-sm text-gray-800 mb-2">{comment.content}</p>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => onUpvoteComment(comment._id)}
-            className={`text-xs font-semibold transition ${hasUpvoted ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'}`}
-          >
-            ▲ {hasUpvoted ? 'Upvoted' : 'Upvote'}
-          </button>
-          {depth === 0 && (
-            <button onClick={() => setShowReply(!showReply)}
-              className="text-xs font-semibold text-gray-400 hover:text-[#111828] transition">
-              💬 Reply
-            </button>
-          )}
-        </div>
-
-        {showReply && (
-          <div className="mt-2">
-            <div className="flex gap-1.5 mb-2">
-              {['Public', 'Anonymous'].map(m => (
-                <button key={m} onClick={() => setMode(m)}
-                  className={`px-2 py-1 rounded text-xs font-semibold ${mode === m ? 'bg-[#111828] text-white' : 'bg-gray-100 text-gray-600'}`}>
-                  {m}
-                </button>
-              ))}
+          <div className="min-w-0 flex flex-col gap-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11.5px] text-brand-ink-soft">{displayName}</span>
+              <span className="text-[11.5px] text-brand-ink-soft">· {when}</span>
+              {post.isEdited && <span className="text-[11px] italic text-brand-ink-faint">(edited)</span>}
             </div>
-            <form onSubmit={handleReply} className="flex gap-2">
-              <input value={replyText} onChange={e => setReplyText(e.target.value)}
-                placeholder="Write a reply..."
-                className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-blue-500" />
-              <button type="submit"
-                className="px-3 py-1.5 bg-[#111828] text-white rounded-lg text-xs font-semibold">
-                Send
-              </button>
-            </form>
-          </div>
-        )}
+            <h1 className="m-0 text-[24px] sm:text-[30px] leading-[1.2] font-semibold text-brand-navy max-w-[28ch]">
+              {post.title}
+            </h1>
+            <p className="m-0 max-w-[76ch] text-[14.5px] leading-[1.75] text-[#3a3838] whitespace-pre-line">
+              {post.content}
+            </p>
 
-        {comment.replies?.map(reply => (
-          <CommentCard key={reply._id} comment={reply} currentUser={currentUser}
-            onAddReply={onAddReply} onUpvoteComment={onUpvoteComment}
-            onDeleteComment={onDeleteComment} onDeleteReply={onDeleteReply}
-            depth={depth + 1} />
-        ))}
+            {post.images?.length > 0 && (
+              <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                {post.images.map((img, i) => (
+                  <div key={i} className="border border-brand-edge overflow-hidden">
+                    <img src={img.url} alt="" className="w-full object-cover max-h-96" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-4 flex-wrap border-t border-brand-row pt-3">
+              <span className="text-[12px] font-medium text-brand-blue tabular-nums">
+                {post.comments?.length || 0} replies
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="border border-brand-edge p-4 flex flex-col gap-3">
+          <form onSubmit={handleAddComment} className="flex flex-col gap-2.5">
+            <input
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Add a reply"
+              className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy placeholder:text-brand-ink-faint"
+            />
+            <div className="flex justify-between items-center gap-3.5 flex-wrap">
+              <label className="flex items-center gap-2 text-[12.5px] text-[#3a3838]">
+                <input
+                  type="checkbox"
+                  checked={mode === 'Anonymous'}
+                  onChange={(e) => setMode(e.target.checked ? 'Anonymous' : 'Public')}
+                  className="w-3.5 h-3.5"
+                />
+                Reply anonymously
+              </label>
+              <button type="submit" className="px-[17px] py-2.5 bg-brand-navy text-white text-[12px] font-semibold">
+                Reply
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="flex flex-col border-t-2 border-brand-navy pt-1">
+          {!post.comments || post.comments.length === 0 ? (
+            <p className="pt-4 text-[13px] italic text-brand-ink-soft">No comments yet. Be the first!</p>
+          ) : (
+            post.comments.map((comment) => (
+              <CommentThread
+                key={comment._id}
+                comment={comment}
+                onAddReply={handleAddReply}
+                onUpvoteComment={handleUpvoteComment}
+                onDeleteComment={handleDeleteComment}
+                onDeleteReply={handleDeleteReply}
+                onUpvoteReply={handleUpvoteReply}
+                currentUser={currentUser}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

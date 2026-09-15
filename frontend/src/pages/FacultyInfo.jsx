@@ -1,4 +1,5 @@
 import React from "react";
+import AboutTabs from "../components/AboutTabs";
 import FacultyCard from "../components/FacultyCard";
 
 const FacultyInfo = () => {
@@ -95,114 +96,96 @@ const FacultyInfo = () => {
     },
   ];
 
+  const hodLinks = [
+    hod.googleSite && { label: "Google Site", href: hod.googleSite },
+    hod.googleScholar && { label: "Scholar", href: hod.googleScholar },
+    hod.orcid && { label: "ORCID", href: hod.orcid },
+  ].filter(Boolean);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-6 md:p-12">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <div className="font-brand">
+      <AboutTabs />
 
-        <h1 className="text-center text-5xl font-bold text-gray-900">
-          Faculty Information
-        </h1>
+      <div className="px-5 sm:px-8 lg:px-12 pt-7 sm:pt-9 lg:pt-[42px] pb-6 flex items-end justify-between gap-5 flex-wrap">
+        <div className="flex flex-col gap-2">
+          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+            {faculty.length + 1} members
+          </span>
+          <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
+            Faculty
+          </h1>
+        </div>
+      </div>
 
-        {/* HOD */}
-        <section className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-10 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-center mb-10 text-black">
-              Head of Department
-            </h2>
-
-          <div className="flex flex-col md:flex-row items-center gap-10">
+      {/* HOD */}
+      <div className="px-5 sm:px-8 lg:px-12 pb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-[minmax(150px,220px)_minmax(0,2fr)] gap-6 border border-brand-edge p-6">
+          <div className="min-h-[230px] bg-brand-blue overflow-hidden">
             <img
               src={hod.imageUrl}
               alt={hod.name}
-              className="h-56 w-56 rounded-full object-cover border-4 shadow-lg"
+              className="w-full h-full object-cover grayscale"
               onError={(e) => {
-                e.currentTarget.src =
-                  "https://via.placeholder.com/224x224?text=No+Image";
+                e.currentTarget.src = "https://via.placeholder.com/300x300?text=No+Image";
               }}
             />
-
-            <div className="text-center md:text-left">
-              <h3 className="text-3xl font-bold">{hod.name}</h3>
-              <p className="text-xl text-gray-600 mb-4">{hod.title}</p>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {hod.specialization.split(", ").map((s) => (
-                  <span
-                    key={s}
-                    className="bg-blue-100 text-blue-800 px-4 py-1 rounded-full"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-
-              <a
-                href={`mailto:${hod.email}`}
-                className="text-blue-600 font-medium block mb-4"
-              >
-                {hod.email}
-              </a>
-
-              <div className="flex gap-4 flex-wrap">
-                {hod.googleSite && (
-                  <a
-                    href={hod.googleSite}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-primary"
-                  >
-                    Google Site
-                  </a>
-                )}
-                {hod.googleScholar && (
-                  <a
-                    href={hod.googleScholar}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-success"
-                  >
-                    Scholar
-                  </a>
-                )}
-                {hod.orcid && (
-                  <a
-                    href={hod.orcid}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-warning"
-                  >
-                    ORCID
-                  </a>
-                )}
-              </div>
+          </div>
+          <div className="min-w-0 flex flex-col gap-2.5">
+            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-brand-red">
+              Head of department
+            </span>
+            <h2 className="m-0 text-[28px] leading-[1.1] font-semibold text-brand-navy">{hod.name}</h2>
+            <span className="text-[13.5px] font-medium text-brand-blue">{hod.title}</span>
+            <div className="flex flex-wrap gap-1.5">
+              {hod.specialization.split(", ").map((s) => (
+                <span key={s} className="px-2.5 py-1 text-[11px] border border-brand-ink-faint text-brand-ink-soft">
+                  {s}
+                </span>
+              ))}
             </div>
-          </div>
-          </div>
-        </section>
-
-        {/* Faculty Grid */}
-        <section className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-10 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
-              Our Faculty
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-              {faculty.map((f) => (
-                <FacultyCard key={f.email} faculty={f} />
+            <div
+              className="grid gap-px bg-brand-edge border border-brand-edge mt-1.5"
+              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}
+            >
+              <div className="bg-white px-3.5 py-3">
+                <div className="text-[9.5px] font-medium tracking-[0.14em] uppercase text-brand-ink-soft">
+                  Email
+                </div>
+                <a
+                  href={`mailto:${hod.email}`}
+                  className="block pt-1.5 text-[13px] font-medium text-brand-blue"
+                >
+                  {hod.email}
+                </a>
+              </div>
+              {hodLinks.map((l) => (
+                <div key={l.label} className="bg-white px-3.5 py-3">
+                  <div className="text-[9.5px] font-medium tracking-[0.14em] uppercase text-brand-ink-soft">
+                    {l.label}
+                  </div>
+                  <a
+                    href={l.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block pt-1.5 text-[13px] font-medium text-brand-navy"
+                  >
+                    Visit
+                  </a>
+                </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </div>
 
+      {/* Faculty grid */}
+      <div
+        className="mx-5 sm:mx-8 lg:mx-12 mb-7 sm:mb-9 lg:mb-12 grid gap-px bg-brand-edge border border-brand-edge"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}
+      >
+        {faculty.map((f) => (
+          <FacultyCard key={f.email} faculty={f} />
+        ))}
       </div>
     </div>
   );

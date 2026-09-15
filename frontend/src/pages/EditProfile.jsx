@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Briefcase, Award, Upload, X, Plus, Edit2, Trash2, Save, AlertCircle, FileText } from "lucide-react";
+import { Upload, X, FileText } from "lucide-react";
+
+const STATUS_STYLE = {
+  approved: { bg: '#e4eaf4', fg: '#1b3a6b' },
+  rejected: { bg: '#ffe0d9', fg: '#ae1800' },
+  new: { bg: '#eae7e7', fg: '#444141' },
+};
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -33,7 +39,6 @@ export default function EditProfile() {
     "Tailwind CSS", "Bootstrap", "REST API", "GraphQL", "Git", "Docker"
   ];
   const [achievements, setAchievements] = useState([]);
-  const [isProfileUpdated, setIsProfileUpdated] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [resume, setResume] = useState(null);
@@ -207,31 +212,29 @@ export default function EditProfile() {
 
   const handleSubmit = async () => {
     try {
-      const profilePayload = { 
-        name, 
-        year, 
-        dob, 
-        registerNumber, 
-        bio, 
+      const profilePayload = {
+        name,
+        year,
+        dob,
+        registerNumber,
+        bio,
         skills,
         socialLinks: { github, leetcode, linkedin }
       };
-      console.log('Submitting profile data:', profilePayload);
-      
+
       const res = await fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profilePayload),
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json();
         console.error('Save failed:', errorData);
         throw new Error("Profile save failed");
       }
-      
-      const savedProfile = await res.json();
-      console.log('Profile saved successfully:', savedProfile);
+
+      await res.json();
 
       for (const a of achievements) {
         if (a.markedForDeletion || (a.localStatus !== "new" && a.localStatus !== "rejected")) continue;
@@ -275,379 +278,297 @@ export default function EditProfile() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 relative overflow-hidden">
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
+  const visibleAchievements = achievements.filter((a) => !a.markedForDeletion);
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Edit Profile
+  return (
+    <div className="font-brand bg-brand-ground px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px]">
+      <div className="max-w-[820px] mx-auto flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">Account</span>
+          <h1 className="m-0 text-[32px] sm:text-[38px] font-semibold tracking-[-0.02em] text-brand-navy">
+            Edit profile
           </h1>
-          <p className="text-sm md:text-base text-gray-600">Update your information and showcase your achievements</p>
+          <p className="m-0 text-[13.5px] text-brand-ink-soft">Update your information and showcase your achievements.</p>
         </div>
 
-        {/* Profile Picture Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="relative">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-3xl md:text-4xl font-bold shadow-lg overflow-hidden">
-                {profileImage?.url ? (
-                  <img src={profileImage.url} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  name.charAt(0).toUpperCase() || <User className="w-12 h-12" />
-                )}
-              </div>
-              <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition shadow-lg">
-                <Upload className="w-4 h-4" />
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files[0])} />
-              </label>
+        {/* Identity */}
+        <div className="bg-white border border-brand-edge p-5 sm:p-6 flex flex-col sm:flex-row gap-6">
+          <div className="flex flex-col items-center gap-3 shrink-0">
+            <div className="w-28 h-28 bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center overflow-hidden">
+              {profileImage?.url ? (
+                <img src={profileImage.url} alt="Profile" className="w-full h-full object-cover grayscale" />
+              ) : (
+                <span className="text-[30px] font-semibold text-[#5f6e88]">{name.charAt(0).toUpperCase() || "U"}</span>
+              )}
             </div>
-            <div className="flex-1 w-full">
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full Name"
-                className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-              />
+            <label className="flex items-center gap-2 px-3 py-2 border border-brand-ink-faint text-[11.5px] font-medium text-brand-ink-soft cursor-pointer">
+              <Upload size={13} />
+              Change photo
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files[0])} />
+            </label>
+            {imageFile && (
+              <button onClick={handleImageUpload} className="px-3 py-2 bg-brand-navy text-white text-[11.5px] font-semibold w-full">
+                Upload image
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <Field label="Full name" value={name} onChange={setName} placeholder="As on the roll list" />
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Year</span>
               <select
-                id="year"
-                name="year"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
+                className="border border-brand-ink-faint px-3 py-2.5 text-[13px] text-brand-navy outline-none focus:border-brand-navy bg-white"
               >
-                <option value="">Select Year</option>
+                <option value="">Select year</option>
                 <option value="1st Year">1st Year</option>
                 <option value="2nd Year">2nd Year</option>
                 <option value="3rd Year">3rd Year</option>
                 <option value="4th Year">4th Year</option>
               </select>
+            </div>
+            <Field label="Date of birth" type="date" value={dob} onChange={setDob} />
+            <Field label="Register number" value={registerNumber} onChange={setRegisterNumber} placeholder="21AD000" />
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Email</span>
               <input
-                id="dob"
-                name="dob"
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                placeholder="Date of Birth"
-                className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-              />
-              <input
-                id="registerNumber"
-                name="registerNumber"
-                type="text"
-                value={registerNumber}
-                onChange={(e) => setRegisterNumber(e.target.value)}
-                placeholder="Register Number"
-                className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-              />
-              <input
-                id="email"
-                name="email"
-                type="email"
                 value={user?.email || ""}
                 disabled
-                className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed outline-none text-sm md:text-base"
+                className="border border-brand-edge bg-brand-ground px-3 py-2.5 text-[13px] text-brand-ink-soft outline-none"
               />
             </div>
-            {imageFile && (
-              <button onClick={handleImageUpload} className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition text-sm md:text-base">
-                Upload Image
-              </button>
-            )}
           </div>
         </div>
 
-        {/* Bio Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
-          <div className="flex items-center gap-2 mb-4">
-            <User className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg md:text-xl font-semibold text-gray-800">About</h2>
-          </div>
+        {/* About */}
+        <Section title="About">
           <textarea
-            id="bio"
-            name="bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            placeholder="Write a short bio about yourself..."
-            rows="4"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm md:text-base"
+            placeholder="Write a short bio about yourself…"
+            rows={4}
+            className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] leading-[1.6] text-brand-ink outline-none focus:border-brand-navy resize-none"
           />
-        </div>
+        </Section>
 
-        {/* Social Links Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
-          <div className="flex items-center gap-2 mb-4">
-            <Briefcase className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-lg md:text-xl font-semibold text-gray-800">Social Links</h2>
+        {/* Social links */}
+        <Section title="Social links">
+          <div className="flex flex-col gap-3">
+            <Field label="GitHub" value={github} onChange={setGithub} placeholder="https://github.com/username" />
+            <Field label="LeetCode" value={leetcode} onChange={setLeetcode} placeholder="https://leetcode.com/username" />
+            <Field label="LinkedIn" value={linkedin} onChange={setLinkedin} placeholder="https://linkedin.com/in/username" />
           </div>
-          <div className="space-y-3">
-            <input
-              id="github"
-              name="github"
-              type="url"
-              value={github}
-              onChange={(e) => setGithub(e.target.value)}
-              placeholder="GitHub Profile URL (e.g., https://github.com/username)"
-              className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-            />
-            <input
-              id="leetcode"
-              name="leetcode"
-              type="url"
-              value={leetcode}
-              onChange={(e) => setLeetcode(e.target.value)}
-              placeholder="LeetCode Profile URL (e.g., https://leetcode.com/username)"
-              className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-            />
-            <input
-              id="linkedin"
-              name="linkedin"
-              type="url"
-              value={linkedin}
-              onChange={(e) => setLinkedin(e.target.value)}
-              placeholder="LinkedIn Profile URL (e.g., https://linkedin.com/in/username)"
-              className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-            />
-          </div>
-        </div>
+        </Section>
 
-        {/* Resume Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
-          <div className="flex items-center gap-2 mb-4">
-            <Upload className="w-5 h-5 text-green-600" />
-            <h2 className="text-lg md:text-xl font-semibold text-gray-800">Resume</h2>
-          </div>
-          <div className="space-y-3">
-            {resume?.url ? (
-              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                <FileText className="w-5 h-5 text-green-600" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{resume.filename || "Resume"}</p>
-                  <a
-                    href={resume.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-700"
-                  >
-                    View Resume →
-                  </a>
-                </div>
-                <button
-                  onClick={() => setResume(null)}
-                  className="text-red-500 hover:text-red-700 p-1"
-                  title="Remove resume"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+        {/* Resume */}
+        <Section title="Résumé">
+          {resume?.url ? (
+            <div className="flex items-center gap-3.5 border border-brand-edge p-3.5">
+              <div className="w-[42px] h-[54px] shrink-0 bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center text-[8px] font-medium text-[#5f6e88]">
+                PDF
               </div>
-            ) : (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                <p className="text-sm text-gray-600 mb-2">Upload your resume (PDF format)</p>
-                <label className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition">
-                  Choose File
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        handleResumeUpload(file);
-                      }
-                    }}
-                  />
-                </label>
+              <div className="flex-1 min-w-0 flex flex-col gap-1">
+                <span className="text-[13px] font-medium text-brand-navy truncate">{resume.filename || "Resume"}</span>
+                <a href={resume.url} target="_blank" rel="noopener noreferrer" className="text-[12px] text-brand-blue">
+                  View resume
+                </a>
+              </div>
+              <button onClick={() => setResume(null)} className="text-brand-red" title="Remove resume">
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            <label className="flex items-center gap-2.5 border border-dashed border-brand-ink-faint px-3.5 py-3 cursor-pointer text-[12.5px] text-brand-ink-soft w-fit">
+              <Upload size={15} />
+              Upload resume (PDF)
+              <input
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={(e) => { const file = e.target.files[0]; if (file) handleResumeUpload(file); }}
+              />
+            </label>
+          )}
+        </Section>
+
+        {/* Skills */}
+        <Section title="Skills">
+          <div className="flex flex-col gap-3">
+            <div className="border border-brand-edge p-3.5 flex flex-col gap-2">
+              <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-brand-blue">AI &amp; Data Science</span>
+              <div className="flex flex-wrap gap-1.5">
+                {aiSkills.filter(s => !skills.includes(s)).map((skill) => (
+                  <button
+                    key={skill}
+                    onClick={() => setSkills([...skills, skill])}
+                    className="px-2.5 py-1 border border-brand-edge text-[11px] text-brand-blue"
+                  >
+                    + {skill}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="border border-brand-edge p-3.5 flex flex-col gap-2">
+              <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-brand-red">Web development</span>
+              <div className="flex flex-wrap gap-1.5">
+                {webSkills.filter(s => !skills.includes(s)).map((skill) => (
+                  <button
+                    key={skill}
+                    onClick={() => setSkills([...skills, skill])}
+                    className="px-2.5 py-1 border border-brand-edge text-[11px] text-brand-red-deep"
+                  >
+                    + {skill}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {skills.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {skills.map((skill) => (
+                  <span key={skill} className="px-3 py-[7px] bg-brand-navy text-white text-[12px] flex items-center gap-2">
+                    {skill}
+                    <X className="w-3 h-3 cursor-pointer" onClick={() => handleRemoveSkill(skill)} />
+                  </span>
+                ))}
               </div>
             )}
+            <input
+              value={newSkill}
+              onChange={(e) => setNewSkill(e.target.value)}
+              onKeyDown={handleAddSkill}
+              placeholder="Add a custom skill and press Enter…"
+              className="border border-brand-ink-faint px-3.5 py-2.5 text-[13px] text-brand-ink outline-none focus:border-brand-navy"
+            />
           </div>
-        </div>
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
-          <div className="flex items-center gap-2 mb-4">
-            <Briefcase className="w-5 h-5 text-purple-600" />
-            <h2 className="text-lg md:text-xl font-semibold text-gray-800">Skills</h2>
-          </div>
+        </Section>
 
-          {/* AI Skills */}
-          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-xs font-semibold text-blue-700 mb-2">AI & Data Science Skills:</p>
-            <div className="flex flex-wrap gap-2">
-              {aiSkills.filter(s => !skills.includes(s)).map((skill) => (
-                <span
-                  key={skill}
-                  onClick={() => setSkills([...skills, skill])}
-                  className="px-2 py-1 bg-white border border-blue-300 text-blue-700 rounded-full text-xs cursor-pointer hover:bg-blue-100 transition"
-                >
-                  + {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Web Skills */}
-          <div className="mb-4 p-3 bg-purple-50 rounded-lg">
-            <p className="text-xs font-semibold text-purple-700 mb-2">Web Development Skills:</p>
-            <div className="flex flex-wrap gap-2">
-              {webSkills.filter(s => !skills.includes(s)).map((skill) => (
-                <span
-                  key={skill}
-                  onClick={() => setSkills([...skills, skill])}
-                  className="px-2 py-1 bg-white border border-purple-300 text-purple-700 rounded-full text-xs cursor-pointer hover:bg-purple-100 transition"
-                >
-                  + {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-3">
-            {skills.map((skill) => (
-              <span key={skill} className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-xs md:text-sm flex items-center gap-2">
-                {skill}
-                <X className="w-3 h-3 cursor-pointer hover:text-red-200" onClick={() => handleRemoveSkill(skill)} />
-              </span>
-            ))}
-          </div>
-          <input
-            id="customSkill"
-            name="customSkill"
-            type="text"
-            value={newSkill}
-            onChange={(e) => setNewSkill(e.target.value)}
-            onKeyDown={handleAddSkill}
-            placeholder="Add a custom skill and press Enter..."
-            className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-          />
-        </div>
-
-        {/* Achievements Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 md:p-6 mb-6 border border-white/50">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-yellow-600" />
-              <h2 className="text-lg md:text-xl font-semibold text-gray-800">Achievements</h2>
-            </div>
-            <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-3 md:px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition text-sm md:text-base">
-              <Plus className="w-4 h-4" />
+        {/* Achievements */}
+        <Section
+          title="Achievements"
+          action={
+            <button onClick={() => setShowAddModal(true)} className="px-3.5 py-2 bg-brand-red text-white text-[11.5px] font-semibold">
               Add
             </button>
-          </div>
-          <div className="space-y-3">
-            {achievements.filter((a) => !a.markedForDeletion).map((a, index) => (
-              <div key={a._id || index} className="border-l-4 border-blue-500 bg-gray-50 p-4 rounded-lg">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-gray-800 text-sm md:text-base">{a.title}</h3>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    a.localStatus === "approved" ? "bg-green-100 text-green-700" :
-                    a.localStatus === "rejected" ? "bg-red-100 text-red-700" :
-                    "bg-yellow-100 text-yellow-700"
-                  }`}>
-                    {a.localStatus.toUpperCase()}
-                  </span>
-                </div>
-                <p className="text-gray-600 mb-3 text-xs md:text-sm">{a.description}</p>
-                <div className="flex gap-2">
-                  <button onClick={() => handleEditAchievement(index)} className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-xs md:text-sm">
-                    <Edit2 className="w-3 h-3" />
-                    Edit
-                  </button>
-                  <button onClick={() => handleDeleteAchievement(index)} className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-xs md:text-sm">
-                    <Trash2 className="w-3 h-3" />
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-            {achievements.filter((a) => !a.markedForDeletion).length === 0 && (
-              <p className="text-center text-gray-500 py-8 text-sm md:text-base">No achievements yet. Click "Add" to create one!</p>
-            )}
-          </div>
-        </div>
+          }
+        >
+          {visibleAchievements.length === 0 ? (
+            <p className="m-0 text-[13px] text-brand-ink-soft">No achievements yet. Click "Add" to create one!</p>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {visibleAchievements.map((a, index) => {
+                const st = STATUS_STYLE[a.localStatus] || STATUS_STYLE.new;
+                return (
+                  <div key={a._id || index} className="border border-brand-edge p-3.5 flex flex-col gap-2">
+                    <div className="flex justify-between items-start gap-3">
+                      <span className="text-[14px] font-semibold text-brand-navy">{a.title}</span>
+                      <span
+                        className="px-2 py-1 text-[9.5px] font-semibold tracking-[0.08em] uppercase shrink-0"
+                        style={{ background: st.bg, color: st.fg }}
+                      >
+                        {a.localStatus}
+                      </span>
+                    </div>
+                    <p className="m-0 text-[12.5px] text-brand-ink-soft">{a.description}</p>
+                    <div className="flex gap-4">
+                      <button onClick={() => handleEditAchievement(achievements.indexOf(a))} className="text-[11.5px] font-medium text-brand-blue">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDeleteAchievement(achievements.indexOf(a))} className="text-[11.5px] font-medium text-brand-red">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Section>
 
-        {/* Save Button */}
-        <div className="flex gap-4">
-          <button onClick={() => handleNavigateWithCheck("/profile")} className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium text-sm md:text-base">
+        {/* Save / Cancel */}
+        <div className="flex gap-3">
+          <button onClick={() => handleNavigateWithCheck("/profile")} className="flex-1 py-3 border border-brand-ink-faint text-[13px] font-medium text-brand-ink-soft">
             Cancel
           </button>
-          <button onClick={handleSubmit} className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition font-medium text-sm md:text-base">
-            <Save className="w-5 h-5" />
-            Save Profile
+          <button onClick={handleSubmit} className="flex-1 py-3 bg-brand-red text-white text-[13px] font-semibold">
+            Save profile
           </button>
         </div>
-
-        {isProfileUpdated && (
-          <div className="fixed top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-[9999] animate-bounce">
-            <Save className="w-6 h-6 flex-shrink-0" />
-            <div>
-              <p className="font-bold text-base">Profile Saved!</p>
-              <p className="text-sm opacity-90">Your changes have been saved successfully.</p>
-            </div>
-          </div>
-        )}
-
-        {showUnsavedToast && (
-          <div className="fixed top-4 right-4 bg-orange-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-[9999] animate-pulse">
-            <AlertCircle className="w-6 h-6 flex-shrink-0" />
-            <div>
-              <p className="font-bold text-base">Unsaved Changes!</p>
-              <p className="text-sm opacity-90">Please save your changes before leaving.</p>
-            </div>
-          </div>
-        )}
       </div>
+
+      {showUnsavedToast && (
+        <div className="fixed top-4 right-4 bg-brand-red-tint text-brand-red-deep px-5 py-3.5 z-[9999]">
+          <p className="m-0 text-[13px] font-semibold">Unsaved changes — save before leaving.</p>
+        </div>
+      )}
 
       {/* Add Achievement Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowAddModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 md:p-8" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl md:text-2xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Add Achievement</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                <input
-                  type="text"
-                  value={modalTitle}
-                  onChange={(e) => setModalTitle(e.target.value)}
-                  placeholder="e.g. Winner at GDG In Campus"
-                  className="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+        <>
+          <div onClick={() => setShowAddModal(false)} className="fixed inset-0 z-[9998] bg-black/50" />
+          <div className="font-brand fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90vw] max-w-[480px] bg-white border border-brand-edge">
+            <div className="bg-brand-navy px-6 py-4">
+              <h2 className="m-0 text-[15px] font-semibold text-white">Add achievement</h2>
+            </div>
+            <div className="p-6 flex flex-col gap-3.5">
+              <Field label="Title" value={modalTitle} onChange={setModalTitle} placeholder="e.g. Winner at GDG In Campus" />
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Description</span>
                 <textarea
                   value={modalDesc}
                   onChange={(e) => setModalDesc(e.target.value)}
-                  placeholder="Describe your achievement..."
-                  rows="4"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm md:text-base"
+                  placeholder="Describe your achievement…"
+                  rows={4}
+                  className="border border-brand-ink-faint px-3 py-2.5 text-[13.5px] leading-[1.6] text-brand-ink outline-none focus:border-brand-navy resize-none"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Certificate (PDF - optional)</label>
+              <label className="flex items-center gap-2.5 border border-dashed border-brand-ink-faint px-3.5 py-3 cursor-pointer text-[12.5px] text-brand-ink-soft w-fit">
+                <FileText size={15} />
+                {certificateFile ? certificateFile.name : "Attach certificate (PDF, optional)"}
                 <input
                   type="file"
                   accept="application/pdf"
+                  className="hidden"
                   onChange={(e) => setCertificateFile(e.target.files[0])}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm md:text-base"
                 />
+              </label>
+              <div className="flex gap-2.5 pt-1">
+                <button onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 border border-brand-ink-faint text-[13px] font-medium text-brand-ink-soft">
+                  Cancel
+                </button>
+                <button onClick={handleSaveNewAchievement} className="flex-1 py-2.5 bg-brand-navy text-white text-[13px] font-semibold">
+                  Save
+                </button>
               </div>
             </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2 md:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium text-sm md:text-base">
-                Cancel
-              </button>
-              <button onClick={handleSaveNewAchievement} className="flex-1 px-4 py-2 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition font-medium text-sm md:text-base">
-                Save
-              </button>
-            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
 }
+
+const Section = ({ title, action, children }) => (
+  <div className="bg-white border border-brand-edge p-5 sm:p-6 flex flex-col gap-3.5">
+    <div className="flex items-center justify-between gap-3">
+      <h2 className="m-0 text-[15px] font-semibold text-brand-navy">{title}</h2>
+      {action}
+    </div>
+    {children}
+  </div>
+);
+
+const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
+  <div className="flex flex-col gap-1.5">
+    <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">{label}</span>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="border border-brand-ink-faint px-3 py-2.5 text-[13px] text-brand-ink outline-none focus:border-brand-navy placeholder:text-brand-ink-faint"
+    />
+  </div>
+);

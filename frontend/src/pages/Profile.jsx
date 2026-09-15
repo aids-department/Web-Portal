@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Mail, Calendar, Award, Code, Edit, TrendingUp, MessageCircle, Hash, Cake, Save, Github, Link, FileText } from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useRef } from "react";
 
 export default function Profile() {
   const { userId: paramUserId } = useParams();
@@ -18,6 +16,7 @@ export default function Profile() {
   const user = JSON.parse(localStorage.getItem("user"));
   const loggedInUserId = user?.id;
   const userId = paramUserId || loggedInUserId;
+  const isOwnProfile = !paramUserId || paramUserId === loggedInUserId;
 
   useEffect(() => {
     if (location.state?.profileSaved) {
@@ -33,7 +32,6 @@ export default function Profile() {
       return;
     }
 
-    // Reset state on route change
     setProfile(null);
     setLoading(true);
     hasShownToast.current = false;
@@ -49,7 +47,6 @@ export default function Profile() {
           setProfile(null);
           return;
         }
-
         setProfile(data);
       })
       .catch((err) => console.error(err))
@@ -67,239 +64,203 @@ export default function Profile() {
           setPostsCount(0);
           return;
         }
-
         const userPosts = data.filter(
           post => post.author?._id === userId || post.author?.id === userId
         );
-
         setPostsCount(userPosts.length);
       })
       .catch(err => console.error(err));
   }, [userId]);
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-xl text-gray-600">Loading profile...</div>
-    </div>
-  );
-
-  
-  if (!loading && !profile && paramUserId) {
+  if (loading) {
     return (
-      <div className="text-center mt-20 text-gray-700 text-lg">
-        Profile Not Found
+      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
+        <p className="text-brand-ink-soft italic text-[13.5px]">Loading profile…</p>
       </div>
     );
   }
 
+  if (!loading && !profile && paramUserId) {
+    return (
+      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
+        <p className="text-brand-ink-soft text-[14px]">Profile not found.</p>
+      </div>
+    );
+  }
+
+  const displayName = profile?.name || user?.username || "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
+  const kicker = [profile?.year, profile?.registerNumber ? `Roll ${profile.registerNumber}` : null]
+    .filter(Boolean)
+    .join(' · ');
+
+  const links = [
+    profile?.socialLinks?.github && { label: 'GitHub', href: profile.socialLinks.github },
+    profile?.socialLinks?.leetcode && { label: 'LeetCode', href: profile.socialLinks.leetcode },
+    profile?.socialLinks?.linkedin && { label: 'LinkedIn', href: profile.socialLinks.linkedin },
+  ].filter(Boolean);
 
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-4 md:p-8 overflow-hidden min-h-[80vh]">
-      {/* Decorative orbs */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
-
-      <div className="relative z-10 max-w-5xl mx-auto">
-        {/* Profile Header */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 md:p-8 mb-6">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-4xl font-bold shrink-0 overflow-hidden">
-              {profile?.profileImage?.url ? (
-                <img src={profile.profileImage.url} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                profile?.name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || "U"
-              )}
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                {profile?.name || user?.username || "User"}
-              </h1>
-              <p className="text-lg text-gray-600 mb-4">{profile?.year || "Student"}</p>
-              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                <span className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-                  <Mail size={16} /> {user?.email || "No email"}
-                </span>
-                <span className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-                  <Hash size={16} /> {profile?.registerNumber || "Not provided"}
-                </span>
-                <span className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-                  <Cake size={16} /> {profile?.dob ? new Date(profile.dob).toLocaleDateString() : "Not provided"}
-                </span>
-              </div>
-            </div>
+    <div className="font-brand">
+      {/* Hero */}
+      <div className="bg-brand-navy px-5 sm:px-8 lg:px-12 py-7 sm:py-8 lg:py-10 grid grid-cols-1 sm:grid-cols-[150px_minmax(0,1fr)_auto] gap-7 items-start">
+        <div className="h-[150px] w-[150px] bg-brand-blue border border-[#3d5077] grid place-items-center overflow-hidden">
+          {profile?.profileImage?.url ? (
+            <img src={profile.profileImage.url} alt={displayName} className="w-full h-full object-cover grayscale" />
+          ) : (
+            <span className="text-[34px] font-semibold text-[#a8b6cc]">{initials}</span>
+          )}
+        </div>
+        <div className="min-w-0 flex flex-col gap-2.5">
+          {kicker && (
+            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-brand-red">
+              {kicker}
+            </span>
+          )}
+          <h1 className="m-0 text-[30px] sm:text-[36px] lg:text-[40px] leading-[1.05] font-semibold tracking-[-0.02em] text-white">
+            {displayName}
+          </h1>
+          <span className="text-[13.5px] text-brand-on-navy">{user?.email || "No email"}</span>
+        </div>
+        {isOwnProfile && (
+          <div className="flex flex-col gap-2.5 items-start min-w-[130px]">
             <button
               onClick={() => navigate("/edit-profile")}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-lg"
+              className="px-4 py-2.5 bg-brand-red text-white text-[12px] font-semibold"
             >
-              <Edit size={18} /> Edit Profile
+              Edit profile
             </button>
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-6">
-          {/* Stats Cards */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 text-center">
-            <Award className="w-8 h-8 mx-auto text-blue-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{achievements.length}</p>
-            <p className="text-sm text-gray-600">Achievements</p>
-          </div>
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 text-center">
-            <TrendingUp className="w-8 h-8 mx-auto text-purple-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{profile?.skills?.length || 0}</p>
-            <p className="text-sm text-gray-600">Skills</p>
-          </div>
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 text-center">
-            <MessageCircle className="w-8 h-8 mx-auto text-green-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{postsCount}</p>
-            <p className="text-sm text-gray-600">Posts</p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Bio Section */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">About</h3>
-            <p className="text-gray-700 leading-relaxed">
-              {profile?.bio || "No bio added yet. Click 'Edit Profile' to add your bio and tell others about yourself!"}
+      {/* Body */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,340px)]">
+        <div className="min-w-0 lg:border-r border-brand-edge px-5 sm:px-8 lg:px-10 py-7 sm:py-8 lg:py-9 flex flex-col gap-7">
+          <div className="flex flex-col gap-3">
+            <h2 className="m-0 text-[20px] font-semibold text-brand-navy border-b-2 border-brand-navy pb-2.5">About</h2>
+            <p className="m-0 max-w-[78ch] text-[14.5px] leading-[1.75] text-[#3a3838]">
+              {profile?.bio || "No bio added yet."}
             </p>
           </div>
 
-          {/* Skills Section */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Code size={20} /> Skills
-            </h3>
-            {profile?.skills && profile.skills.length > 0 ? (
+          <div className="flex flex-col gap-3.5">
+            <h2 className="m-0 text-[20px] font-semibold text-brand-navy border-b-2 border-brand-navy pb-2.5">Skills</h2>
+            {profile?.skills?.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {profile.skills.map((skill, i) => (
-                  <span key={i} className="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-purple-100 text-gray-800 rounded-full text-sm font-medium">
+                  <span key={i} className="px-3 py-[7px] border border-brand-ink-faint text-[12.5px] text-[#3a3838]">
                     {skill}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">No skills added yet. Add your skills to showcase your expertise!</p>
+              <p className="m-0 text-[13px] text-brand-ink-soft">No skills added yet.</p>
             )}
           </div>
 
-          {/* Social Links Section */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Link size={20} /> Social Links
-            </h3>
-            {profile?.socialLinks && (profile.socialLinks.github || profile.socialLinks.leetcode || profile.socialLinks.linkedin) ? (
-              <div className="space-y-3">
-                {profile.socialLinks.github && (
-                  <a
-                    href={profile.socialLinks.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                  >
-                    <Github size={16} />
-                    <span className="text-sm">GitHub</span>
-                  </a>
-                )}
-                {profile.socialLinks.leetcode && (
-                  <a
-                    href={profile.socialLinks.leetcode}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors"
-                  >
-                    <Code size={16} />
-                    <span className="text-sm">LeetCode</span>
-                  </a>
-                )}
-                {profile.socialLinks.linkedin && (
-                  <a
-                    href={profile.socialLinks.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-700 hover:text-blue-800 transition-colors"
-                  >
-                    <Link size={16} />
-                    <span className="text-sm">LinkedIn</span>
-                  </a>
-                )}
-              </div>
+          <div className="flex flex-col gap-3.5">
+            <h2 className="m-0 text-[20px] font-semibold text-brand-navy border-b-2 border-brand-navy pb-2.5">Achievements</h2>
+            {achievements.length === 0 ? (
+              <p className="m-0 text-[13px] text-brand-ink-soft">No achievements yet.</p>
             ) : (
-              <p className="text-gray-500 text-sm">No social links added yet. Add your profiles to connect with others!</p>
+              achievements.map((a, i) => (
+                <div key={i} className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-3 sm:gap-5 py-3.5 border-b border-brand-row">
+                  {a.createdAt && (
+                    <span className="text-[12px] font-medium text-brand-ink-soft tabular-nums">
+                      {new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    </span>
+                  )}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[15px] font-semibold text-brand-navy">{a.title}</span>
+                    <span className="text-[13px] leading-[1.6] text-brand-ink-soft">{a.description}</span>
+                    {a.certificate?.url && (
+                      <a
+                        href={a.certificate.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[12px] font-medium text-brand-blue"
+                      >
+                        View certificate
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>
 
-        {/* Resume Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 mt-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <FileText size={20} /> Resume
-          </h3>
-          {profile?.resume?.url ? (
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-              <FileText className="w-8 h-8 text-green-600" />
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">{profile.resume.filename || "Resume.pdf"}</p>
-                <p className="text-sm text-gray-600">Click to view your resume</p>
-              </div>
-              <a
-                href={profile.resume.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
-              >
-                View Resume
-              </a>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <FileText className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-              <p className="text-gray-500">No resume uploaded yet</p>
-              <p className="text-sm text-gray-400">Upload your resume in Edit Profile to showcase your experience!</p>
-            </div>
-          )}
-        </div>
-
-        {/* Achievements Section */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 p-6 mt-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Award size={20} /> Achievements
-          </h3>
-          {achievements.length === 0 ? (
-            <div className="text-center py-12">
-              <Award className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500 mb-2">No achievements yet</p>
-              <p className="text-sm text-gray-400">Add your achievements in Edit Profile to showcase your accomplishments!</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {achievements.map((a, i) => (
-                <div key={i} className="border-l-4 border-blue-600 pl-4 py-2">
-                  <h4 className="font-semibold text-gray-900">{a.title}</h4>
-                  <p className="text-sm text-gray-600 mt-1">{a.description}</p>
-                  {a.certificate?.url && (
-                    <a
-                      href={a.certificate.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-700 mt-2 inline-block"
-                    >
-                      View Certificate →
-                    </a>
-                  )}
+        <aside className="px-5 sm:px-8 lg:px-7 py-7 sm:py-8 lg:py-9 bg-brand-ground flex flex-col gap-6 min-w-[250px]">
+          <div className="border border-brand-edge bg-white p-5 flex flex-col gap-3">
+            <span className="text-[10.5px] font-semibold tracking-[0.18em] uppercase text-brand-red">Résumé</span>
+            {profile?.resume?.url ? (
+              <>
+                <div className="flex gap-3.5 items-center">
+                  <div className="w-[52px] h-[66px] shrink-0 bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center text-[8.5px] font-medium text-[#5f6e88]">
+                    PDF
+                  </div>
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <span className="text-[13px] font-medium text-brand-navy truncate">
+                      {profile.resume.filename || "Resume.pdf"}
+                    </span>
+                  </div>
                 </div>
-              ))}
+                <a
+                  href={profile.resume.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2.5 bg-brand-navy text-white text-[11.5px] font-semibold text-center"
+                >
+                  Download
+                </a>
+              </>
+            ) : (
+              <p className="m-0 text-[12.5px] text-brand-ink-soft">No resume uploaded yet.</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10.5px] font-medium tracking-[0.18em] uppercase text-brand-navy">Links</span>
+            {links.length > 0 ? (
+              links.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex justify-between gap-2.5 border-t border-brand-edge pt-2.5"
+                >
+                  <span className="text-[13px] font-medium text-brand-navy">{l.label}</span>
+                  <span className="text-[12px] text-brand-blue">Visit</span>
+                </a>
+              ))
+            ) : (
+              <p className="m-0 text-[12.5px] text-brand-ink-soft">No links added yet.</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10.5px] font-medium tracking-[0.18em] uppercase text-brand-navy">Activity</span>
+            <div className="flex justify-between border-t border-brand-edge pt-2.5">
+              <span className="text-[13px] text-brand-ink-soft">Posts</span>
+              <span className="text-[13px] font-medium text-brand-navy tabular-nums">{postsCount}</span>
             </div>
-          )}
-        </div>
+            <div className="flex justify-between border-t border-brand-edge pt-2.5">
+              <span className="text-[13px] text-brand-ink-soft">Achievements</span>
+              <span className="text-[13px] font-medium text-brand-navy tabular-nums">{achievements.length}</span>
+            </div>
+            <div className="flex justify-between border-t border-brand-edge pt-2.5">
+              <span className="text-[13px] text-brand-ink-soft">Skills listed</span>
+              <span className="text-[13px] font-medium text-brand-navy tabular-nums">{profile?.skills?.length || 0}</span>
+            </div>
+          </div>
+        </aside>
       </div>
 
       {showSavedToast && (
-        <div className="fixed top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-[9999] animate-bounce">
-          <Save className="w-6 h-6 flex-shrink-0" />
-          <div>
-            <p className="font-bold text-base">Profile Saved!</p>
-            <p className="text-sm opacity-90">Your changes have been saved successfully.</p>
-          </div>
+        <div className="fixed top-4 right-4 bg-brand-navy text-white px-5 py-3.5 z-[9999] flex items-center gap-2">
+          <span className="text-[13px] font-semibold">Profile saved.</span>
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaSearch, FaFilter } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { User, Building, Code } from "lucide-react";
 import AlumniCard from "../components/AlumniCard";
 
@@ -132,230 +132,163 @@ export default function Alumni() {
     setFilteredAlumni(result);
   }, [searchTerm, filters, alumni]);
 
-  if (loading)
+  const suggestionIcon = (type) => {
+    switch (type) {
+      case 'name': return <User className="text-brand-blue" size={14} />;
+      case 'company': return <Building className="text-brand-blue" size={14} />;
+      case 'skill': return <Code className="text-brand-blue" size={14} />;
+      default: return <FaSearch className="text-brand-ink-faint" size={12} />;
+    }
+  };
+
+  const clearFilters = () => {
+    setFilters({ passOutYear: "All", company: "", skills: "" });
+    setSearchTerm("");
+  };
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-lg text-gray-600">Loading alumni...</p>
+      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
+        <p className="text-brand-ink-soft italic text-[13.5px]">Loading alumni…</p>
       </div>
     );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-6">
-      {/* Decorative background elements */}
-      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
-      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-pink-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
+    <div className="font-brand px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] flex flex-col gap-5.5 gap-y-5">
+      <div className="flex flex-col gap-2.5">
+        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+          {alumni.length} profiles
+        </span>
+        <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
+          Alumni directory
+        </h1>
+      </div>
 
-      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
-        {/* Header */}
-        <section className="relative bg-gradient-to-br from-purple-50 via-white to-pink-50 backdrop-blur-lg p-10 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-              Alumni Connect - AI and Data Science Department
-            </h1>
-            <p className="text-gray-600 leading-relaxed max-w-3xl">
-              Connect with our successful alumni working in leading tech companies
-              worldwide. Explore their career paths, skills, and get inspired for
-              your journey.
-            </p>
-          </div>
-        </section>
-
-      {/* Search and Filters */}
-      <section className="relative bg-gradient-to-br from-indigo-50 via-white to-cyan-50 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-        <div className="relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search alumni by name, company, or skills..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)} // Delay to allow click on suggestions
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {/* Suggestions Dropdown */}
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto">
-                {suggestions.map((suggestion, index) => {
-                  const getIcon = (type) => {
-                    switch (type) {
-                      case 'name':
-                        return <User className="text-blue-500" size={16} />;
-                      case 'company':
-                        return <Building className="text-green-500" size={16} />;
-                      case 'skill':
-                        return <Code className="text-purple-500" size={16} />;
-                      default:
-                        return <FaSearch className="text-gray-400" size={14} />;
-                    }
-                  };
-
-                  const getTypeLabel = (type) => {
-                    switch (type) {
-                      case 'name':
-                        return 'Name';
-                      case 'company':
-                        return 'Company';
-                      case 'skill':
-                        return 'Skill';
-                      default:
-                        return '';
-                    }
-                  };
-
-                  return (
-                    <div
-                      key={index}
-                      className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      onClick={() => {
-                        setSearchTerm(suggestion.value);
-                        setShowSuggestions(false);
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          {getIcon(suggestion.type)}
-                          <span className="text-gray-700 ml-2">{suggestion.value}</span>
-                        </div>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                          {getTypeLabel(suggestion.type)}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+      {/* Search */}
+      <div className="relative max-w-lg">
+        <div className="flex items-stretch border-2 border-brand-navy">
+          <span className="px-3.5 grid place-items-center text-[12.5px] text-brand-ink-soft">Search</span>
+          <input
+            type="text"
+            placeholder="Name, company or skill"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            className="flex-1 py-3.5 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+          />
         </div>
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-brand-edge shadow-lg z-30 max-h-56 overflow-y-auto">
+            {suggestions.map((s, i) => (
+              <div
+                key={i}
+                className="px-3.5 py-2.5 hover:bg-brand-ground cursor-pointer border-b border-brand-row last:border-b-0 flex items-center justify-between gap-2"
+                onClick={() => {
+                  setSearchTerm(s.value);
+                  setShowSuggestions(false);
+                }}
+              >
+                <span className="flex items-center gap-2 text-[13px] text-brand-ink">
+                  {suggestionIcon(s.type)}
+                  {s.value}
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.1em] text-brand-ink-faint">{s.type}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-        {/* Filter Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Pass Out Year */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FaFilter className="inline mr-2" />
-              Pass Out Year
-            </label>
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,240px)_minmax(0,3fr)] gap-6 items-start">
+        {/* Filters */}
+        <aside className="border border-brand-edge bg-brand-ground p-5 flex flex-col gap-5 min-w-[230px]">
+          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-navy">Filter</span>
+
+          <div className="flex flex-col gap-2 border-t border-brand-edge pt-3.5">
+            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+              Pass out year
+            </span>
             <select
               value={filters.passOutYear}
-              onChange={(e) =>
-                setFilters({ ...filters, passOutYear: e.target.value })
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setFilters({ ...filters, passOutYear: e.target.value })}
+              className="border border-brand-ink-faint bg-white px-3 py-2.5 text-[12.5px] text-brand-navy outline-none"
             >
               <option>All</option>
               {passOutYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
+                <option key={year} value={year}>{year}</option>
               ))}
             </select>
           </div>
 
-          {/* Company */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="flex flex-col gap-2 border-t border-brand-edge pt-3.5">
+            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
               Company
-            </label>
+            </span>
             <input
               type="text"
-              placeholder="e.g., Google"
+              list="alumni-companies"
+              placeholder="e.g. Google"
               value={filters.company}
-              onChange={(e) =>
-                setFilters({ ...filters, company: e.target.value })
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setFilters({ ...filters, company: e.target.value })}
+              className="border border-brand-ink-faint bg-white px-3 py-2.5 text-[12.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
             />
+            <datalist id="alumni-companies">
+              {companies.map((c) => <option key={c} value={c} />)}
+            </datalist>
           </div>
 
-          {/* Skills */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Technical Skills
-            </label>
+          <div className="flex flex-col gap-2 border-t border-brand-edge pt-3.5">
+            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+              Skills
+            </span>
             <input
               type="text"
-              placeholder="e.g., Python, ML"
+              placeholder="e.g. Python, ML"
               value={filters.skills}
-              onChange={(e) =>
-                setFilters({ ...filters, skills: e.target.value })
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setFilters({ ...filters, skills: e.target.value })}
+              className="border border-brand-ink-faint bg-white px-3 py-2.5 text-[12.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
             />
           </div>
-        </div>
 
-        {/* Clear Filters Button */}
-        <button
-          onClick={() => {
-            setFilters({ passOutYear: "All", company: "", skills: "" });
-            setSearchTerm("");
-          }}
-          className="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
-        >
-          Clear Filters
-        </button>
-        </div>
-      </section>
+          <button
+            onClick={clearFilters}
+            className="self-start px-3.5 py-2.5 border border-brand-ink-faint bg-white text-[11.5px] font-medium text-brand-ink-soft hover:bg-brand-ground"
+          >
+            Clear all
+          </button>
+        </aside>
 
-      {/* Results Count */}
-      <div className="text-gray-600 font-medium">
-        Showing {filteredAlumni.length} of {alumni.length} alumni
-      </div>
+        {/* Results */}
+        <div className="min-w-0 flex flex-col gap-3.5">
+          <span className="text-[12.5px] text-brand-ink-soft">
+            Showing {filteredAlumni.length} of {alumni.length}
+          </span>
 
-      {/* Alumni Cards Grid */}
-      {filteredAlumni.length > 0 ? (
-        <div className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+          {error && (
+            <div className="bg-brand-red-tint text-brand-red-deep px-3.5 py-3 text-[13px]">
+              Error: {error}
+            </div>
+          )}
 
-          <div className="relative z-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAlumni.length > 0 ? (
+            <div
+              className="grid gap-px bg-brand-edge border border-brand-edge"
+              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}
+            >
               {filteredAlumni.map((alum) => (
                 <AlumniCard key={alum._id} alumni={alum} />
               ))}
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="relative bg-gradient-to-br from-red-50 via-white to-orange-50 backdrop-blur-lg p-10 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-red-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10 text-center">
-            <p className="text-lg text-gray-600">
-              No alumni found matching your filters.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="relative bg-gradient-to-br from-red-50 via-white to-pink-50 backdrop-blur-lg px-4 py-3 rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-red-200/20 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
-
-          <div className="relative z-10">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-              Error: {error}
+          ) : (
+            <div className="border border-brand-edge p-10 text-center">
+              <p className="m-0 text-[13.5px] text-brand-ink-soft">
+                No alumni found matching your filters.
+              </p>
             </div>
-          </div>
+          )}
         </div>
-      )}
       </div>
     </div>
   );

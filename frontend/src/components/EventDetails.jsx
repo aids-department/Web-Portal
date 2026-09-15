@@ -1,9 +1,6 @@
 // frontend/src/components/EventDetails.jsx
 import React, { useState } from 'react';
-import {
-  ArrowLeft, Calendar, MapPin, Award,
-  FileText, PenTool
-} from 'lucide-react';
+import { eventTagStyle } from '../utils/eventTagStyle';
 
 const EventDetails = ({ event, onBack }) => {
   const [openSection, setOpenSection] = useState(null);
@@ -15,7 +12,7 @@ const EventDetails = ({ event, onBack }) => {
 
   const formatDate = (d) =>
     d ? new Date(d).toLocaleDateString('en-US', {
-      weekday: 'long', month: 'short', day: 'numeric'
+      weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
     }) : '';
 
   const formatTime = (d) =>
@@ -23,162 +20,131 @@ const EventDetails = ({ event, onBack }) => {
       hour: '2-digit', minute: '2-digit'
     }) : '';
 
+  const tag = eventTagStyle(event.eventType);
+  const hasRegistration = !!(event.registrationLink && event.registrationLink !== 'NO_LINK');
+
+  const facts = [
+    { k: 'Date', v: formatDate(event.startDate) },
+    event.startDate && { k: 'Time', v: formatTime(event.startDate) },
+    { k: 'Venue', v: event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On campus' },
+    (event.organizer || event.companyName || event.conductedBy) && {
+      k: 'Conducted by',
+      v: event.organizer || event.companyName || event.conductedBy,
+    },
+    event.totalParticipants && { k: 'Participants', v: event.totalParticipants },
+    event.prizeAmount && { k: 'Prize pool', v: `₹${event.prizeAmount}` },
+  ].filter(Boolean);
+
+  const extraSections = [
+    event.hackProblemStatements && { key: 'problem', title: 'Problem Statements', content: event.hackProblemStatements },
+    event.hackJudgingCriteria && { key: 'judging', title: 'Judging Criteria', content: event.hackJudgingCriteria },
+    event.hackRules && { key: 'rules', title: 'Rules', content: event.hackRules },
+  ].filter(Boolean);
+
+  const winner = event.winner || event.winningTeam;
+
   return (
-    <div className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-
-      {/* Decorative orbs */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
-
-      {/* Back */}
-      <div className="relative z-10 px-6 py-4 border-b border-white/40">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-blue-700 font-medium transition"
-        >
-          <ArrowLeft size={18} />
-          Back to Events
+    <div className="font-brand">
+      <div className="px-5 sm:px-8 lg:px-12 py-4 border-b border-brand-edge flex items-center gap-2 flex-wrap">
+        <button onClick={onBack} className="text-[12px] font-medium text-brand-blue hover:underline">
+          Events
         </button>
+        <span className="text-[12px] text-brand-ink-faint">/</span>
+        <span className="text-[12px] text-brand-ink-soft">{event.eventName}</span>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
+      <div className="min-h-[220px] sm:min-h-[280px] bg-brand-blue grid place-items-center overflow-hidden">
+        {event.poster ? (
+          <img src={event.poster} alt={event.eventName} className="w-full h-full object-cover grayscale" />
+        ) : (
+          <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-[#a8b6cc]">
+            Event photograph
+          </span>
+        )}
+      </div>
 
-        {/* HERO */}
-        <div className="flex flex-col lg:flex-row gap-10 mb-14">
-          <img
-            src={event.poster}
-            alt={event.eventName}
-            className="w-full lg:w-1/3 rounded-3xl object-cover shadow-xl"
-          />
-
-          <div className="flex-1 space-y-6">
-            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,320px)]">
+        <div className="min-w-0 px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-10 flex flex-col gap-5 lg:border-r border-brand-edge">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span
+                className="px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
+                style={{ background: tag.bg, color: tag.fg }}
+              >
+                {event.eventType || 'Event'}
+              </span>
+              <span className="text-[12px] text-brand-ink-soft tabular-nums">
+                {formatDate(event.startDate)}
+              </span>
+            </div>
+            <h1 className="m-0 text-[28px] sm:text-[34px] lg:text-[38px] leading-[1.1] font-semibold tracking-[-0.02em] text-brand-navy max-w-[24ch]">
               {event.eventName}
             </h1>
-
-            <p className="text-gray-600 text-lg">
-              Organized by <span className="font-semibold text-gray-800">
-                {event.organizer || event.companyName}
+            {winner && (
+              <span className="text-[13px] font-semibold text-brand-red">
+                Champion: {winner}
               </span>
-            </p>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              <Info
-                icon={<Calendar size={18} />}
-                label="Date"
-                value={formatDate(event.startDate)}
-                sub={formatTime(event.startDate)}
-              />
-              <Info
-                icon={<MapPin size={18} />}
-                label="Venue"
-                value={event.eventMode === 'Online' ? 'Online Event' : event.venue}
-              />
-            </div>
-
-            {/* ACCORDIONS */}
-            {event.hackProblemStatements && (
-              <Accordion
-                title="Problem Statements"
-                icon={<FileText />}
-                open={openSection === 'problem'}
-                onClick={() => toggle('problem')}
-                content={event.hackProblemStatements}
-                theme="blue"
-              />
             )}
-
-            {event.hackJudgingCriteria && (
-              <Accordion
-                title="Judging Criteria"
-                icon={<Award />}
-                open={openSection === 'judging'}
-                onClick={() => toggle('judging')}
-                content={event.hackJudgingCriteria}
-                theme="purple"
-              />
-            )}
-
-            {event.hackRules && (
-              <Accordion
-                title="Rules"
-                icon={<PenTool />}
-                open={openSection === 'rules'}
-                onClick={() => toggle('rules')}
-                content={event.hackRules}
-                theme="amber"
-              />
-            )}
-
-            <div className="pt-4">
-              <button
-                  onClick={() => {
-                    if (!event.registrationLink || event.registrationLink === "NO_LINK") {
-                      alert("No registration link has been provided for this event.");
-                      return;
-                    }
-                    window.open(event.registrationLink, "_blank");
-                  }}
-                  className="inline-block px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl transition">
-                  Register Now
-                </button>
-                
-              
-            </div>
           </div>
-        </div>
 
-        {/* DESCRIPTION */}
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-lg border border-white/40 p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            About the Event
-          </h3>
-          <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+          <p className="m-0 max-w-[76ch] text-[15px] leading-[1.75] text-[#3a3838] whitespace-pre-line">
             {event.description || 'No description provided.'}
           </p>
+
+          {extraSections.map((s) => (
+            <div key={s.key} className="border border-brand-edge">
+              <button
+                onClick={() => toggle(s.key)}
+                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-[12.5px] font-semibold text-brand-navy hover:bg-brand-ground"
+              >
+                {s.title}
+                <span className="text-brand-ink-faint">{openSection === s.key ? '−' : '+'}</span>
+              </button>
+              {openSection === s.key && (
+                <div className="px-4 py-3 text-[13px] leading-[1.6] text-brand-ink-soft whitespace-pre-line border-t border-brand-row">
+                  {s.content}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
+
+        <aside className="px-5 sm:px-8 lg:px-8 py-8 sm:py-9 lg:py-10 bg-brand-ground flex flex-col gap-5 min-w-[260px]">
+          <div className="flex flex-col gap-3">
+            {facts.map((f) => (
+              <div key={f.k} className="border-t border-brand-edge pt-2.5 flex flex-col gap-1">
+                <span className="text-[9.5px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+                  {f.k}
+                </span>
+                <span className="text-[13.5px] font-medium text-brand-navy">{f.v}</span>
+              </div>
+            ))}
+          </div>
+
+          {hasRegistration ? (
+            <div className="border border-brand-navy bg-white p-[18px] flex flex-col gap-2.5">
+              <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-red">
+                Registration open
+              </span>
+              <button
+                onClick={() => window.open(event.registrationLink, '_blank')}
+                className="px-[18px] py-[13px] bg-brand-red text-white text-[12.5px] font-semibold"
+              >
+                Register
+              </button>
+            </div>
+          ) : (
+            <div className="border border-brand-edge bg-white p-[18px] flex flex-col gap-2">
+              <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-ink-soft">
+                No registration
+              </span>
+              <span className="text-[12.5px] leading-[1.6] text-[#3a3838]">
+                Open to all students of the department.
+              </span>
+            </div>
+          )}
+        </aside>
       </div>
-    </div>
-  );
-};
-
-/* ---------- SUB COMPONENTS ---------- */
-
-const Info = ({ icon, label, value, sub }) => (
-  <div className="bg-white/70 backdrop-blur-md border border-white/40 rounded-2xl p-4 flex gap-3 shadow-sm">
-    <div className="text-blue-600">{icon}</div>
-    <div>
-      <p className="text-xs uppercase tracking-wider text-gray-400 font-bold">
-        {label}
-      </p>
-      <p className="font-bold text-gray-800">{value}</p>
-      {sub && <p className="text-xs text-gray-500">{sub}</p>}
-    </div>
-  </div>
-);
-
-const Accordion = ({ title, icon, open, onClick, content, theme }) => {
-  const themes = {
-    blue: 'from-blue-50 to-blue-100 text-blue-800',
-    purple: 'from-purple-50 to-purple-100 text-purple-800',
-    amber: 'from-amber-50 to-amber-100 text-amber-800',
-  };
-
-  return (
-    <div className="rounded-2xl overflow-hidden shadow-sm border border-white/40 bg-white/60 backdrop-blur-md">
-      <button
-        onClick={onClick}
-        className={`w-full flex items-center gap-3 p-4 font-bold bg-gradient-to-r ${themes[theme]} hover:opacity-90 transition`}
-      >
-        {icon}
-        {title}
-      </button>
-
-      {open && (
-        <div className="p-4 text-gray-700 whitespace-pre-line bg-white/70">
-          {content}
-        </div>
-      )}
     </div>
   );
 };

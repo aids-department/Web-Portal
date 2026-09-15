@@ -1,21 +1,8 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FaTimes, FaLinkedin } from "react-icons/fa";
-
-/* Skill color palette (cycled) */
-const SKILL_COLORS = [
-  "bg-blue-100 text-blue-800",
-  "bg-indigo-100 text-indigo-800",
-  "bg-purple-100 text-purple-800",
-  "bg-green-100 text-green-800",
-  "bg-teal-100 text-teal-800",
-  "bg-pink-100 text-pink-800",
-];
 
 export default function AlumniCard({ alumni }) {
   const [open, setOpen] = useState(false);
-
-  if (!alumni) return null;
 
   /* Lock body scroll */
   useEffect(() => {
@@ -23,195 +10,151 @@ export default function AlumniCard({ alumni }) {
     return () => (document.body.style.overflow = "");
   }, [open]);
 
+  if (!alumni) return null;
+
+  const facts = [
+    alumni.role && { k: "Current role", v: alumni.role },
+    alumni.company && { k: "Company", v: alumni.company },
+    alumni.passOutYear && { k: "Pass out year", v: alumni.passOutYear },
+  ].filter(Boolean);
+
+  const roleAtCompany = [alumni.role, alumni.company ? `at ${alumni.company}` : null]
+    .filter(Boolean)
+    .join(' ');
+  const roleDotCompany = [alumni.role, alumni.company].filter(Boolean).join(' · ');
+
   return (
     <>
-      {/* ================= CARD ================= */}
-      <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden">
-        {/* Banner */}
-        <div className="h-28 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 relative">
-          <div className="absolute -bottom-10 left-6">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-3xl font-bold text-indigo-700 ring-4 ring-white shadow-md group-hover:scale-105 transition">
-              {alumni.name?.charAt(0)?.toUpperCase()}
-            </div>
-          </div>
+      {/* ================= DIRECTORY TILE ================= */}
+      <button
+        onClick={() => setOpen(true)}
+        className="font-brand text-left bg-white p-[18px] flex flex-col gap-2.5 hover:bg-[#f7f9fc]"
+      >
+        <div className="h-[130px] bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center overflow-hidden">
+          {alumni.imageUrl ? (
+            <img src={alumni.imageUrl} alt={alumni.name} className="w-full h-full object-cover grayscale" />
+          ) : (
+            <span className="text-[9px] font-medium tracking-[0.14em] uppercase text-[#5f6e88]">
+              Portrait
+            </span>
+          )}
         </div>
-
-        {/* Content */}
-        <div className="pt-14 px-6 pb-6">
-          <h3 className="text-xl font-extrabold bg-gradient-to-r from-gray-900 to-indigo-800 bg-clip-text text-transparent">
-            {alumni.name}
-          </h3>
-
-          <p className="text-sm font-semibold text-indigo-600">
-            {alumni.role}
-          </p>
-
-          <p className="text-xs text-gray-500 mb-4">
-            {alumni.company || "Company not specified"}
-          </p>
-
-          {/* Skills preview */}
-          <div className="flex flex-wrap gap-2 mb-5">
-            {alumni.skills?.slice(0, 3).map((skill, i) => (
-              <span
-                key={i}
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  SKILL_COLORS[i % SKILL_COLORS.length]
-                }`}
-              >
-                {skill}
-              </span>
-            ))}
-
-            {alumni.skills?.length > 3 && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-                +{alumni.skills.length - 3}
-              </span>
-            )}
-          </div>
-
-          <button
-            onClick={() => setOpen(true)}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-md hover:from-blue-700 hover:to-purple-700 transition"
-          >
-            View Full Profile
-          </button>
+        <h3 className="m-0 text-[15px] font-semibold leading-[1.3] text-brand-navy">{alumni.name}</h3>
+        <div className="flex justify-between gap-2 flex-wrap">
+          <span className="text-[11.5px] leading-[1.3] text-brand-ink-soft">
+            {roleDotCompany || 'Company not specified'}
+          </span>
+          {alumni.passOutYear && (
+            <span className="text-[11.5px] font-medium text-brand-blue tabular-nums">
+              {alumni.passOutYear}
+            </span>
+          )}
         </div>
-      </div>
+      </button>
 
-      {/* ================= MODAL (PORTAL) ================= */}
+      {/* ================= PROFILE (PORTAL) ================= */}
       {open &&
         createPortal(
-          <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
-              onClick={() => setOpen(false)}
-            />
+          <div className="font-brand fixed inset-0 z-[9999] overflow-y-auto bg-brand-ground">
+            <div className="px-5 sm:px-8 lg:px-12 py-4 border-b border-brand-edge flex items-center gap-2 flex-wrap bg-white">
+              <button onClick={() => setOpen(false)} className="text-[12px] font-medium text-brand-blue hover:underline">
+                Alumni directory
+              </button>
+              <span className="text-[12px] text-brand-ink-faint">/</span>
+              <span className="text-[12px] text-brand-ink-soft">{alumni.name}</span>
+              <button
+                onClick={() => setOpen(false)}
+                className="ml-auto text-[12px] font-medium text-brand-ink-soft border border-brand-ink-faint px-3 py-1.5"
+              >
+                Close
+              </button>
+            </div>
 
-            {/* Modal */}
-            <div className="fixed inset-0 z-[10000] flex items-center justify-center px-4">
-              <div className="w-full max-w-4xl max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
-
-                {/* Header */}
-                <div className="p-6 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow">
-                      {alumni.name?.charAt(0)?.toUpperCase()}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-extrabold bg-gradient-to-r from-gray-900 to-indigo-800 bg-clip-text text-transparent">
-                        {alumni.name}
-                      </h2>
-                      <p className="text-sm font-medium text-indigo-600">
-                        {alumni.role}
-                      </p>
-                    </div>
+            <div className="bg-brand-navy px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-10 grid grid-cols-[150px_minmax(0,1fr)] gap-7 items-start">
+              <div className="h-[180px] bg-brand-blue border border-[#3d5077] grid place-items-center overflow-hidden">
+                {alumni.imageUrl ? (
+                  <img src={alumni.imageUrl} alt={alumni.name} className="w-full h-full object-cover grayscale" />
+                ) : (
+                  <span className="text-[9px] font-medium tracking-[0.14em] uppercase text-[#a8b6cc]">
+                    Portrait
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex flex-col gap-2.5">
+                {alumni.passOutYear && (
+                  <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-brand-red">
+                    Class of {alumni.passOutYear}
+                  </span>
+                )}
+                <h1 className="m-0 text-[28px] sm:text-[34px] lg:text-[40px] leading-[1.05] font-semibold tracking-[-0.02em] text-white">
+                  {alumni.name}
+                </h1>
+                {roleAtCompany && (
+                  <span className="text-[14.5px] leading-[1.5] text-brand-on-navy">
+                    {roleAtCompany}
+                  </span>
+                )}
+                {alumni.linkedinUrl && (
+                  <div className="flex gap-2 flex-wrap pt-1.5">
+                    <a
+                      href={alumni.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-[15px] py-2.5 border border-[#4a5a7a] text-[12px] font-medium text-white"
+                    >
+                      LinkedIn
+                    </a>
                   </div>
-
-                  <button
-                    onClick={() => setOpen(false)}
-                    className="p-2 rounded-full hover:bg-gray-200 transition"
-                  >
-                    <FaTimes size={18} />
-                  </button>
-                </div>
-
-                {/* Body */}
-                <div className="flex-1 overflow-y-auto p-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-                    {/* LEFT */}
-                    <Section title="Professional Information" accent="indigo">
-                      <Info label="Current Role" value={alumni.role} />
-                      <Info label="Company" value={alumni.company || "Not specified"} />
-                      <Info label="Pass Out Year" value={alumni.passOutYear} />
-                    </Section>
-
-                    {/* RIGHT */}
-                    <Section title="Technical Skills" accent="blue">
-                      <div className="flex flex-wrap gap-2">
-                        {alumni.skills?.length ? (
-                          alumni.skills.map((skill, i) => (
-                            <span
-                              key={i}
-                              className={`px-4 py-1.5 rounded-full text-sm font-semibold ${
-                                SKILL_COLORS[i % SKILL_COLORS.length]
-                              }`}
-                            >
-                              {skill}
-                            </span>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No skills listed
-                          </p>
-                        )}
-                      </div>
-                    </Section>
-
-                    {alumni.bio && (
-                      <Section title="About" accent="purple">
-                        <p className="text-gray-700 leading-relaxed">
-                          {alumni.bio}
-                        </p>
-                      </Section>
-                    )}
-
-                    {alumni.linkedin && (
-                      <Section title="Connect" accent="blue">
-                        <a
-                          href={alumni.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-                        >
-                          <FaLinkedin size={20} />
-                          LinkedIn Profile
-                        </a>
-                      </Section>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
             </div>
-          </>,
+
+            <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-8 lg:py-9 flex flex-col gap-7 bg-white">
+              <div
+                className="grid gap-px bg-brand-edge border border-brand-edge"
+                style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}
+              >
+                {facts.map((f) => (
+                  <div key={f.k} className="bg-white px-[18px] py-4 flex flex-col gap-1.5">
+                    <span className="text-[9.5px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+                      {f.k}
+                    </span>
+                    <span className="text-[13.5px] font-medium text-brand-navy">{f.v}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
+                  Skills
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {alumni.skills?.length ? (
+                    alumni.skills.map((skill, i) => (
+                      <span key={i} className="px-3 py-[7px] border border-brand-ink-faint text-[12.5px] text-[#3a3838]">
+                        {skill}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="m-0 text-[13px] text-brand-ink-soft">No skills listed</p>
+                  )}
+                </div>
+              </div>
+
+              {alumni.bio && (
+                <div className="flex flex-col gap-3">
+                  <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
+                    About
+                  </span>
+                  <p className="m-0 max-w-[76ch] text-[14px] leading-[1.7] text-[#3a3838] whitespace-pre-line">
+                    {alumni.bio}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>,
           document.body
         )}
     </>
-  );
-}
-
-/* ================= UI HELPERS ================= */
-
-function Section({ title, accent = "indigo", children }) {
-  const accentMap = {
-    indigo: "text-indigo-700",
-    blue: "text-blue-700",
-    purple: "text-purple-700",
-  };
-
-  return (
-    <div>
-      <h3 className={`text-lg font-bold mb-4 ${accentMap[accent]}`}>
-        {title}
-      </h3>
-      <div className="bg-gray-50 rounded-2xl p-5 space-y-3">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Info({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
-        {label}
-      </p>
-      <p className="text-sm font-semibold text-gray-900">
-        {value}
-      </p>
-    </div>
   );
 }

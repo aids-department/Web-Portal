@@ -1,11 +1,11 @@
 import axios from "axios";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 
 import { useState, useEffect, useRef } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Users, BookOpen, GraduationCap, FlaskConical } from "lucide-react";
-import Sidebar from "./components/Sidebar";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import HeroCanvas from "./components/HeroCanvas";
 import BrickBreakerGame from "./components/BrickBreakerGame";
 
 // Pages from App 1
@@ -19,7 +19,6 @@ import Alumni from "./pages/Alumni";
 // Pages from App 2
 import EventsPage from "./pages/EventsPage";
 import PostsPage from "./pages/PostsPage";
-import QuestionBank from "./pages/QuestionBank";
 import AssociationMembers from "./pages/AssociationMembers";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -30,11 +29,6 @@ import ProfessionalAdminLayout from "./components/ProfessionalAdminLayout";
 import ManageUploads from "./components/ManageUploads";
 import ManageContent from "./components/ManageContent"; 
 import UpdateContent from "./components/ManageContentupdates.jsx";
-// Images for Dashboard
-import img1 from "./assets/enigma.png";
-import img2 from "./assets/genesys.png";
-import Dashboard_Carousel from "./components/Dashboard_Carousel";
-import AchievementsCarousel from "./components/AchievementsCarousel";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import AdminLeaderboards from "./pages/AdminLeaderboards";
@@ -78,9 +72,15 @@ const ScrollNumber = ({ target, suffix = "", duration = 1000 }) => {
 // ============================================
 // DASHBOARD PAGE COMPONENT (From App 1)
 // ============================================
+const DASHBOARD_STATS = [
+  { label: "Ongoing Projects", value: "50+", num: "50" },
+  { label: "Faculty Members", value: "12", num: "12" },
+  { label: "Active Students", value: "300+", num: "300" },
+  { label: "Research Lab", value: "1", num: "1" },
+];
+
 function DashboardPage() {
     const [updates, setUpdates] = useState([]);
-    const [achievements, setAchievements] = useState([]);
     // Fetch updates from the dedicated MongoDB server on port 5001
     useEffect(() => {
         const fetchUpdates = async () => {
@@ -91,125 +91,143 @@ function DashboardPage() {
                 console.error("Failed to fetch updates:", err);
             }
         };
-        // Fetch achievements from the Render API
-        const fetchAchievements = async () => {
-            try {
-                const res = await fetch("https://web-portal-760h.onrender.com/api/achievements/approved/recent");
-                const data = await res.json();
-                setAchievements(data);
-            } catch (err) {
-                console.error("Failed to fetch achievements:", err);
-            }
-        };
         fetchUpdates();
-        fetchAchievements();
     }, []);
 
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
+    const tiles = [
+        { label: "About", body: "Faculty, staff and the full syllabus by semester.", to: "/about/faculty" },
+        { label: "Events", body: "Workshops, talks and contests with a marked calendar.", to: "/events" },
+        { label: "Leaderboard", body: "Coding contest standings and rankings.", to: "/leaderboards" },
+        { label: "Achievements", body: "A gallery of what students have won and built.", to: "/achievements" },
+        { label: "Alumni", body: "Browse the alumni directory.", to: "/alumni" },
+        { label: "Posts", body: "Open discussion. Sign in required.", to: "/posts" },
+        { label: "Your profile", body: "Skills, links and achievements.", to: user ? "/profile" : "/login" },
+    ];
+
     return (
-        <>
-            {/* HEADER SECTION - Kept exactly the same */}
-            <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 backdrop-blur-lg p-12 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/10 to-purple-100/10 rounded-full blur-3xl"></div>
-
-                <div className="relative z-10">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4 font-cursive leading-tight">
-                            Welcome to the Department of AI and DS
-                        </h1>
-                        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-6"></div>
+        <div className="font-brand">
+            {/* HERO */}
+            <div className="bg-brand-navy grid items-stretch" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))" }}>
+                <div className="px-5 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-[60px] flex flex-col gap-6 border-r-2 border-brand-blue">
+                    <span className="text-[11px] font-medium tracking-[0.22em] uppercase text-brand-red">
+                        Undergraduate and postgraduate
+                    </span>
+                    <h1 className="m-0 text-[38px] sm:text-[48px] lg:text-[60px] leading-[1.03] font-semibold tracking-[-0.02em] text-white max-w-[16ch]">
+                        Artificial Intelligence and Data Science
+                    </h1>
+                    <p className="m-0 max-w-[52ch] text-[15px] leading-[1.62] text-brand-on-navy">
+                        Our mission is to foster innovation and excellence in Artificial Intelligence and Data
+                        Science through cutting-edge research, industry collaboration, and a dynamic learning
+                        environment.
+                    </p>
+                    <div className="flex gap-3 flex-wrap pt-1">
+                        <Link
+                            to="/about/syllabus"
+                            className="px-5 py-[13px] bg-brand-red text-white font-semibold text-[12.5px]"
+                        >
+                            Explore the programme
+                        </Link>
+                        <Link
+                            to="/events"
+                            className="px-5 py-[13px] border border-[#4a5a7a] text-white font-medium text-[12.5px]"
+                        >
+                            Upcoming events
+                        </Link>
                     </div>
-
-                    <div className="max-w-4xl mx-auto text-center mb-12">
-                        <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                            Our mission is to foster innovation and excellence in Artificial Intelligence and Data Science through
-                            <span className="font-semibold text-blue-700"> cutting-edge research</span>,
-                            <span className="font-semibold text-purple-700"> industry collaboration</span>, and a
-                            <span className="font-semibold text-green-700"> dynamic learning environment</span>.
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-                            <span className="px-3 py-1 bg-blue-100/50 rounded-full">🤖 AI Research</span>
-                            <span className="px-3 py-1 bg-purple-100/50 rounded-full">📊 Data Science</span>
-                            <span className="px-3 py-1 bg-green-100/50 rounded-full">🎓 Education</span>
-                            <span className="px-3 py-1 bg-orange-100/50 rounded-full">🚀 Innovation</span>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            { label: "Ongoing Projects", value: "50+", num: "50", icon: BookOpen, color: "text-blue-600" },
-                            { label: "Faculty Members", value: "12", num: "12", icon: Users, color: "text-purple-600" },
-                            { label: "Active Students", value: "300+", num: "300", icon: GraduationCap, color: "text-green-600" },
-                            { label: "Research Lab", value: "1", num: "1", icon: FlaskConical, color: "text-orange-600" },
-                        ].map((item) => {
-                            const IconComponent = item.icon;
-                            return (
-                                <div
-                                    key={item.label}
-                                    className="group bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-white/40 text-center hover:scale-105 hover:bg-white/90 hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    <div className="relative z-10">
-                                        <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3 ${item.color}`}>
-                                            <IconComponent size={24} />
-                                        </div>
-                                        <div className="text-4xl font-bold text-gray-900 mb-1">
-                                            <ScrollNumber target={item.num} suffix={item.value.includes('+') ? '+' : ''} />
-                                        </div>
-                                        <p className="text-gray-700 font-medium text-sm">{item.label}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div className="flex gap-8 flex-wrap border-t border-[#23345c] pt-5 mt-auto">
+                        {DASHBOARD_STATS.map((s) => (
+                            <div key={s.label} className="flex flex-col gap-1.5">
+                                <span className="text-[26px] leading-none font-semibold text-white tabular-nums">
+                                    <ScrollNumber target={s.num} suffix={s.value.includes("+") ? "+" : ""} />
+                                </span>
+                                <span className="text-[10.5px] leading-none tracking-[0.14em] uppercase text-brand-on-navy-muted">
+                                    {s.label}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-            </section>
-
-            {/* EVENTS - Kept exactly the same */}
-            <section id="events" className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 mb-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-                <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Events</h2>
-                    <Dashboard_Carousel
-                        slides={[
-                            { img: img1, page: "/events/codenigma" },
-                            { img: img2, page: "/events/genesys" },
-                        ]}
-                    />
-                </div>
-            </section>
-            {/* 3. NEW: RECENT ACHIEVEMENTS SECTION (Between Events and Updates) */}
-            <section className="mb-8">
-                <AchievementsCarousel />
-            </section>
-            {/* RECENT UPDATES - Now Dynamic from MongoDB */}
-            <section className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-                <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-900 font-cursive">Recent Updates</h2>
-
-                    <div className="space-y-4">
-                        {updates.length > 0 ? (
-                            updates.map((u) => (
-                                <div key={u._id} className="group pb-4 border-b border-gray-200 hover:bg-white/60 transition-all duration-300 rounded-lg px-4 py-3 hover:shadow-md">
-                                    <p className="text-gray-900 font-medium group-hover:text-gray-800">{u.title}</p>
-                                    <p className="text-gray-500 text-sm group-hover:text-gray-600">
-                                        {formatDistanceToNow(new Date(u.createdAt), { addSuffix: true })}
-                                    </p>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-gray-500 italic">No updates available at the moment.</p>
-                        )}
+                <div className="relative bg-brand-navy-deep min-h-[300px] lg:min-h-[440px]">
+                    <HeroCanvas />
+                    <div className="absolute left-[22px] bottom-5 flex flex-col gap-1 pointer-events-none">
+                        <span className="text-[10px] leading-none tracking-[0.18em] uppercase text-brand-red">
+                            Interactive
+                        </span>
+                        <span className="text-[11px] leading-[1.4] text-brand-on-navy-muted">
+                            Move the cursor. Points settling from noise into structure.
+                        </span>
                     </div>
                 </div>
+            </div>
+
+            {/* RECENT UPDATES */}
+            <section className="px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-[46px] border-b-2 border-brand-navy">
+                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-[22px]">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+                            Recent updates
+                        </span>
+                        <h2 className="m-0 text-[30px] font-semibold tracking-[-0.01em] text-brand-navy">
+                            What is happening
+                        </h2>
+                    </div>
+                    <Link to="/posts" className="text-[12.5px] font-semibold text-brand-red">
+                        All updates
+                    </Link>
+                </div>
+                {updates.length > 0 ? (
+                    <div
+                        className="grid gap-px bg-brand-edge border border-brand-edge"
+                        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))" }}
+                    >
+                        {updates.map((u) => (
+                            <div key={u._id} className="bg-white p-5 flex flex-col gap-2">
+                                <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-red">
+                                    Update
+                                </span>
+                                <h3 className="m-0 text-[16.5px] leading-[1.32] font-semibold text-brand-navy">
+                                    {u.title}
+                                </h3>
+                                <span className="mt-auto border-t border-brand-row pt-2.5 text-[11.5px] text-brand-ink-soft">
+                                    {format(new Date(u.createdAt), "dd MMM yyyy")}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-brand-ink-soft italic text-[13.5px]">No updates available at the moment.</p>
+                )}
             </section>
-        </>
+
+            {/* WHERE TO GO */}
+            <section className="px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-[46px]">
+                <div className="flex flex-col gap-2 mb-[22px]">
+                    <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+                        Where to go
+                    </span>
+                    <h2 className="m-0 text-[30px] font-semibold tracking-[-0.01em] text-brand-navy">
+                        The portal at a glance
+                    </h2>
+                </div>
+                <div
+                    className="grid gap-px bg-brand-edge border border-brand-edge"
+                    style={{ gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}
+                >
+                    {tiles.map((t) => (
+                        <Link
+                            key={t.label}
+                            to={t.to}
+                            className="bg-white p-5 flex flex-col gap-2 hover:bg-[#f7f9fc]"
+                        >
+                            <span className="text-[15.5px] font-semibold text-brand-navy">{t.label}</span>
+                            <span className="text-[12.5px] leading-[1.6] text-brand-ink-soft">{t.body}</span>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+        </div>
     );
 }
 // ============================================
@@ -266,30 +284,18 @@ function ProjectsPage() {
 // ============================================
 // MAIN LAYOUT COMPONENT
 // ============================================
-function MainLayout({ children, isOpen, toggleSidebar, fullBleed = false }) {
+function MainLayout({ children, fullBleed = false }) {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans overflow-x-hidden flex relative">
-      <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-
-      <div
-        className={`
-          flex-1 flex flex-col overflow-x-hidden transition-all duration-300 pt-20
-          ${isOpen ? "ml-64" : "ml-0"}
-        `}
-      >
-        <Navbar toggleSidebar={toggleSidebar} />
-        <main className={`flex-1 overflow-y-auto ${fullBleed ? 'p-0 bg-transparent' : 'p-8 bg-white shadow-inner'}`}>
-          {fullBleed ? (
-            <div className="w-full h-full">
-              {children}
-            </div>
-          ) : (
-            <div className="max-w-7xl mx-auto">
-              {children}
-            </div>
-          )}
-        </main>
-      </div>
+    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
+      <Navbar />
+      <main className="flex-1">
+        {fullBleed ? (
+          <div className="w-full h-full">{children}</div>
+        ) : (
+          <div className="max-w-7xl mx-auto p-8">{children}</div>
+        )}
+      </main>
+      <Footer />
     </div>
   );
 }
@@ -421,9 +427,6 @@ function AdminLayout({ children }) {
 // MAIN APP COMPONENT
 // ============================================
 export default function App() {
-  const [isOpen, setIsOpen] = useState(true);
-  const toggleSidebar = () => setIsOpen(!isOpen);
-
   return (
     <BrowserRouter>
        <Toaster position="top-right" reverseOrder={false} />
@@ -435,8 +438,22 @@ export default function App() {
         */}
         
         {/* Login and Signup pages */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route
+          path="/login"
+          element={
+            <MainLayout fullBleed={true}>
+              <LoginPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <MainLayout fullBleed={true}>
+              <SignupPage />
+            </MainLayout>
+          }
+        />
 
         {/* Admin Login */}
         <Route path="/admin-login" element={<AdminLogin />} />
@@ -519,14 +536,14 @@ export default function App() {
         {/* 
           ============================================
           MAIN APPLICATION ROUTES
-          All pages wrapped in MainLayout with Sidebar/Navbar
+          All pages wrapped in MainLayout with Navbar/Footer
           ============================================
         */}
 
         <Route
           path="/profile"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <Profile />
             </MainLayout>
           }
@@ -535,7 +552,7 @@ export default function App() {
         <Route
           path="/profile/:userId"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <Profile />
             </MainLayout>
           }
@@ -544,7 +561,7 @@ export default function App() {
         <Route
           path="/edit-profile"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <EditProfile />
             </MainLayout>
           }
@@ -555,7 +572,7 @@ export default function App() {
         <Route
           path="/"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <DashboardPage />
             </MainLayout>
           }
@@ -565,7 +582,7 @@ export default function App() {
         <Route
           path="/leaderboards"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <UserLeaderboards />
             </MainLayout>
           }
@@ -576,7 +593,7 @@ export default function App() {
         <Route
           path="/events"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <EventsPage />
             </MainLayout>
           }
@@ -584,7 +601,7 @@ export default function App() {
         <Route
           path="/events/codenigma"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Codenigma />
             </MainLayout>
           }
@@ -592,7 +609,7 @@ export default function App() {
         <Route
           path="/events/genesys"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Genesys />
             </MainLayout>
           }
@@ -602,7 +619,7 @@ export default function App() {
         <Route
           path="/about/faculty"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <FacultyInfo />
             </MainLayout>
           }
@@ -610,7 +627,7 @@ export default function App() {
         <Route
           path="/about/staff"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <StaffInfo />
             </MainLayout>
           }
@@ -618,7 +635,7 @@ export default function App() {
         <Route
           path="/about/syllabus"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <Syllabus />
             </MainLayout>
           }
@@ -628,7 +645,7 @@ export default function App() {
         <Route
           path="/alumni"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <Alumni />
             </MainLayout>
           }
@@ -638,7 +655,7 @@ export default function App() {
         <Route
           path="/achievements"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout fullBleed={true}>
               <UserAchievements />
             </MainLayout>
           }
@@ -648,7 +665,7 @@ export default function App() {
         <Route
           path="/connect"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <ConnectPage />
             </MainLayout>
           }
@@ -658,7 +675,7 @@ export default function App() {
         <Route
           path="/projects"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <ProjectsPage />
             </MainLayout>
           }
@@ -668,7 +685,7 @@ export default function App() {
         <Route
           path="/team-info"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar} fullBleed={true}>
+            <MainLayout fullBleed={true}>
               <TeamInfo />
             </MainLayout>
           }
@@ -678,7 +695,7 @@ export default function App() {
         <Route
           path="/association-members"
           element={
-            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+            <MainLayout>
               <AssociationMembers />
             </MainLayout>
           }
@@ -694,7 +711,7 @@ export default function App() {
           path="/posts"
           element={
             <ProtectedRoute>
-              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <MainLayout fullBleed={true}>
                 <PostsPage />
               </MainLayout>
             </ProtectedRoute>
@@ -704,25 +721,12 @@ export default function App() {
           path="/posts/:postId"
           element={
             <ProtectedRoute>
-              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
+              <MainLayout fullBleed={true}>
                 <PostDetailPage />
               </MainLayout>
             </ProtectedRoute>
           }
-        /> 
-
-        <Route
-          path="/question-bank"
-          element={
-            <ProtectedRoute>
-              <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
-                <QuestionBank />
-              </MainLayout>
-            </ProtectedRoute>
-          }
         />
-
-
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

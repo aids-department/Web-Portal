@@ -1,4 +1,5 @@
 import React from "react";
+import AboutTabs from "../components/AboutTabs";
 
 // Import images properly
 import kanagarajImg from "../assets/staff/kanagaraj.jpg";
@@ -19,42 +20,54 @@ export default function StaffInfo() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-4 sm:p-6 md:p-10">
-      {/* Decorative background elements */}
-      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-green-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
-      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
+    <div className="font-brand">
+      <AboutTabs />
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <h1 className="text-center text-4xl sm:text-5xl font-bold mb-12 text-gray-900 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Staff Information</h1>
-        
-        <div className="relative bg-gradient-to-br from-green-50 via-white to-blue-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-8 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+      <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+            Administrative and technical
+          </span>
+          <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
+            Staff
+          </h1>
+        </div>
 
-          <div className="relative z-10">
-            <div className="flex justify-center">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
-                {staffData.map((staff, index) => (
-                  <div
-                    key={index}
-                    className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer p-6 text-center"
-                  >
-                    <img
-                      src={staff.img}
-                      alt={staff.name}
-                      className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-gray-200"
-                      onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/128x128/6b7280/ffffff?text=No+Image";
-                      }}
-                    />
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">{staff.name}</h2>
-                    <p className="text-sm text-gray-600">{staff.role}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[420px] border-collapse">
+            <thead>
+              <tr className="border-b-2 border-brand-navy">
+                <th className="text-left py-3 pr-3.5 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">
+                  Name
+                </th>
+                <th className="text-left py-3 px-3.5 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">
+                  Role
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {staffData.map((staff) => (
+                <tr key={staff.name} className="border-b border-brand-row">
+                  <td className="py-3.5 pr-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 shrink-0 overflow-hidden bg-brand-blue-tint">
+                        <img
+                          src={staff.img}
+                          alt={staff.name}
+                          className="w-full h-full object-cover grayscale"
+                          onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/64x64/6b7280/ffffff?text=No+Image";
+                          }}
+                        />
+                      </div>
+                      <span className="text-[14px] font-medium text-brand-navy">{staff.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-3.5 text-[13.5px] text-[#3a3838]">{staff.role}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

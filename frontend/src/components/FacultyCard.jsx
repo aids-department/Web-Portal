@@ -1,40 +1,46 @@
 import React from 'react';
 
 const FacultyCard = ({ faculty }) => {
+  const links = [
+    faculty.googleSite && { label: 'Site', href: faculty.googleSite },
+    faculty.googleScholar && { label: 'Scholar', href: faculty.googleScholar },
+    faculty.orcid && { label: 'ORCiD', href: faculty.orcid },
+  ].filter(Boolean);
+
   return (
-    <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-      <div className="p-6">
+    <div className="font-brand bg-white p-5 flex flex-col gap-2.5">
+      <div className="h-[150px] bg-brand-blue-tint border border-[#c3cfe3] overflow-hidden">
         <img
           src={faculty.imageUrl}
           alt={faculty.name}
-          className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-gray-200"
+          className="w-full h-full object-cover grayscale"
           onError={(e) => {
-            e.target.src = "https://via.placeholder.com/128x128/6b7280/ffffff?text=No+Image";
+            e.target.src = 'https://via.placeholder.com/300x300/6b7280/ffffff?text=No+Image';
           }}
         />
-        <h3 className="text-xl font-bold text-gray-900 text-center mb-2">{faculty.name}</h3>
-        <p className="text-sm text-gray-600 text-center mb-2">{faculty.title}</p>
-        <div className="flex flex-wrap justify-center gap-1 mb-4">
-          {faculty.specialization.split(', ').map((skill, index) => (
-            <span key={index} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              {skill.trim()}
-            </span>
-          ))}
-        </div>
-        <div className="text-center">
-          <a href={`mailto:${faculty.email}`} className="text-sm text-blue-600 hover:text-blue-800 font-medium block mb-2">{faculty.email}</a>
-          <div className="flex justify-center space-x-4 text-xs">
-            {faculty.googleSite !== 'javascript:void(0)' && (
-              <a href={faculty.googleSite} className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">Site</a>
-            )}
-            {faculty.googleScholar !== 'javascript:void(0)' && (
-              <a href={faculty.googleScholar} className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">Scholar</a>
-            )}
-            {faculty.orcid !== 'javascript:void(0)' && (
-              <a href={faculty.orcid} className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">ORCiD</a>
-            )}
+      </div>
+      <h3 className="m-0 text-[16px] font-semibold leading-[1.25] text-brand-navy">{faculty.name}</h3>
+      <span className="text-[11.5px] font-medium leading-[1.3] text-brand-blue">{faculty.title}</span>
+      <span className="text-[11.5px] leading-[1.4] text-brand-ink-soft">{faculty.specialization}</span>
+      <div className="mt-auto border-t border-brand-row pt-2.5 flex flex-col gap-1.5">
+        <a href={`mailto:${faculty.email}`} className="text-[11px] text-brand-red font-medium truncate">
+          {faculty.email}
+        </a>
+        {links.length > 0 && (
+          <div className="flex gap-3 flex-wrap">
+            {links.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-brand-blue"
+              >
+                {l.label}
+              </a>
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
