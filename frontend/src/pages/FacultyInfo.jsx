@@ -120,11 +120,11 @@ const FacultyInfo = () => {
       {/* HOD */}
       <div className="px-5 sm:px-8 lg:px-12 pb-5">
         <div className="grid grid-cols-1 sm:grid-cols-[minmax(150px,220px)_minmax(0,2fr)] gap-6 border border-brand-edge p-6">
-          <div className="min-h-[230px] bg-brand-blue overflow-hidden">
+          <div className="w-[180px] h-[180px] mx-auto rounded-xl bg-brand-blue overflow-hidden flex-shrink-0 self-center">
             <img
               src={hod.imageUrl}
               alt={hod.name}
-              className="w-full h-full object-cover grayscale"
+              className="w-full h-full object-cover object-top scale-[0.85]"
               onError={(e) => {
                 e.currentTarget.src = "https://via.placeholder.com/300x300?text=No+Image";
               }}
