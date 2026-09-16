@@ -389,6 +389,58 @@ app.put('/api/stats', async (req, res) => {
 
 // GET ALL POSTS
 app.use("/api/posts", postsRouter);
+
+// ============================================
+// ALUMNI THOUGHTS ROUTES
+// ============================================
+const AlumniThought = require("./models/AlumniThought");
+const { verifyToken: verifyTokenThoughts } = require("./middleware/auth");
+
+// GET all thoughts (public)
+app.get("/api/alumni-thoughts", async (req, res) => {
+  try {
+    const thoughts = await AlumniThought.find().sort({ createdAt: -1 });
+    res.json(thoughts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST a new thought (alumni only)
+app.post("/api/alumni-thoughts", verifyTokenThoughts, async (req, res) => {
+  try {
+    if (req.user.role !== "alumni") {
+      return res.status(403).json({ error: "Only alumni can post thoughts." });
+    }
+
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: "Thought text is required." });
+    }
+
+    const wordCount = text.trim().split(/\s+/).length;
+    if (wordCount > 100) {
+      return res.status(400).json({ error: "Thought cannot exceed 100 words." });
+    }
+
+    // Look up the user's full name
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const thought = await AlumniThought.create({
+      text: text.trim(),
+      authorName: user.fullName,
+      authorId: user._id,
+    });
+
+    res.status(201).json(thought);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============================================
 // API ROUTES – EVENTS CRUD
 // ============================================

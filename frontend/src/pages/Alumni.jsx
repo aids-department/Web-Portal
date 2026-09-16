@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { User, Building, Code } from "lucide-react";
 import AlumniCard from "../components/AlumniCard";
+import AlumniThoughts from "../components/AlumniThoughts";
 
 export default function Alumni() {
   const [alumni, setAlumni] = useState([]);
@@ -168,7 +169,9 @@ export default function Alumni() {
       {/* Search */}
       <div className="relative max-w-lg">
         <div className="flex items-stretch border-2 border-brand-navy">
-          <span className="px-3.5 grid place-items-center text-[12.5px] text-brand-ink-soft">Search</span>
+          <span className="px-3.5 grid place-items-center text-brand-ink-soft">
+            <FaSearch size={14} />
+          </span>
           <input
             type="text"
             placeholder="Name, company or skill"
@@ -274,11 +277,13 @@ export default function Alumni() {
 
           {filteredAlumni.length > 0 ? (
             <div
-              className="grid gap-px bg-brand-edge border border-brand-edge"
-              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}
+              className="grid gap-4"
+              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
             >
               {filteredAlumni.map((alum) => (
-                <AlumniCard key={alum._id} alumni={alum} />
+                <div key={alum._id} className="border border-brand-edge">
+                  <AlumniCard alumni={alum} />
+                </div>
               ))}
             </div>
           ) : (
@@ -289,6 +294,11 @@ export default function Alumni() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Alumni Thoughts Carousel */}
+      <div className="mt-6 sm:mt-8">
+        <AlumniThoughts />
       </div>
     </div>
   );
