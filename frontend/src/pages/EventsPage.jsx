@@ -6,10 +6,11 @@ import UpcomingEventCard from '../components/UpcomingEventCard';
 import PastEventCard from '../components/PastEventCard';
 import EventCalendar from '../components/EventCalendar';
 import EventDetails from '../components/EventDetails';
+import CalendarEmbed from '../components/CalendarEmbed';
 
 const EventsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming' | 'past' | 'calendar'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventsData, setEventsData] = useState([]);
 
@@ -49,72 +50,99 @@ const EventsPage = () => {
           </h1>
         </div>
 
+        {/* Tab Switcher */}
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setActiveTab('upcoming')}
-            className={`px-3.5 py-2 text-[11.5px] font-semibold ${
-              activeTab === 'upcoming' ? 'bg-brand-navy text-white' : 'border border-brand-edge text-brand-ink-soft'
+            className={`px-3.5 py-2 text-[11.5px] font-semibold transition-colors ${
+              activeTab === 'upcoming'
+                ? 'bg-brand-navy text-white'
+                : 'border border-brand-edge text-brand-ink-soft hover:bg-brand-ground'
             }`}
           >
             Upcoming
           </button>
           <button
             onClick={() => setActiveTab('past')}
-            className={`px-3.5 py-2 text-[11.5px] font-semibold ${
-              activeTab === 'past' ? 'bg-brand-navy text-white' : 'border border-brand-edge text-brand-ink-soft'
+            className={`px-3.5 py-2 text-[11.5px] font-semibold transition-colors ${
+              activeTab === 'past'
+                ? 'bg-brand-navy text-white'
+                : 'border border-brand-edge text-brand-ink-soft hover:bg-brand-ground'
             }`}
           >
             Past
           </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 text-[11.5px] font-semibold transition-colors ${
+              activeTab === 'calendar'
+                ? 'bg-brand-navy text-white'
+                : 'border border-brand-edge text-brand-ink-soft hover:bg-brand-ground'
+            }`}
+          >
+            <CalendarDays size={14} />
+            Google Calendar
+          </button>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="flex items-stretch border-2 border-brand-navy max-w-md">
-        <span className="px-3 grid place-items-center text-brand-ink-faint">
-          <Search size={16} />
-        </span>
-        <input
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search events..."
-          className="flex-1 py-3 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
-        />
-      </div>
+      {/* When Google Calendar Tab is Active */}
+      {activeTab === 'calendar' ? (
+        <CalendarEmbed />
+      ) : (
+        <>
+          {/* Search */}
+          <div className="flex items-stretch border-2 border-brand-navy max-w-md">
+            <span className="px-3 grid place-items-center text-brand-ink-faint">
+              <Search size={16} />
+            </span>
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search events..."
+              className="flex-1 py-3 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+            />
+          </div>
 
-      {/* Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(250px,320px)] gap-7 items-start">
-        <div className="min-w-0 flex flex-col gap-3.5">
-          {filteredEvents.length === 0 ? (
-            <div className="border border-brand-edge p-10 text-center flex flex-col items-center gap-3">
-              <CalendarDays className="text-brand-ink-faint" size={32} />
-              <h3 className="m-0 text-[17px] font-semibold text-brand-navy">No events found</h3>
-              <p className="m-0 text-[13px] text-brand-ink-soft">
-                Try adjusting your search or check back later.
-              </p>
+          {/* Events List & Dynamic Sidebar Calendar */}
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,340px)] gap-7 items-start">
+            <div className="min-w-0 flex flex-col gap-3.5">
+              {filteredEvents.length === 0 ? (
+                <div className="border border-brand-edge p-10 text-center flex flex-col items-center gap-3">
+                  <CalendarDays className="text-brand-ink-faint" size={32} />
+                  <h3 className="m-0 text-[17px] font-semibold text-brand-navy">No events found</h3>
+                  <p className="m-0 text-[13px] text-brand-ink-soft">
+                    Try adjusting your search or check back later.
+                  </p>
+                </div>
+              ) : activeTab === 'upcoming' ? (
+                <div className="flex flex-col gap-3.5">
+                  {filteredEvents.map(event => (
+                    <UpcomingEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
+                  ))}
+                </div>
+              ) : (
+                <div
+                  className="grid gap-px bg-brand-edge border border-brand-edge"
+                  style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
+                >
+                  {filteredEvents.map(event => (
+                    <PastEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
+                  ))}
+                </div>
+              )}
             </div>
-          ) : activeTab === 'upcoming' ? (
-            <div className="flex flex-col gap-3.5">
-              {filteredEvents.map(event => (
-                <UpcomingEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
-              ))}
-            </div>
-          ) : (
-            <div
-              className="grid gap-px bg-brand-edge border border-brand-edge"
-              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
-            >
-              {filteredEvents.map(event => (
-                <PastEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
-              ))}
-            </div>
-          )}
-        </div>
 
-        <div className="hidden lg:block sticky top-8">
-          <EventCalendar events={eventsData} />
-        </div>
-      </div>
+            <div className="hidden lg:block sticky top-8">
+              <EventCalendar
+                events={eventsData}
+                onViewFullCalendar={() => setActiveTab('calendar')}
+                onSelectEvent={setSelectedEvent}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

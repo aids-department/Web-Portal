@@ -10,9 +10,7 @@ const NAV_ITEMS = [
   { label: "Leaderboard", to: "/leaderboards", match: (p) => p.startsWith("/leaderboards") },
   { label: "Achievements", to: "/achievements", match: (p) => p.startsWith("/achievements") },
   { label: "Alumni", to: "/alumni", match: (p) => p.startsWith("/alumni") },
-  // Only Posts is actually gated by ProtectedRoute today, so it's the only
-  // item that shows the "locked" hint when signed out.
-  { label: "Posts", to: "/posts", match: (p) => p.startsWith("/posts"), gated: true },
+  { label: "Posts", to: "/posts", match: (p) => p.startsWith("/posts") },
 ];
 
 export default function Navbar() {
@@ -79,12 +77,10 @@ export default function Navbar() {
           <nav className="hidden lg:flex items-stretch gap-5">
             {NAV_ITEMS.map((item) => {
               const isActive = item.match(location.pathname);
-              const locked = item.gated && !authed;
               return (
                 <Link
                   key={item.label}
                   to={item.to}
-                  title={locked ? "Sign in required" : item.label}
                   className={`flex items-center gap-1.5 py-[18px] text-[12.5px] font-medium whitespace-nowrap box-border ${
                     isActive
                       ? "text-brand-navy shadow-[inset_0_-3px_0_#dd2b0f]"
@@ -92,11 +88,6 @@ export default function Navbar() {
                   }`}
                 >
                   {item.label}
-                  {locked && (
-                    <span className="text-[8px] leading-none tracking-[0.08em] font-semibold text-brand-ink-faint">
-                      LOCKED
-                    </span>
-                  )}
                 </Link>
               );
             })}
@@ -166,15 +157,9 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="px-[15px] py-2.5 border border-brand-ink-faint bg-white text-[12px] font-medium text-brand-navy hover:bg-brand-ground"
+                className="px-[16px] py-2 bg-brand-navy text-[12px] font-semibold text-white hover:bg-brand-blue transition-colors"
               >
                 Sign in
-              </Link>
-              <Link
-                to="/signup"
-                className="px-[15px] py-2.5 border-none bg-brand-navy text-[12px] font-semibold text-white hover:bg-brand-blue"
-              >
-                Create account
               </Link>
             </div>
           )}
@@ -198,7 +183,6 @@ export default function Navbar() {
           <nav className="flex flex-col">
             {NAV_ITEMS.map((item) => {
               const isActive = item.match(location.pathname);
-              const locked = item.gated && !authed;
               return (
                 <Link
                   key={item.label}
@@ -209,11 +193,6 @@ export default function Navbar() {
                   }`}
                 >
                   {item.label}
-                  {locked && (
-                    <span className="text-[9px] leading-none tracking-[0.08em] font-semibold text-brand-ink-faint">
-                      LOCKED
-                    </span>
-                  )}
                 </Link>
               );
             })}
@@ -254,16 +233,9 @@ export default function Navbar() {
                 <Link
                   to="/login"
                   onClick={closeMobileMenu}
-                  className="px-4 py-2.5 border border-brand-ink-faint text-[12.5px] font-medium text-brand-navy text-center"
+                  className="px-4 py-2.5 bg-brand-navy text-white text-[12.5px] font-semibold text-center hover:bg-brand-blue transition-colors"
                 >
                   Sign in
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2.5 bg-brand-navy text-white text-[12.5px] font-semibold text-center"
-                >
-                  Create account
                 </Link>
               </div>
             )}

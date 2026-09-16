@@ -1,6 +1,7 @@
-// frontend/src/components/EventDetails.jsx
 import React, { useState } from 'react';
+import { Calendar, Download } from 'lucide-react';
 import { eventTagStyle } from '../utils/eventTagStyle';
+import { getGoogleCalendarUrl, downloadVCalendar } from '../utils/calendarUtils';
 
 const EventDetails = ({ event, onBack }) => {
   const [openSection, setOpenSection] = useState(null);
@@ -143,6 +144,30 @@ const EventDetails = ({ event, onBack }) => {
               </span>
             </div>
           )}
+
+          {/* Google Calendar & vCalendar Sync */}
+          <div className="border border-brand-edge bg-white p-[18px] flex flex-col gap-2.5">
+            <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-navy">
+              Calendar Sync
+            </span>
+            <a
+              href={getGoogleCalendarUrl(event)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2.5 bg-brand-navy text-white text-[12px] font-semibold flex items-center justify-center gap-2 hover:bg-brand-blue transition-colors text-center"
+            >
+              <Calendar size={14} />
+              Add to Google Calendar
+            </a>
+            <button
+              type="button"
+              onClick={() => downloadVCalendar(event)}
+              className="px-3 py-2 border border-brand-edge text-brand-navy text-[11.5px] font-medium flex items-center justify-center gap-1.5 hover:bg-brand-ground transition-colors"
+            >
+              <Download size={13} />
+              Download vCalendar (.ics)
+            </button>
+          </div>
         </aside>
       </div>
     </div>

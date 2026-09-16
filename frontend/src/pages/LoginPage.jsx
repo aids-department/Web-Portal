@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import HeroCanvas from '../components/HeroCanvas';
 
 const LoginPage = () => {
@@ -85,7 +85,7 @@ const LoginPage = () => {
         <div className="bg-white p-8 flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <h1 className="m-0 text-[30px] font-semibold tracking-[-0.02em] text-brand-navy">Sign in</h1>
-            <span className="text-[13px] text-brand-ink-soft">Login to AI &amp; DS Association</span>
+            <span className="text-[13px] text-brand-ink-soft">Login to AI &amp; DS Department</span>
           </div>
           <div className="h-0.5 bg-brand-navy" />
 
@@ -133,15 +133,8 @@ const LoginPage = () => {
             </button>
           </form>
 
-          <div className="mt-auto border-t border-brand-row pt-4 flex justify-between items-center gap-3 flex-wrap">
-            <span className="text-[12.5px] text-brand-ink-soft">New here?</span>
-            <Link
-              to="/signup"
-              className="text-[12.5px] font-semibold text-brand-blue border-b-2 border-brand-red pb-0.5"
-            >
-              Create an account
-            </Link>
-          </div>
+
+
         </div>
       </div>
     </div>

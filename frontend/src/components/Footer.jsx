@@ -70,7 +70,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-[#23345c] pt-[18px] flex flex-wrap justify-between gap-4">
         <span className="text-[11.5px] leading-none text-[#6b7a95]">
-          Maintained by the department web committee.
+          Maintained by the AI&amp;DS department web committee.
         </span>
       </div>
     </footer>
