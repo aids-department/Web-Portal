@@ -13,6 +13,7 @@ export default function Footer() {
         { label: "Staff", to: "/about/staff" },
         { label: "Syllabus", to: "/about/syllabus" },
         { label: "Events", to: "/events" },
+        { label: "Team", to: "/team-info" },
       ],
     },
     {

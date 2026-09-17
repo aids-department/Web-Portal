@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import { User, Building, Code } from "lucide-react";
 import AlumniCard from "../components/AlumniCard";
@@ -19,6 +19,22 @@ export default function Alumni() {
   });
   const [passOutYears, setPassOutYears] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const searchRef = useRef(null);
+
+  // Click outside listener for suggestions dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
 
   // Fetch alumni data
   useEffect(() => {
@@ -170,7 +186,7 @@ export default function Alumni() {
       </div>
 
       {/* Search */}
-      <div className="relative max-w-lg">
+      <div ref={searchRef} className="relative max-w-lg">
         <div className="flex items-stretch border-2 border-brand-navy">
           <span className="px-3.5 grid place-items-center text-brand-ink-soft">
             <FaSearch size={14} />
@@ -181,12 +197,14 @@ export default function Alumni() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
             className="flex-1 py-3.5 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
           />
         </div>
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-brand-edge shadow-lg z-30 max-h-56 overflow-y-auto">
+          <div
+            onMouseDown={(e) => e.preventDefault()}
+            className="absolute top-full left-0 right-0 mt-1 bg-white border border-brand-edge shadow-lg z-30 max-h-56 overflow-y-auto"
+          >
             {suggestions.map((s, i) => (
               <div
                 key={i}

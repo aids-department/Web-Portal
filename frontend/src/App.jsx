@@ -687,6 +687,14 @@ export default function App() {
             </MainLayout>
           }
         />
+        <Route
+          path="/team"
+          element={<Navigate to="/team-info" replace />}
+        />
+        <Route
+          path="/about/team"
+          element={<Navigate to="/team-info" replace />}
+        />
         
         {/* Association Members - PUBLIC */}
         <Route

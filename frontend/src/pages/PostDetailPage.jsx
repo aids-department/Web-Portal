@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import toast from 'react-hot-toast';
 import CommentThread from '../components/CommentThread';
 
 const BASE_URL = 'https://web-portal-760h.onrender.com';
@@ -98,7 +99,7 @@ const PostDetailPage = () => {
       navigator.share({ title: post.title, text: post.content, url });
     } else {
       navigator.clipboard.writeText(url);
-      alert('Link copied to clipboard!');
+      toast.success('Link copied to clipboard!');
     }
   };
 
@@ -144,13 +145,18 @@ const PostDetailPage = () => {
       <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-8 lg:py-9 max-w-[900px] flex flex-col gap-6">
         <div className="grid grid-cols-[48px_1fr] sm:grid-cols-[64px_1fr] gap-4">
           <div className="flex flex-col items-center gap-1">
-            <button onClick={handleUpvote} className={`text-[12px] ${hasUpvoted ? 'text-brand-red' : 'text-brand-ink-soft'}`}>
-              ▲
+            <button
+              onClick={handleUpvote}
+              title={hasUpvoted ? "Remove upvote" : "Upvote post"}
+              className={`flex flex-col items-center gap-0.5 px-2.5 py-2 rounded transition-colors ${
+                hasUpvoted
+                  ? 'bg-brand-red-tint text-brand-red font-semibold'
+                  : 'hover:bg-brand-ground text-brand-ink-soft hover:text-brand-navy'
+              }`}
+            >
+              <span className="text-[14px] leading-none">▲</span>
+              <span className="text-[15px] font-semibold tabular-nums">{post.upvotes?.length || 0}</span>
             </button>
-            <span className="text-[17px] font-semibold text-brand-navy tabular-nums">
-              {post.upvotes?.length || 0}
-            </span>
-            <span className="text-[12px] text-brand-ink-soft">▼</span>
           </div>
           <div className="min-w-0 flex flex-col gap-3">
             <div className="flex items-center gap-2 flex-wrap">

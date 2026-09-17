@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: "Achievements", to: "/achievements", match: (p) => p.startsWith("/achievements") },
   { label: "Alumni", to: "/alumni", match: (p) => p.startsWith("/alumni") },
   { label: "Posts", to: "/posts", match: (p) => p.startsWith("/posts") },
+  { label: "Team", to: "/team-info", match: (p) => p.startsWith("/team") },
 ];
 
 export default function Navbar() {

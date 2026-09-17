@@ -15,6 +15,15 @@ const RoleSection = ({
 }) => {
   if (!members || members.length === 0) return null;
 
+  const gridCols =
+    columns === 1
+      ? "grid-cols-1"
+      : columns === 3
+      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      : columns === 4
+      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+      : "grid-cols-1 md:grid-cols-2";
+
   return (
     <div className="mb-16">
       <h4 className="text-xl font-semibold text-gray-800 mb-6 text-center">
@@ -23,7 +32,7 @@ const RoleSection = ({
 
       <div className="flex justify-center">
         <div
-          className={`grid grid-cols-1 md:grid-cols-${columns} gap-6 ${maxWidth} w-full`}
+          className={`grid ${gridCols} gap-6 ${maxWidth} w-full`}
         >
           {members.map((member) => (
             <div
