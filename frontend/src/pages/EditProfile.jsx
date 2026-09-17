@@ -54,7 +54,10 @@ export default function EditProfile() {
   const userId = user?.id;
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      navigate('/login');
+      return;
+    }
     fetch(`https://web-portal-760h.onrender.com/api/profile/${userId}`)
       .then((res) => res.json())
       .then((data) => {

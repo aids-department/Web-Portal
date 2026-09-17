@@ -2,9 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+const cleanStudentName = (name) => {
+  if (!name) return "";
+  return name.replace(/^bjhH+/i, "").trim();
+};
+
 const formatRows = (rows) => {
   return rows.map((r, index) => ({
     ...r,
+    name: cleanStudentName(r.name),
     rank: index + 1,
     yearDisplay:
         r.year === 1 ? "I" : r.year === 2 ? "II" : r.year === 3 ? "III" : r.year === 4 ? "IV" : r.year,
@@ -56,10 +62,40 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
     loadLeaderboards();
   }, []);
 
-  const currentLeaderboard =
+  // Intelligently categorize by actual student year (year === 1 vs year > 1)
+  const isSwapped =
+    Array.isArray(firstYearData) &&
+    firstYearData.filter((r) => Number(r.year) > 1).length >
+      firstYearData.filter((r) => Number(r.year) === 1).length;
+
+  let currentRaw = [];
+  if (isSwapped) {
+    currentRaw =
       activeSubTab === "first_years"
-          ? formatRows(firstYearData)
-          : formatRows(nonFirstYearData);
+        ? [...nonFirstYearData, ...firstYearData].filter((r) => Number(r.year) === 1)
+        : [...firstYearData, ...nonFirstYearData].filter((r) => Number(r.year) > 1);
+  } else {
+    currentRaw =
+      activeSubTab === "first_years" ? firstYearData : nonFirstYearData;
+  }
+
+  // Deduplicate and sort by score desc, then time asc
+  const seen = new Set();
+  const deduped = [];
+  const sorted = [...currentRaw].sort(
+    (a, b) =>
+      (Number(b.score) || 0) - (Number(a.score) || 0) ||
+      (Number(a.time) || 0) - (Number(b.time) || 0)
+  );
+  for (const r of sorted) {
+    const key = (r.roll || r.name || "").trim().toLowerCase();
+    if (key && !seen.has(key)) {
+      seen.add(key);
+      deduped.push(r);
+    }
+  }
+
+  const currentLeaderboard = formatRows(deduped);
 
   const codenigmaWinners = codenigmaData.map(
       (p) => `${p.name} (${p.year} Year)`

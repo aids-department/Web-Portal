@@ -561,9 +561,11 @@ export default function App() {
         <Route
           path="/edit-profile"
           element={
-            <MainLayout fullBleed={true}>
-              <EditProfile />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout fullBleed={true}>
+                <EditProfile />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
 

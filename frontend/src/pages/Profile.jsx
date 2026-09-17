@@ -60,16 +60,16 @@ export default function Profile() {
     fetch(`https://web-portal-760h.onrender.com/api/posts`)
       .then(res => res.json())
       .then(data => {
-        if (!Array.isArray(data)) {
-          setPostsCount(0);
-          return;
-        }
-        const userPosts = data.filter(
+        const postsList = Array.isArray(data) ? data : Array.isArray(data?.posts) ? data.posts : [];
+        const userPosts = postsList.filter(
           post => post.author?._id === userId || post.author?.id === userId
         );
         setPostsCount(userPosts.length);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        setPostsCount(0);
+      });
   }, [userId]);
 
   if (loading) {

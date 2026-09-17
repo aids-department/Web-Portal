@@ -59,7 +59,7 @@ export default function Alumni() {
 
       alumni.forEach((alum) => {
         // Add matching names
-        if (alum.name.toLowerCase().includes(term)) {
+        if (alum.name && alum.name.toLowerCase().includes(term)) {
           if (!suggestionMap.has(alum.name)) {
             suggestionMap.set(alum.name, { value: alum.name, type: 'name' });
           }
@@ -71,13 +71,15 @@ export default function Alumni() {
           }
         }
         // Add matching skills
-        alum.skills.forEach((skill) => {
-          if (skill.toLowerCase().includes(term)) {
-            if (!suggestionMap.has(skill)) {
-              suggestionMap.set(skill, { value: skill, type: 'skill' });
+        if (Array.isArray(alum.skills)) {
+          alum.skills.forEach((skill) => {
+            if (skill && skill.toLowerCase().includes(term)) {
+              if (!suggestionMap.has(skill)) {
+                suggestionMap.set(skill, { value: skill, type: 'skill' });
+              }
             }
-          }
-        });
+          });
+        }
       });
 
       const suggestionArray = Array.from(suggestionMap.values()).slice(0, 8); // Limit to 8 suggestions
@@ -93,16 +95,15 @@ export default function Alumni() {
   useEffect(() => {
     let result = alumni;
 
-    // Search filter - FIXED: Added null/undefined checks
+    // Search filter - with safe checks
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
         (a) =>
-          a.name.toLowerCase().includes(term) ||
-          (a.company && a.company.toLowerCase().includes(term)) || // NULL CHECK ADDED HERE
-          a.skills.some((skill) =>
-            skill.toLowerCase().includes(term)
-          )
+          (a.name && a.name.toLowerCase().includes(term)) ||
+          (a.company && a.company.toLowerCase().includes(term)) ||
+          (Array.isArray(a.skills) &&
+            a.skills.some((skill) => skill && skill.toLowerCase().includes(term)))
       );
     }
 
@@ -111,10 +112,10 @@ export default function Alumni() {
       result = result.filter((a) => a.passOutYear == filters.passOutYear);
     }
 
-    // Company filter - FIXED: Added null/undefined check
+    // Company filter
     if (filters.company) {
       result = result.filter((a) =>
-        a.company && a.company.toLowerCase().includes(filters.company.toLowerCase()) // NULL CHECK ADDED HERE
+        a.company && a.company.toLowerCase().includes(filters.company.toLowerCase())
       );
     }
 
@@ -122,10 +123,12 @@ export default function Alumni() {
     if (filters.skills) {
       const skillsArray = filters.skills
         .split(",")
-        .map((s) => s.trim().toLowerCase());
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
       result = result.filter((a) =>
+        Array.isArray(a.skills) &&
         skillsArray.every((skill) =>
-          a.skills.map((s) => s.toLowerCase()).includes(skill)
+          a.skills.map((s) => (s ? s.toLowerCase() : "")).includes(skill)
         )
       );
     }
