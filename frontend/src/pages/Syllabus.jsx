@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from "react";
+import AboutTabs from "../components/AboutTabs";
+import { Search, X, FileText, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 
 const DATA = {
   "Semester 1": {
@@ -322,176 +324,253 @@ export default function Syllabus() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 flex justify-center p-10">
-      {/* Decorative background elements */}
-      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
-      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-yellow-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
+    <div className="font-brand bg-white min-h-screen">
+      <AboutTabs />
 
-      <div className="w-full max-w-3xl text-black relative z-10">
-        <h2 className="text-3xl font-bold mb-6 text-gray-900">AI & DS - Syllabus Portal</h2>
+      {/* Header */}
+      <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] border-b-2 border-brand-navy flex items-end justify-between gap-5 flex-wrap">
+        <div className="flex flex-col gap-2.5">
+          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+            Curriculum
+          </span>
+          <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
+            Syllabus
+          </h1>
+          <p className="m-0 max-w-[64ch] text-[14px] leading-[1.65] text-brand-ink-soft">
+            Complete semester-wise course curriculum, theory subjects, and laboratory modules for AI &amp; DS.
+          </p>
+        </div>
+      </div>
 
-        {/* SEARCH BAR */}
-        <input
-          value={q}
-          onChange={(e) => {
-            const value = e.target.value;
-            setQ(value);
-            setInvalidSearch(value.trim() && filteredSubjects.length === 0);
-          }}
-          placeholder="Search subjects..."
-          className="w-full p-3 rounded-xl bg-gray-200 border border-gray-300 text-black mb-6"
-        />
+      <div className="px-5 sm:px-8 lg:px-12 py-8 max-w-5xl mx-auto flex flex-col gap-6">
+        {/* Search */}
+        <div className="flex items-stretch border-2 border-brand-navy max-w-md w-full">
+          <span className="px-3.5 grid place-items-center text-brand-ink-soft">
+            <Search size={16} />
+          </span>
+          <input
+            value={q}
+            onChange={(e) => {
+              const value = e.target.value;
+              setQ(value);
+              setInvalidSearch(value.trim() && filteredSubjects.length === 0);
+            }}
+            placeholder="Search subjects by name..."
+            className="flex-1 py-3 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+          />
+          {q && (
+            <button
+              onClick={() => {
+                setQ("");
+                setInvalidSearch(false);
+              }}
+              className="px-3 text-brand-ink-soft hover:text-brand-navy"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-        {/* SEARCH RESULTS */}
+        {/* Search Results */}
         {q.trim() !== "" && filteredSubjects.length > 0 && (
-          <div className="mb-4">
-            <strong>Results:</strong>
-            <div className="mt-2 space-y-2">
+          <div className="border border-brand-edge bg-brand-ground p-4 flex flex-col gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-navy">
+              Found {filteredSubjects.length} matching subject{filteredSubjects.length > 1 ? "s" : ""}:
+            </span>
+            <div className="flex flex-col gap-1.5">
               {filteredSubjects.map((s, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-white rounded-lg shadow cursor-pointer hover:bg-gray-50"
                   onClick={() => {
                     setOpenSem(semesters.indexOf(s.sem));
                     setOpenGroup({ [s.sem]: s.group });
                     setOpenSubject(s);
                   }}
+                  className="p-3 bg-white border border-brand-edge hover:border-brand-navy cursor-pointer flex items-center justify-between gap-3 text-[13px] transition-colors"
                 >
-                  {s.sem} → {s.group} → <b>{s.title}</b>
+                  <div>
+                    <span className="font-semibold text-brand-navy">{s.title}</span>
+                    <span className="text-brand-ink-soft text-[12px] ml-2">
+                      ({s.sem} · {s.group === "theory" ? "Theory" : "Laboratory"})
+                    </span>
+                  </div>
+                  <span className="text-brand-red font-medium text-[12px]">View PDF →</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* SEMESTER CARDS */}
-        {semesters.map((sem, index) => {
-          const hasTheory = Array.isArray(DATA[sem].theory);
-          const hasLab = Array.isArray(DATA[sem].lab);
+        {/* Semester Accordion */}
+        <div className="flex flex-col border border-brand-edge divide-y divide-brand-edge">
+          {semesters.map((sem, index) => {
+            const hasTheory = Array.isArray(DATA[sem]?.theory);
+            const hasLab = Array.isArray(DATA[sem]?.lab);
+            const isOpen = openSem === index;
+            const currentGroup = openGroup[sem] || (hasTheory ? "theory" : "lab");
 
-          return (
-            <div
-              key={sem}
-              className="bg-white p-5 rounded-2xl shadow mb-6"
-            >
-              <button
-                onClick={() =>
-                  setOpenSem(openSem === index ? null : index)
-                }
-                className="w-full text-left flex justify-between font-semibold text-lg"
-              >
-                {sem}
-                <span>{openSem === index ? "▲" : "▼"}</span>
-              </button>
-
-              {openSem === index && (
-                <div className="mt-3 overflow-hidden">
-                  {/* THEORY / LAB BUTTONS */}
-                  <div className="flex gap-3 mb-3">
-                    <button
-                      onClick={() => {
-                        if (!hasTheory) return setOpenMessage("Content will be updated soon.");
-                        setOpenGroup({ [sem]: "theory" });
-                      }}
-                      className={`p-2 rounded-lg border w-full ${
-                        openGroup[sem] === "theory"
-                          ? "bg-blue-100 border-blue-300"
-                          : "bg-white border-gray-300"
-                      }`}
-                    >
-                      Theory
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (!hasLab) return setOpenMessage("Content will be updated soon.");
-                        setOpenGroup({ [sem]: "lab" });
-                      }}
-                      className={`p-2 rounded-lg border w-full ${
-                        openGroup[sem] === "lab"
-                          ? "bg-blue-100 border-blue-300"
-                          : "bg-white border-gray-300"
-                      }`}
-                    >
-                      Lab
-                    </button>
+            return (
+              <div key={sem} className="bg-white">
+                <button
+                  onClick={() => setOpenSem(isOpen ? null : index)}
+                  className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-brand-ground transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 bg-brand-navy text-white text-[12px] font-bold grid place-items-center">
+                      {index + 1}
+                    </span>
+                    <span className="font-semibold text-[16px] text-brand-navy">{sem}</span>
                   </div>
+                  <span className="text-brand-ink-soft">
+                    {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  </span>
+                </button>
 
-                  {/* SUBJECT LIST */}
-                  {openGroup[sem] &&
-                    Array.isArray(DATA[sem][openGroup[sem]]) &&
-                    DATA[sem][openGroup[sem]].map((subject, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 bg-gray-100 rounded-xl flex justify-between items-center mb-2"
+                {isOpen && (
+                  <div className="px-5 pb-5 pt-2 border-t border-brand-row bg-[#fafbfc] flex flex-col gap-3">
+                    {/* Theory / Lab Tabs */}
+                    <div className="flex gap-2 border-b border-brand-edge pb-2">
+                      <button
+                        onClick={() => {
+                          if (!hasTheory) return setOpenMessage("Theory content will be updated soon.");
+                          setOpenGroup({ [sem]: "theory" });
+                        }}
+                        className={`px-4 py-2 text-[12px] font-semibold transition-colors ${
+                          currentGroup === "theory"
+                            ? "bg-brand-navy text-white"
+                            : "border border-brand-edge text-brand-ink-soft hover:bg-white"
+                        }`}
                       >
-                        <div>{subject.title}</div>
-                        <button
-                          onClick={() => setOpenSubject(subject)}
-                          className="px-3 py-1 border rounded-lg bg-white hover:bg-gray-200"
-                        >
-                          View
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                        Theory ({DATA[sem]?.theory?.length || 0})
+                      </button>
 
-        {/* POPUPS */}
+                      <button
+                        onClick={() => {
+                          if (!hasLab) return setOpenMessage("Laboratory content will be updated soon.");
+                          setOpenGroup({ [sem]: "lab" });
+                        }}
+                        className={`px-4 py-2 text-[12px] font-semibold transition-colors ${
+                          currentGroup === "lab"
+                            ? "bg-brand-navy text-white"
+                            : "border border-brand-edge text-brand-ink-soft hover:bg-white"
+                        }`}
+                      >
+                        Laboratory ({DATA[sem]?.lab?.length || 0})
+                      </button>
+                    </div>
 
-        {/* INVALID SEARCH */}
+                    {/* Subject List */}
+                    <div className="flex flex-col gap-2">
+                      {Array.isArray(DATA[sem]?.[currentGroup]) &&
+                        DATA[sem][currentGroup].map((subject, idx) => (
+                          <div
+                            key={idx}
+                            className="p-3.5 bg-white border border-brand-edge flex items-center justify-between gap-3 hover:border-brand-navy transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <FileText size={16} className="text-brand-navy shrink-0" />
+                              <span className="text-[13.5px] font-medium text-brand-navy">
+                                {subject.title}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => setOpenSubject(subject)}
+                              className="px-3 py-1.5 text-[11.5px] font-semibold bg-brand-navy text-white hover:bg-brand-blue transition-colors shrink-0"
+                            >
+                              View PDF
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Invalid Search Alert */}
         {invalidSearch && (
           <div
             className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
             onClick={() => setInvalidSearch(false)}
           >
-            <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
-              Enter a valid subject name
+            <div className="bg-white p-6 border-2 border-brand-navy max-w-sm w-full mx-4 shadow-xl flex flex-col gap-3">
+              <span className="text-[14px] text-brand-navy font-medium">
+                No subjects matching "{q}" were found.
+              </span>
+              <button
+                onClick={() => setInvalidSearch(false)}
+                className="px-4 py-2 bg-brand-navy text-white text-[12px] font-semibold self-end"
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
 
-        {/* ALERT MESSAGE */}
+        {/* Message Alert */}
         {openMessage && (
           <div
             className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
             onClick={() => setOpenMessage(null)}
           >
-            <div className="bg-white p-5 rounded-xl shadow-xl text-lg">
-              {openMessage}
+            <div className="bg-white p-6 border-2 border-brand-navy max-w-sm w-full mx-4 shadow-xl flex flex-col gap-3">
+              <span className="text-[14px] text-brand-navy font-medium">{openMessage}</span>
+              <button
+                onClick={() => setOpenMessage(null)}
+                className="px-4 py-2 bg-brand-navy text-white text-[12px] font-semibold self-end"
+              >
+                OK
+              </button>
             </div>
           </div>
         )}
 
-        {/* PDF MODAL */}
+        {/* PDF Modal */}
         {openSubject && (
-          <div
-            className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-[999]"
-          >
-            <div
-              className="bg-white w-[90%] h-[90%] rounded-xl overflow-hidden shadow-xl flex flex-col"
-            >
-              <div className="p-3 border-b flex justify-between">
-                <strong>{openSubject.title}</strong>
-                <button
-                  onClick={() => setOpenSubject(null)}
-                  className="px-3 py-1 bg-red-500 text-white rounded-lg"
-                >
-                  Close
-                </button>
+          <div className="fixed inset-0 bg-black/60 flex justify-center items-center p-4 z-[999]">
+            <div className="bg-white w-full max-w-5xl h-[85vh] border-2 border-brand-navy flex flex-col shadow-2xl">
+              <div className="px-5 py-3.5 bg-brand-navy text-white flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileText size={16} className="text-brand-red shrink-0" />
+                  <strong className="text-[14px] truncate">{openSubject.title}</strong>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  {openSubject.url && (
+                    <a
+                      href={openSubject.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[12px] text-brand-on-navy hover:text-white flex items-center gap-1"
+                    >
+                      <ExternalLink size={13} />
+                      Open in tab
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setOpenSubject(null)}
+                    className="px-3 py-1 bg-brand-red text-white text-[12px] font-semibold hover:opacity-90"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
 
-              <iframe
-                src={
-                  openSubject.url
-                    ? `${openSubject.url}#page=${openSubject.pdfPage || 1}`
-                    : `https://www.orimi.com/pdf-test.pdf#page=${openSubject.pdfPage}`
-                }
-                className="w-full h-full"
-              />
+              <div className="flex-1 bg-slate-100 relative">
+                {openSubject.url ? (
+                  <iframe
+                    src={`${openSubject.url}#page=${openSubject.pdfPage || 1}`}
+                    title={openSubject.title}
+                    className="w-full h-full border-0"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-brand-ink-soft">
+                    <FileText size={36} className="text-brand-ink-faint" />
+                    <p className="text-[14px]">PDF document will be available soon.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

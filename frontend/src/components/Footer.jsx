@@ -27,9 +27,9 @@ export default function Footer() {
       title: "Network",
       links: [
         { label: "Alumni directory", to: "/alumni" },
-        { label: "Your profile", to: authed ? "/profile" : "/login" },
-        { label: "Sign in", to: "/login" },
-        { label: "Create account", to: "/signup" },
+        ...(authed
+          ? [{ label: "Your profile", to: "/profile" }]
+          : [{ label: "Sign in", to: "/login" }]),
       ],
     },
   ];
