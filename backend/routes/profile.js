@@ -1,12 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const Profile = require("../models/Profile");
 const multer = require("multer");
-const fs = require("fs");
-const cloudinary = require("cloudinary").v2;
+const supabase = require("../config/supabaseClient");
+const { uploadFile, deleteFile } = require("../lib/storage");
+const { serializeProfile } = require("../lib/serializers");
 
-const upload = multer({ dest: "uploads/" });
-const mongoose = require("mongoose");
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
+const PROFILE_FIELD_MAP = {
+  name: "name",
+  year: "year",
+  dob: "dob",
+  registerNumber: "register_number",
+  bio: "bio",
+  skills: "skills",
+};
+
+function toColumns(body) {
+  const columns = {};
+  for (const [key, column] of Object.entries(PROFILE_FIELD_MAP)) {
+    if (body[key] !== undefined) columns[column] = body[key];
+  }
+  if (body.socialLinks) {
+    if (body.socialLinks.github !== undefined) columns.social_github = body.socialLinks.github;
+    if (body.socialLinks.leetcode !== undefined) columns.social_leetcode = body.socialLinks.leetcode;
+    if (body.socialLinks.linkedin !== undefined) columns.social_linkedin = body.socialLinks.linkedin;
+  }
+  return columns;
+}
 
 /**
  * SEARCH profiles
@@ -16,19 +37,16 @@ router.get("/", async (req, res) => {
     const q = req.query.q || "";
     if (!q.trim()) return res.json([]);
 
-    const profiles = await Profile.find(
-      {
-        name: {
-          $exists: true,
-          $type: "string",
-          $regex: q,
-          $options: "i",
-        },
-      },
-      { name: 1, year: 1, userId: 1, _id: 0 }
-    ).limit(10);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("name, year, user_id")
+      .ilike("name", `%${q}%`)
+      .not("name", "is", null)
+      .limit(10);
 
-    res.json(profiles);
+    if (error) throw error;
+
+    res.json(data.map((row) => ({ name: row.name, year: row.year, userId: row.user_id })));
   } catch (err) {
     console.error("Profile search error:", err);
     res.status(500).json({ error: err.message });
@@ -42,14 +60,15 @@ router.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Prevent CastError
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.json(null);
-    }
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-    const profile = await Profile.findOne({ userId });
-    res.json(profile || null);
+    if (error) throw error;
 
+    res.json(serializeProfile(data));
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.status(500).json({ error: "Server error" });
@@ -62,15 +81,16 @@ router.get("/:userId", async (req, res) => {
 router.put("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    const payload = req.body;
 
-    const profile = await Profile.findOneAndUpdate(
-      { userId },
-      { ...payload, userId },
-      { new: true, upsert: true }
-    );
+    const { data, error } = await supabase
+      .from("profiles")
+      .upsert({ ...toColumns(req.body), user_id: userId }, { onConflict: "user_id" })
+      .select()
+      .single();
 
-    res.json(profile);
+    if (error) throw error;
+
+    res.json(serializeProfile(data));
   } catch (err) {
     console.error("Error saving profile:", err);
     res.status(500).json({ error: "Server error" });
@@ -88,35 +108,33 @@ router.post("/:userId/image", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image provided" });
     }
 
-    const profile = await Profile.findOne({ userId });
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("profile_image_path")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    const uploaded = await uploadFile("profile-images", req.file.buffer, req.file.originalname, {
       folder: "profiles",
-      resource_type: "image",
-      transformation: [
-        { width: 400, height: 400, crop: "fill", gravity: "face" },
-        { quality: "auto" },
-      ],
+      contentType: req.file.mimetype,
     });
 
-    if (profile?.profileImage?.publicId) {
-      await cloudinary.uploader.destroy(profile.profileImage.publicId);
+    if (profile?.profile_image_path) {
+      await deleteFile("profile-images", profile.profile_image_path);
     }
 
-    const updated = await Profile.findOneAndUpdate(
-      { userId },
-      {
-        profileImage: {
-          url: result.secure_url,
-          publicId: result.public_id,
-        },
-      },
-      { new: true, upsert: true }
-    );
+    const { data: updated, error } = await supabase
+      .from("profiles")
+      .upsert(
+        { user_id: userId, profile_image_url: uploaded.url, profile_image_path: uploaded.path },
+        { onConflict: "user_id" }
+      )
+      .select()
+      .single();
 
-    fs.unlinkSync(req.file.path);
+    if (error) throw error;
 
-    res.json(updated.profileImage);
+    res.json({ url: updated.profile_image_url, publicId: updated.profile_image_path });
   } catch (err) {
     console.error("Image upload error:", err);
     res.status(500).json({ error: "Failed to upload image" });
@@ -134,41 +152,41 @@ router.post("/:userId/resume", upload.single("resume"), async (req, res) => {
       return res.status(400).json({ error: "No resume provided" });
     }
 
-    const profile = await Profile.findOne({ userId });
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("resume_path")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    const uploaded = await uploadFile("resumes", req.file.buffer, `resume_${userId}_${Date.now()}.pdf`, {
       folder: "resumes",
-      resource_type: "raw",
-      type: "upload",
-      access_mode: "public",
-      public_id: `resume_${userId}_${Date.now()}.pdf`,
-      use_filename: true,
-      unique_filename: false,
+      contentType: "application/pdf",
     });
 
-    if (profile?.resume?.publicId) {
-      await cloudinary.uploader.destroy(profile.resume.publicId, {
-        resource_type: "raw",
-      });
+    if (profile?.resume_path) {
+      await deleteFile("resumes", profile.resume_path);
     }
 
-    const updated = await Profile.findOneAndUpdate(
-      { userId },
-      {
-        resume: {
-          url: result.secure_url,
-          publicId: result.public_id,
-          filename: req.file.originalname,
+    const { data: updated, error } = await supabase
+      .from("profiles")
+      .upsert(
+        {
+          user_id: userId,
+          resume_url: uploaded.url,
+          resume_path: uploaded.path,
+          resume_filename: req.file.originalname,
         },
-      },
-      { new: true, upsert: true }
-    );
+        { onConflict: "user_id" }
+      )
+      .select()
+      .single();
 
-    fs.unlinkSync(req.file.path);
+    if (error) throw error;
 
-    res.json(updated.resume);
+    res.json({ url: updated.resume_url, publicId: updated.resume_path, filename: updated.resume_filename });
   } catch (err) {
     console.error("Resume upload error:", err);
+    res.status(500).json({ error: "Failed to upload resume" });
   }
 });
 

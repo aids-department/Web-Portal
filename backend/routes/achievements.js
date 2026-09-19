@@ -1,14 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const Achievement = require("../models/Achievement");
 const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const fs = require("fs");
-
-const mongoose = require("mongoose");
+const supabase = require("../config/supabaseClient");
+const { uploadFile, deleteFile } = require("../lib/storage");
+const { serializeAchievement } = require("../lib/serializers");
 
 const upload = multer({
-  dest: "uploads/",
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") cb(null, true);
@@ -16,10 +14,11 @@ const upload = multer({
   },
 });
 
+function isUuid(v) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v || "");
+}
 
 router.post("/", upload.single("certificate"), async (req, res) => {
-  let uploadedCert = null;
-
   try {
     const { userId, title, description } = req.body;
 
@@ -27,39 +26,31 @@ router.post("/", upload.single("certificate"), async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // ----- Upload certificate to Cloudinary (if exists) -----
+    let certificateUrl = null;
+    let certificatePath = null;
+
     if (req.file) {
-      const originalName = req.file.originalname
-        .replace(/\s+/g, "_")
-        .replace(/\.pdf$/i, "");
-
-      const publicId = `cert_${originalName}_${Date.now()}.pdf`;
-
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "certificates",
-        resource_type: "raw",
-        public_id: publicId,
-        use_filename: true,
-        unique_filename: false,
-      });
-
-      uploadedCert = {
-        url: result.secure_url,
-        publicId: result.public_id,
-      };
-
-      fs.unlinkSync(req.file.path); // cleanup temp file
+      const originalName = req.file.originalname.replace(/\s+/g, "_").replace(/\.pdf$/i, "");
+      const uploaded = await uploadFile(
+        "achievement-certificates",
+        req.file.buffer,
+        `cert_${originalName}_${Date.now()}.pdf`,
+        { folder: "certificates", contentType: "application/pdf" }
+      );
+      certificateUrl = uploaded.url;
+      certificatePath = uploaded.path;
     }
 
-    const achievement = new Achievement({
-      userId,
+    const { error } = await supabase.from("achievements").insert({
+      user_id: userId,
       title,
       description,
       status: "pending",
-      certificate: uploadedCert,
+      certificate_url: certificateUrl,
+      certificate_path: certificatePath,
     });
 
-    await achievement.save();
+    if (error) throw error;
 
     res.json({ message: "Achievement submitted for approval" });
   } catch (err) {
@@ -70,11 +61,15 @@ router.post("/", upload.single("certificate"), async (req, res) => {
 
 router.get("/pending", async (req, res) => {
   try {
-    const pending = await Achievement.find({ status: "pending" })
-      .populate("userId", "fullName username year")
-      .sort({ createdAt: -1 });
+    const { data, error } = await supabase
+      .from("achievements")
+      .select("*, user:users(id, full_name, username, year)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
 
-    res.json(pending);
+    if (error) throw error;
+
+    res.json(data.map((row) => serializeAchievement(row, { user: row.user })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -82,72 +77,82 @@ router.get("/pending", async (req, res) => {
 });
 
 router.patch("/:id/approve", async (req, res) => {
-  const achievement = await Achievement.findById(req.params.id);
-  if (!achievement) return res.status(404).json({ error: "Not found" });
-
-  achievement.status = "approved";
-  achievement.reviewedBy = req.body.adminId;
-  achievement.reviewedAt = new Date();
-
-  await achievement.save(); // ← THIS LINE IS CRITICAL
-
-  res.json({ message: "Achievement approved" });
-});
-
-
-router.patch("/:id/reject", async (req, res) => {
-  const achievement = await Achievement.findById(req.params.id);
-  if (!achievement) return res.status(404).json({ error: "Not found" });
-
-  achievement.status = "rejected";
-  achievement.reviewedBy = req.body.adminId;
-  achievement.reviewedAt = new Date();
-  achievement.rejectionReason = req.body.reason;
-
-  await achievement.save(); // ← ALSO REQUIRED
-
-  res.json({ message: "Achievement rejected" });
-});
-
-
-router.get("/user/:userId", async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { all } = req.query;
+    const { data, error } = await supabase
+      .from("achievements")
+      .update({ status: "approved", reviewed_by: req.body.adminId, reviewed_at: new Date().toISOString() })
+      .eq("id", req.params.id)
+      .select()
+      .maybeSingle();
 
-    const filter = { userId };
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: "Not found" });
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.json([]);
-    }
-
-    // Only profile page should see approved
-    if (!all) {
-      filter.status = "approved";
-    }
-
-    const achievements = await Achievement.find(filter).sort({
-      createdAt: -1,
-    });
-
-    res.json(achievements);
+    res.json({ message: "Achievement approved" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
+router.patch("/:id/reject", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("achievements")
+      .update({
+        status: "rejected",
+        reviewed_by: req.body.adminId,
+        reviewed_at: new Date().toISOString(),
+        rejection_reason: req.body.reason,
+      })
+      .eq("id", req.params.id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: "Not found" });
+
+    res.json({ message: "Achievement rejected" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { all } = req.query;
+
+    if (!isUuid(userId)) {
+      return res.json([]);
+    }
+
+    let query = supabase.from("achievements").select("*").eq("user_id", userId);
+    if (!all) query = query.eq("status", "approved");
+
+    const { data, error } = await query.order("created_at", { ascending: false });
+    if (error) throw error;
+
+    res.json(data.map((row) => serializeAchievement(row)));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 router.get("/approved/recent", async (req, res) => {
   try {
-    const achievements = await Achievement.find({
-      status: "approved",
-    })
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .populate("userId", "fullName year");
+    const { data, error } = await supabase
+      .from("achievements")
+      .select("*, user:users(id, full_name, year)")
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(10);
 
-    res.json(achievements);
+    if (error) throw error;
+
+    res.json(data.map((row) => serializeAchievement(row, { user: row.user })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -156,22 +161,21 @@ router.get("/approved/recent", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const achievement = await Achievement.findById(req.params.id);
+    const { data: achievement, error: fetchErr } = await supabase
+      .from("achievements")
+      .select("certificate_path")
+      .eq("id", req.params.id)
+      .maybeSingle();
 
-    if (!achievement) {
-      return res.status(404).json({ error: "Achievement not found" });
+    if (fetchErr) throw fetchErr;
+    if (!achievement) return res.status(404).json({ error: "Achievement not found" });
+
+    if (achievement.certificate_path) {
+      await deleteFile("achievement-certificates", achievement.certificate_path);
     }
 
-    // 🔥 Delete certificate from Cloudinary (if exists)
-    if (achievement.certificate?.publicId) {
-      await cloudinary.uploader.destroy(
-        achievement.certificate.publicId,
-        { resource_type: "raw" } // IMPORTANT for PDFs
-      );
-    }
-
-    // Delete achievement from DB
-    await Achievement.findByIdAndDelete(req.params.id);
+    const { error } = await supabase.from("achievements").delete().eq("id", req.params.id);
+    if (error) throw error;
 
     res.json({ message: "Achievement deleted" });
   } catch (err) {
@@ -179,6 +183,5 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Delete failed" });
   }
 });
-
 
 module.exports = router;

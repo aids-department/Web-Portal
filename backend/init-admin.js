@@ -1,37 +1,33 @@
 require("dotenv").config();
-const mongoose = require("mongoose");
-const Admin = require("./models/Admin");
-
-// Use the same connection string pattern as the main server
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/webportal";
+const bcrypt = require("bcrypt");
+const supabase = require("./config/supabaseClient");
 
 async function createAdmin() {
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("Connected to MongoDB");
+    const { data: existingAdmin, error: findErr } = await supabase
+      .from("admins")
+      .select("id")
+      .eq("username", "admin")
+      .maybeSingle();
+    if (findErr) throw findErr;
 
-    // Check if admin already exists
-    const existingAdmin = await Admin.findOne({ username: "admin" });
     if (existingAdmin) {
       console.log("Admin already exists");
-      process.exit(0);
+      return;
     }
 
-    // Create new admin
-    const admin = new Admin({
-      username: "admin",
-      password: "admin123"
-    });
+    const passwordHash = await bcrypt.hash("admin123", 10);
 
-    await admin.save();
+    const { error: insertErr } = await supabase
+      .from("admins")
+      .insert({ username: "admin", password_hash: passwordHash });
+    if (insertErr) throw insertErr;
+
     console.log("✓ Admin user created successfully");
     console.log("Username: admin");
     console.log("Password: admin123");
-    
   } catch (error) {
     console.error("Error:", error);
-  } finally {
-    mongoose.connection.close();
   }
 }
 

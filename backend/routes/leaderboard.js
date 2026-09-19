@@ -1,17 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const LeaderboardRow = require("../models/Leaderboard");
+const supabase = require("../config/supabaseClient");
+const { serializeLeaderboardRow } = require("../lib/serializers");
 
 // GET leaderboard by category
 router.get("/:category", async (req, res) => {
   try {
     const { category } = req.params;
 
-    const rows = await LeaderboardRow.find({ category })
-      .sort({ score: -1, time: 1 })
+    const { data, error } = await supabase
+      .from("leaderboard_rows")
+      .select("*")
+      .eq("category", category)
+      .order("score", { ascending: false })
+      .order("time", { ascending: true })
       .limit(10);
 
-    res.json(rows);
+    if (error) throw error;
+
+    res.json(data.map(serializeLeaderboardRow));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch leaderboard" });
@@ -23,13 +30,15 @@ router.post("/", async (req, res) => {
   try {
     const { category, name, roll, year, score, time } = req.body;
 
-    const row = await LeaderboardRow.findOneAndUpdate(
-      { category, roll },
-      { name, roll, year, score, time },
-      { upsert: true, new: true }
-    );
+    const { data, error } = await supabase
+      .from("leaderboard_rows")
+      .upsert({ category, name, roll, year, score, time }, { onConflict: "category,roll" })
+      .select()
+      .single();
 
-    res.json(row);
+    if (error) throw error;
+
+    res.json(serializeLeaderboardRow(data));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save leaderboard row" });
@@ -41,7 +50,8 @@ router.delete("/:category", async (req, res) => {
   try {
     const { category } = req.params;
 
-    await LeaderboardRow.deleteMany({ category }); // ✅ FIX
+    const { error } = await supabase.from("leaderboard_rows").delete().eq("category", category);
+    if (error) throw error;
 
     res.json({ success: true });
   } catch (err) {

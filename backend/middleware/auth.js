@@ -56,7 +56,7 @@ const verifyAdmin = (req, res, next) => {
 const generateToken = (user) => {
   return jwt.sign(
     {
-      id:       user._id.toString(),
+      id:       user.id,
       username: user.username,
       role:     user.role || 'user',   // default role is 'user'
     },

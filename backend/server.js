@@ -1,58 +1,47 @@
 // ============================================
 // MERGED BACKEND SERVER
-// Features: Alumni, Events, Posts, Question Papers, Auth, Cloudinary, Google Calendar
+// Features: Alumni, Events, Posts, Question Papers, Auth, Supabase, Google Calendar
 // ============================================
 
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const fs = require("fs");
+const bcrypt = require("bcrypt");
 const path = require("path");
 const { google } = require("googleapis");
+const fs = require("fs");
+
+const supabase = require("./config/supabaseClient");
+const { uploadFile, deleteFile } = require("./lib/storage");
+const {
+  serializeAuthUser,
+  serializeAdminAuth,
+  serializeAlumniThought,
+  serializeEvent,
+  splitEventPayload,
+  serializeQuestionPaper,
+  serializeUpdate,
+  serializeStats,
+} = require("./lib/serializers");
 
 // Import Routes
 const alumniRoutes = require("./routes/alumni");
-
-// Import Models
-const Event = require("./models/Event");
-const User = require("./models/User");
-const Admin = require("./models/Admin");
-const { Post, Comment } = require("./models/Post");
-const QuestionPaper = require("./models/QuestionPaper");
-const Profile = require("./models/Profile");
-const { generateToken } = require('./middleware/auth');
-// Updates Schema
-const updateSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
-});
-const Update = mongoose.model('RecentUpdate', updateSchema);
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-const postsRouter = require('./routes/post');
+const postsRouter = require("./routes/post");
 const leaderboardRoutes = require("./routes/leaderboard");
 const profileRoutes = require("./routes/profile");
 const achievementRoutes = require("./routes/achievements");
 
-// ============================================
-// CLOUDINARY CONFIG
-// ============================================
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-console.log("✓ Cloudinary configured");
+const { generateToken, verifyToken } = require("./middleware/auth");
+
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 // ============================================
-// MULTER CONFIG FOR IMAGE UPLOAD AND PDF UPLOAD
+// MULTER CONFIG (memory storage — buffers go straight to Supabase Storage)
 // ============================================
 const upload = multer({
-  dest: "uploads/",
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|webp|pdf/;
@@ -62,41 +51,7 @@ const upload = multer({
   },
 });
 
-if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
-
-// ============================================
-// CLOUDINARY IMAGE SERVICE
-// ============================================
-class ImageService {
-  async uploadImage(filePath, fileName) {
-    const result = await cloudinary.uploader.upload(filePath, {
-      folder: "posts",
-      public_id: `${Date.now()}-${path.parse(fileName).name}`,
-      resource_type: "image",
-      transformation: [{ width: 1200, crop: "limit" }, { quality: "auto" }],
-    });
-    return {
-      imageUrl: result.secure_url,
-      publicId: result.public_id,
-    };
-  }
-
-  async deleteImage(publicId) {
-    await cloudinary.uploader.destroy(publicId);
-  }
-}
-const imageService = new ImageService();
-
-// ============================================
-// MONGODB CONNECTION
-// ============================================
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("✓ Connected to MongoDB Atlas"))
-  .catch((err) => {
-    console.error("❌ MongoDB error:", err.message);
-    process.exit(1);
-  });
+console.log("✓ Supabase configured");
 
 // ============================================
 // EXPRESS MIDDLEWARE
@@ -213,7 +168,6 @@ async function createCalendarEvent(payload) {
 // ADMIN AUTHENTICATION ROUTES
 // ============================================
 
-// ADMIN LOGIN
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -222,14 +176,17 @@ app.post('/api/admin/login', async (req, res) => {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    const admin = await Admin.findOne({ username });
+    const { data: admin, error } = await supabase
+      .from('admins')
+      .select('*')
+      .eq('username', username)
+      .maybeSingle();
+    if (error) throw error;
 
-    if (!admin || admin.password !== password) {
+    if (!admin || !(await bcrypt.compare(password, admin.password_hash))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Admin schema has role: { default: 'admin' }
-    // so the JWT will carry role:'admin' automatically
     const token = generateToken(admin);
 
     console.log('✓ Admin logged in:', admin.username);
@@ -237,12 +194,8 @@ app.post('/api/admin/login', async (req, res) => {
     res.json({
       success: true,
       message: 'Admin login successful',
-      token,        // ← this is what was missing before
-      admin: {
-        id:       admin._id,
-        username: admin.username,
-        role:     admin.role,
-      },
+      token,
+      admin: serializeAdminAuth(admin),
     });
   } catch (err) {
     console.error('Admin login error:', err);
@@ -263,21 +216,36 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    if (await User.findOne({ username: username.toLowerCase() })) {
+    const lowerUsername = username.toLowerCase();
+    const lowerEmail = email.toLowerCase();
+
+    const { data: existingUsername } = await supabase
+      .from('users').select('id').eq('username', lowerUsername).maybeSingle();
+    if (existingUsername) {
       return res.status(400).json({ error: 'Username already taken' });
     }
-    if (await User.findOne({ email: email.toLowerCase() })) {
+
+    const { data: existingEmail } = await supabase
+      .from('users').select('id').eq('email', lowerEmail).maybeSingle();
+    if (existingEmail) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const newUser = await User.create({
-      fullName,
-      username,
-      email,
-      password,   // plain text — fine for now
-      year,
-      role: 'user',
-    });
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({
+        full_name: fullName,
+        username: lowerUsername,
+        email: lowerEmail,
+        password_hash: passwordHash,
+        year,
+        role: 'user',
+      })
+      .select()
+      .single();
+    if (error) throw error;
 
     const token = generateToken(newUser);
 
@@ -285,14 +253,7 @@ app.post('/api/auth/signup', async (req, res) => {
       success: true,
       message: 'Account created successfully',
       token,
-      user: {
-        id:       newUser._id,
-        fullName: newUser.fullName,
-        username: newUser.username,
-        email:    newUser.email,
-        year:     newUser.year,
-        role:     newUser.role,
-      },
+      user: serializeAuthUser(newUser),
     });
   } catch (err) {
     console.error('Signup error:', err);
@@ -309,40 +270,32 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Please provide credentials' });
     }
 
-    const user = await User.findOne({
-      $or: [
-        { username: identifier.toLowerCase() },
-        { email:    identifier.toLowerCase() },
-      ],
-    });
+    const lower = identifier.toLowerCase();
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .or(`username.eq.${lower},email.eq.${lower}`)
+      .maybeSingle();
+    if (error) throw error;
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const bcrypt = require("bcrypt");
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // generateToken now correctly reads role from DB
-    // because we added role to the User schema
     const token = generateToken(user);
 
     res.json({
       success: true,
       message: 'Login successful',
       token,
-      user: {
-        id:       user._id.toString(),
-        fullName: user.fullName,
-        username: user.username,
-        email:    user.email,
-        year:     user.year,
-        role:     user.role,
-      },
+      user: serializeAuthUser(user),
     });
   } catch (err) {
     console.error('Login error:', err);
@@ -353,61 +306,61 @@ app.post('/api/auth/login', async (req, res) => {
 // ============================================
 // participation count
 // ============================================
-// 1. Define Schemas
-;
-const statsSchema = new mongoose.Schema({
-  key: { type: String, default: "participant_count" },
-  value: { type: Number, default: 23 }
-});
-
-const Stats = mongoose.model('Stats', statsSchema);
-
-// 2. Add Routes
-app.get('/api/updates', async (req, res) => {
-  const updates = await Update.find().sort({ createdAt: -1 }).limit(10);
-  res.json(updates);
-});
-
 app.get('/api/stats', async (req, res) => {
-  let stats = await Stats.findOne({ key: "participant_count" });
-  if (!stats) stats = await Stats.create({ key: "participant_count", value: 23 });
-  res.json(stats);
-});
-
-app.put('/api/stats', async (req, res) => {
-  const stats = await Stats.findOneAndUpdate(
-      { key: "participant_count" },
-      { value: req.body.value },
-      { new: true, upsert: true }
-  );
-  res.json(stats);
-});
-
-// ============================================
-// POSTS ROUTES
-// ============================================
-
-// GET ALL POSTS
-app.use("/api/posts", postsRouter);
-
-// ============================================
-// ALUMNI THOUGHTS ROUTES
-// ============================================
-const AlumniThought = require("./models/AlumniThought");
-const { verifyToken: verifyTokenThoughts } = require("./middleware/auth");
-
-// GET all thoughts (public)
-app.get("/api/alumni-thoughts", async (req, res) => {
   try {
-    const thoughts = await AlumniThought.find().sort({ createdAt: -1 });
-    res.json(thoughts);
+    let { data: stats, error } = await supabase
+      .from('stats').select('*').eq('key', 'participant_count').maybeSingle();
+    if (error) throw error;
+
+    if (!stats) {
+      const { data: created, error: insertErr } = await supabase
+        .from('stats').insert({ key: 'participant_count', value: 23 }).select().single();
+      if (insertErr) throw insertErr;
+      stats = created;
+    }
+
+    res.json(serializeStats(stats));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST a new thought (alumni only)
-app.post("/api/alumni-thoughts", verifyTokenThoughts, async (req, res) => {
+app.put('/api/stats', async (req, res) => {
+  try {
+    const { data: stats, error } = await supabase
+      .from('stats')
+      .upsert({ key: 'participant_count', value: req.body.value }, { onConflict: 'key' })
+      .select()
+      .single();
+    if (error) throw error;
+
+    res.json(serializeStats(stats));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================
+// POSTS ROUTES
+// ============================================
+app.use("/api/posts", postsRouter);
+
+// ============================================
+// ALUMNI THOUGHTS ROUTES
+// ============================================
+app.get("/api/alumni-thoughts", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('alumni_thoughts').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+
+    res.json(data.map(serializeAlumniThought));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/alumni-thoughts", verifyToken, async (req, res) => {
   try {
     if (req.user.role !== "alumni") {
       return res.status(403).json({ error: "Only alumni can post thoughts." });
@@ -423,19 +376,21 @@ app.post("/api/alumni-thoughts", verifyTokenThoughts, async (req, res) => {
       return res.status(400).json({ error: "Thought cannot exceed 100 words." });
     }
 
-    // Look up the user's full name
-    const user = await User.findById(req.user.id);
+    const { data: user, error: userErr } = await supabase
+      .from('users').select('*').eq('id', req.user.id).maybeSingle();
+    if (userErr) throw userErr;
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const thought = await AlumniThought.create({
-      text: text.trim(),
-      authorName: user.fullName,
-      authorId: user._id,
-    });
+    const { data: thought, error } = await supabase
+      .from('alumni_thoughts')
+      .insert({ text: text.trim(), author_name: user.full_name, author_id: user.id })
+      .select()
+      .single();
+    if (error) throw error;
 
-    res.status(201).json(thought);
+    res.status(201).json(serializeAlumniThought(thought));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -446,44 +401,59 @@ app.post("/api/alumni-thoughts", verifyTokenThoughts, async (req, res) => {
 // ============================================
 
 app.get("/api/events", async (req, res) => {
-  const events = await Event.find().sort({ createdAt: -1 });
-  res.json(events);
+  try {
+    const { data, error } = await supabase
+      .from('events').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+
+    res.json(data.map(serializeEvent));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get("/api/events/:id", async (req, res) => {
-  const event = await Event.findById(req.params.id);
-  res.json(event);
+  try {
+    const { data, error } = await supabase
+      .from('events').select('*').eq('id', req.params.id).maybeSingle();
+    if (error) throw error;
+
+    res.json(data ? serializeEvent(data) : null);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post("/api/events", upload.single("poster"), async (req, res) => {
-  let temp = null,
-    publicId = null;
-
   try {
-    const eventData = { ...req.body };
+    const { columns, details } = splitEventPayload(req.body);
 
     if (req.file) {
-      temp = req.file.path;
-      const uploaded = await imageService.uploadImage(temp, req.file.originalname);
-      eventData.poster = uploaded.imageUrl;
-      eventData.thumbnailUrl = uploaded.thumbnailUrl;
-      eventData.posterPublicId = uploaded.publicId;
-      publicId = uploaded.publicId;
+      const uploaded = await uploadFile('event-posters', req.file.buffer, req.file.originalname, {
+        folder: 'events',
+        contentType: req.file.mimetype,
+      });
+      columns.poster_url = uploaded.url;
+      columns.poster_path = uploaded.path;
     }
 
-    const newEvent = new Event(eventData);
-    const savedEvent = await newEvent.save();
+    const { data: savedEvent, error } = await supabase
+      .from('events')
+      .insert({ ...columns, details })
+      .select()
+      .single();
+    if (error) throw error;
 
-    console.log("✓ Event added:", savedEvent.eventName);
+    console.log("✓ Event added:", savedEvent.event_name);
 
     if (process.env.ENABLE_CALENDAR_SYNC === "true") {
       try {
         await createCalendarEvent({
-          title: savedEvent.eventName,
+          title: savedEvent.event_name,
           venue: savedEvent.venue,
           description: savedEvent.description,
-          startDate: savedEvent.startDate,
-          endDate: savedEvent.endDate,
+          startDate: savedEvent.start_date,
+          endDate: savedEvent.end_date,
         });
 
         console.log("✓ Synced to Google Calendar");
@@ -492,89 +462,75 @@ app.post("/api/events", upload.single("poster"), async (req, res) => {
       }
     }
 
-
-    res.json({ success: true, event: savedEvent });
+    res.json({ success: true, event: serializeEvent(savedEvent) });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    if (temp && fs.existsSync(temp)) fs.unlinkSync(temp);
   }
-})
-;
-app.put("/api/events/:id", async (req, res) => {
+});
+
+// Single consolidated handler (the original file registered three
+// conflicting PUT /api/events/:id routes — Express only ever runs the
+// first match, so poster replacement on edit was silently a no-op).
+app.put("/api/events/:id", upload.single("poster"), async (req, res) => {
   try {
+    const { columns, details } = splitEventPayload(req.body);
 
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    if (req.file) {
+      const { data: existing } = await supabase
+        .from('events').select('poster_path').eq('id', req.params.id).maybeSingle();
 
-    if (!updatedEvent) {
-      return res.status(404).json({ message: "Event not found" });
+      const uploaded = await uploadFile('event-posters', req.file.buffer, req.file.originalname, {
+        folder: 'events',
+        contentType: req.file.mimetype,
+      });
+      columns.poster_url = uploaded.url;
+      columns.poster_path = uploaded.path;
+
+      if (existing?.poster_path) await deleteFile('event-posters', existing.poster_path);
     }
 
-    res.json(updatedEvent);
+    const updatePayload = { ...columns };
+    if (Object.keys(details).length > 0) {
+      const { data: current } = await supabase
+        .from('events').select('details').eq('id', req.params.id).maybeSingle();
+      updatePayload.details = { ...(current?.details || {}), ...details };
+    }
 
+    const { data: updated, error } = await supabase
+      .from('events')
+      .update(updatePayload)
+      .eq('id', req.params.id)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+
+    if (!updated) return res.status(404).json({ message: "Event not found" });
+
+    res.json(serializeEvent(updated));
   } catch (err) {
     console.error("Update error:", err);
     res.status(500).json({ error: "Failed to update event" });
   }
 });
-app.put("/api/events/:id", upload.single("poster"), async (req, res) => {
+
+// Single consolidated handler (the original file also registered a
+// second, dead-code duplicate of this route).
+app.delete("/api/events/:id", async (req, res) => {
   try {
+    const { data: event } = await supabase
+      .from('events').select('poster_path').eq('id', req.params.id).maybeSingle();
 
-    const updateData = {
-      eventName: req.body.eventName,
-      eventType: req.body.eventType,
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
-      venue: req.body.venue,
-      eventMode: req.body.eventMode,
-      organizer: req.body.organizer,
-      description: req.body.description,
-      registrationLink: req.body.registrationLink,
-      contact: req.body.contact,
-      deadlines: req.body.deadlines,
-      startTime: req.body.startTime,
-      endTime: req.body.endTime,
-      hackProblemStatements: req.body.hackProblemStatements,
-      hackTechStack: req.body.hackTechStack,
-      hackJudgingCriteria: req.body.hackJudgingCriteria,
-      hackPrizes: req.body.hackPrizes,
-      hackMentors: req.body.hackMentors,
-      hackRules: req.body.hackRules,
-      theme: req.body.theme,
-      teamSize: req.body.teamSize
-    };
-
-    if (req.file) {
-      updateData.poster = req.file.path;
+    if (event?.poster_path) {
+      await deleteFile('event-posters', event.poster_path);
     }
 
-    const updated = await Event.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    const { error } = await supabase.from('events').delete().eq('id', req.params.id);
+    if (error) throw error;
 
-    res.json(updated);
-
-  } catch (error) {
-    console.error("Update error:", error);
-    res.status(500).json({ error: "Failed to update event" });
+    res.json({ success: true, message: "Event deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete event" });
   }
-});
-
-app.delete("/api/events/:id", async (req, res) => {
-  const event = await Event.findById(req.params.id);
-
-  if (event.posterPublicId) {
-    await imageService.deleteImage(event.posterPublicId);
-  }
-
-  await Event.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
 });
 
 // ============================================
@@ -583,7 +539,6 @@ app.delete("/api/events/:id", async (req, res) => {
 
 // 1. UPLOAD PDF (With Error Handling for Large Files)
 app.post("/api/qp", (req, res, next) => {
-  // Wrap upload in a function to catch Multer errors
   upload.single("pdfFile")(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
@@ -593,75 +548,61 @@ app.post("/api/qp", (req, res, next) => {
     } else if (err) {
       return res.status(400).json({ error: err.message });
     }
-    // If no error, proceed to the main logic
     next();
   });
 }, async (req, res) => {
   try {
     const { semester, subjectCode, subjectName, examType, authorId } = req.body;
-    
+
     if (!req.file) return res.status(400).json({ error: "PDF file is required" });
     if (!authorId) return res.status(400).json({ error: "Author ID is required" });
 
-    // Sanitize Filename
-    const cleanExamType = examType.trim().replace(/\s+/g, "_"); 
+    const cleanExamType = examType.trim().replace(/\s+/g, "_");
     const cleanCode = subjectCode.trim().replace(/\s+/g, "_");
-    const publicId = `${cleanCode}_${cleanExamType}_${Date.now()}.pdf`;
+    const fileName = `${cleanCode}_${cleanExamType}_${Date.now()}.pdf`;
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "question_papers",
-      resource_type: "raw", 
-      public_id: publicId,
-      use_filename: true,
-      unique_filename: false
+    const uploaded = await uploadFile('question-papers', req.file.buffer, fileName, {
+      folder: 'question_papers',
+      contentType: 'application/pdf',
     });
 
-    const newQP = new QuestionPaper({
-      semester,
-      subjectCode,
-      subjectName,
-      examType,
-      fileName: req.file.originalname,
-      fileUrl: result.secure_url,
-      publicId: result.public_id,
-      author: authorId,
-    });
+    const { data: newQP, error } = await supabase
+      .from('question_papers')
+      .insert({
+        semester,
+        subject_code: subjectCode,
+        subject_name: subjectName,
+        exam_type: examType,
+        file_name: req.file.originalname,
+        file_url: uploaded.url,
+        file_path: uploaded.path,
+        author_id: authorId,
+      })
+      .select('*, author:users(id, username, full_name, email)')
+      .single();
+    if (error) throw error;
 
-    await newQP.save();
-    fs.unlinkSync(req.file.path);
-
-    const populatedQP = await QuestionPaper.findById(newQP._id).populate("author", "username fullName");
-    res.json({ success: true, data: populatedQP });
-
+    res.json({ success: true, data: serializeQuestionPaper(newQP, { author: newQP.author }) });
   } catch (err) {
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     console.error("QP Upload Error:", err);
     res.status(500).json({ error: "Server Error: " + err.message });
   }
 });
 
-// 2. GET ALL PAPERS (Updated to populate author details)
+// 2. GET ALL PAPERS (with author details)
 app.get("/api/qp", async (req, res) => {
   try {
     const { search } = req.query;
-    let query = {};
+    let query = supabase.from('question_papers').select('*, author:users(id, username, full_name, email)');
 
     if (search) {
-      query = {
-        $or: [
-          { subjectName: { $regex: search, $options: "i" } },
-          { subjectCode: { $regex: search, $options: "i" } },
-        ],
-      };
+      query = query.or(`subject_name.ilike.%${search}%,subject_code.ilike.%${search}%`);
     }
 
-    // ✅ .populate() fills in the author field with actual user data
-    const papers = await QuestionPaper.find(query)
-      .populate("author", "username fullName email") 
-      .sort({ uploadedAt: -1 });
-      
-    res.json(papers);
+    const { data, error } = await query.order('uploaded_at', { ascending: false });
+    if (error) throw error;
+
+    res.json(data.map((row) => serializeQuestionPaper(row, { author: row.author })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -670,17 +611,14 @@ app.get("/api/qp", async (req, res) => {
 // 3. DELETE PAPER
 app.delete("/api/qp/:id", async (req, res) => {
   try {
-    const paper = await QuestionPaper.findById(req.params.id);
+    const { data: paper } = await supabase
+      .from('question_papers').select('file_path').eq('id', req.params.id).maybeSingle();
     if (!paper) return res.status(404).json({ error: "Paper not found" });
 
-    // Try deleting as 'image' first (Cloudinary sometimes treats PDFs as images), then 'raw'
-    try {
-        await cloudinary.uploader.destroy(paper.publicId);
-    } catch (e) {
-        await cloudinary.uploader.destroy(paper.publicId, { resource_type: "raw" });
-    }
+    await deleteFile('question-papers', paper.file_path);
+    const { error } = await supabase.from('question_papers').delete().eq('id', req.params.id);
+    if (error) throw error;
 
-    await QuestionPaper.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -693,8 +631,11 @@ app.delete("/api/qp/:id", async (req, res) => {
 
 app.get("/api/updates", async (req, res) => {
   try {
-    const updates = await Update.find().sort({ createdAt: -1 }).limit(10);
-    res.json(updates);
+    const { data, error } = await supabase
+      .from('recent_updates').select('*').order('created_at', { ascending: false }).limit(10);
+    if (error) throw error;
+
+    res.json(data.map(serializeUpdate));
   } catch (err) {
     res.status(500).json({ error: "Fetch failed" });
   }
@@ -702,9 +643,11 @@ app.get("/api/updates", async (req, res) => {
 
 app.post("/api/updates", async (req, res) => {
   try {
-    const newUpdate = new Update({ title: req.body.title });
-    await newUpdate.save();
-    res.status(201).json(newUpdate);
+    const { data, error } = await supabase
+      .from('recent_updates').insert({ title: req.body.title }).select().single();
+    if (error) throw error;
+
+    res.status(201).json(serializeUpdate(data));
   } catch (err) {
     res.status(500).json({ error: "Save failed" });
   }
@@ -712,7 +655,9 @@ app.post("/api/updates", async (req, res) => {
 
 app.delete("/api/updates/:id", async (req, res) => {
   try {
-    await Update.findByIdAndDelete(req.params.id);
+    const { error } = await supabase.from('recent_updates').delete().eq('id', req.params.id);
+    if (error) throw error;
+
     res.json({ message: "Deleted" });
   } catch (err) {
     res.status(500).json({ error: "Delete failed" });
@@ -723,7 +668,6 @@ app.delete("/api/updates/:id", async (req, res) => {
 // ALUMNI ROUTES
 // ============================================
 app.use("/api/alumni", alumniRoutes);
-
 
 app.get("/health", (req, res) => {
   res.json({ message: "Backend is running" });
@@ -742,86 +686,11 @@ app.use((err, req, res, next) => {
 // ============================================
 app.listen(PORT, () => {
   console.log(`🚀 Backend running at http://localhost:${PORT}`);
-  console.log("→ MongoDB Connected");
-  console.log("→ Cloudinary Ready");
+  console.log("→ Supabase Connected");
+  console.log("→ Supabase Storage Ready");
   console.log("→ Google Calendar Ready");
   console.log("→ Authentication Enabled");
   console.log("→ Posts System Enabled");
   console.log("→ Alumni Routes Enabled");
   console.log(`  Authorize: http://localhost:${PORT}/calendar/auth`);
-});
-app.put("/api/events/:id", upload.single("poster"), async (req, res) => {
-
-  try {
-
-    const id = req.params.id;
-
-    const updateData = {
-      ...req.body
-    };
-
-    if (req.file) {
-      updateData.poster = req.file.path;
-    }
-
-    const updatedEvent = await Event.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
-
-    res.json(updatedEvent);
-
-  } catch (error) {
-
-    res.status(500).json({ error: "Update failed" });
-
-  }
-
-});
-
-
-app.delete("/api/events/:id", async (req, res) => {
-  try {
-
-    const eventId = req.params.id;
-
-    await Event.findByIdAndDelete(eventId);
-
-    res.json({ message: "Event deleted successfully" });
-
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete event" });
-  }
-});
-
-app.get('/api/migrate-posts', async (req, res) => {
-  try {
-    const { Post, Comment } = require('./models/Post');
-
-    const postResult = await Post.updateMany(
-      { isDeleted: { $exists: false } },
-      { $set: { isDeleted: false, isEdited: false, isAnonymous: false } }
-    );
-
-    // Also fix posts that have isDeleted but missing isAnonymous
-    const anonResult = await Post.updateMany(
-      { isAnonymous: { $exists: false } },
-      { $set: { isAnonymous: false } }
-    );
-
-    const commentResult = await Comment.updateMany(
-      { isDeleted: { $exists: false } },
-      { $set: { isDeleted: false, isEdited: false, isAnonymous: false } }
-    );
-
-    res.json({
-      success:          true,
-      postsMigrated:    postResult.modifiedCount,
-      anonFixed:        anonResult.modifiedCount,
-      commentsMigrated: commentResult.modifiedCount,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });

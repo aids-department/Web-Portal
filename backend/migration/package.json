@@ -1,0 +1,17 @@
+{
+  "name": "web-portal-migration",
+  "private": true,
+  "version": "1.0.0",
+  "description": "One-off MongoDB + Cloudinary -> Supabase data migration. Not part of the deployed backend.",
+  "scripts": {
+    "migrate": "node migrate.js",
+    "migrate:dry-run": "node migrate.js --dry-run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.8.0",
+    "dotenv": "^17.2.3",
+    "mongoose": "^9.1.2"
+  }
+}
