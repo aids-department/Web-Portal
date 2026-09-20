@@ -261,6 +261,40 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
+// ============================================
+// DYNAMIC ROLE & YEAR CALCULATION
+// The latest 4 distinct batches in the database are active students.
+// Any batches prior to the latest 4 are alumni.
+// ============================================
+async function getRoleAndYearForBatch(passOutYear) {
+  const pYear = parseInt(passOutYear, 10);
+  if (isNaN(pYear)) {
+    return { role: 'user', year: '1' };
+  }
+
+  // Fetch all distinct pass_out_year values from students table
+  const { data: rows } = await supabase
+    .from('students')
+    .select('pass_out_year');
+
+  const uniqueBatches = Array.from(
+    new Set((rows || []).map((r) => parseInt(r.pass_out_year, 10)).filter((n) => !isNaN(n)))
+  ).sort((a, b) => b - a); // descending, e.g. [2030, 2029, 2028, 2027, 2026, 2020]
+
+  // Top 4 batches are current students
+  const studentBatches = uniqueBatches.slice(0, 4);
+
+  const batchIndex = studentBatches.indexOf(pYear);
+  if (batchIndex !== -1) {
+    // Current student: newest batch (index 0) = 1st year, ..., 4th batch (index 3) = 4th year
+    const yearString = String(batchIndex + 1);
+    return { role: 'user', year: yearString };
+  }
+
+  // Not in the latest 4 batches -> Alumni
+  return { role: 'alumni', year: '4' };
+}
+
 // LOGIN
 app.post('/api/auth/login', async (req, res) => {
   try {
@@ -270,32 +304,168 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Please provide credentials' });
     }
 
-    const lower = identifier.toLowerCase();
+    const clean = identifier.trim();
+    const lower = clean.toLowerCase();
 
-    const { data: user, error } = await supabase
+    // 1. Try finding in users table first
+    const { data: user, error: userErr } = await supabase
       .from('users')
       .select('*')
       .or(`username.eq.${lower},email.eq.${lower}`)
       .maybeSingle();
-    if (error) throw error;
 
-    if (!user) {
+    if (userErr) throw userErr;
+
+    if (user) {
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (isMatch) {
+        // Dynamically re-check batch/role if linked to a student
+        let activeUser = user;
+        const { data: studentLink } = await supabase
+          .from('students')
+          .select('pass_out_year')
+          .or(`id.eq.${user.id},email.eq.${user.email}`)
+          .maybeSingle();
+
+        if (studentLink && activeUser.role !== 'admin') {
+          const { role: dynamicRole, year: dynamicYear } = await getRoleAndYearForBatch(studentLink.pass_out_year);
+          if (activeUser.role !== dynamicRole || activeUser.year !== dynamicYear) {
+            const { data: updated } = await supabase
+              .from('users')
+              .update({ role: dynamicRole, year: dynamicYear })
+              .eq('id', user.id)
+              .select()
+              .single();
+            if (updated) activeUser = updated;
+          }
+        }
+
+        const token = generateToken(activeUser);
+        return res.json({
+          success: true,
+          message: 'Login successful',
+          token,
+          user: serializeAuthUser(activeUser),
+        });
+      }
+    }
+
+    // 2. Check students table
+    // Match by full email, or roll number prefix (e.g. 23d102 -> 23d102@psgitech.ac.in)
+    let studentQuery = supabase.from('students').select('*');
+    if (lower.includes('@')) {
+      studentQuery = studentQuery.ilike('email', lower);
+    } else {
+      studentQuery = studentQuery.or(`email.ilike.${lower}@%,email.eq.${lower}`);
+    }
+
+    const { data: matchedStudents, error: studentErr } = await studentQuery;
+    if (studentErr) throw studentErr;
+
+    let authenticatedStudent = null;
+    if (matchedStudents && matchedStudents.length > 0) {
+      for (const student of matchedStudents) {
+        const isMatch = await bcrypt.compare(password, student.password);
+        if (isMatch) {
+          authenticatedStudent = student;
+          break;
+        }
+      }
+    }
+
+    if (!authenticatedStudent) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+    // 3. Dynamically determine role ('user' vs 'alumni') and year based on latest 4 batches
+    const { role: dynamicRole, year: dynamicYear } = await getRoleAndYearForBatch(authenticatedStudent.pass_out_year);
 
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    // 4. Ensure a corresponding 'users' row exists for this student
+    // (since posts, profiles, achievements, etc. have FKs referencing users.id)
+    let authUser = null;
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .or(`id.eq.${authenticatedStudent.id},email.eq.${authenticatedStudent.email}`)
+      .maybeSingle();
+
+    if (existingUser) {
+      const { data: updatedUser } = await supabase
+        .from('users')
+        .update({
+          password_hash: authenticatedStudent.password,
+          role: dynamicRole,
+          year: dynamicYear,
+        })
+        .eq('id', existingUser.id)
+        .select()
+        .single();
+      authUser = updatedUser || existingUser;
+    } else {
+      // Base username from roll or email
+      let baseUsername = (authenticatedStudent.email.split('@')[0] || 'student').toLowerCase();
+      const { data: userWithUname } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', baseUsername)
+        .maybeSingle();
+      if (userWithUname) {
+        baseUsername = `${baseUsername}_${authenticatedStudent.id.slice(0, 4)}`;
+      }
+
+      // Check if email already taken in users
+      let userEmail = authenticatedStudent.email;
+      const { data: userWithEmail } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', userEmail)
+        .maybeSingle();
+      if (userWithEmail) {
+        userEmail = `${userEmail.replace('@', `+${authenticatedStudent.id.slice(0, 4)}@`)}`;
+      }
+
+      const { data: createdUser, error: createErr } = await supabase
+        .from('users')
+        .insert({
+          id: authenticatedStudent.id,
+          full_name: authenticatedStudent.name,
+          username: baseUsername,
+          email: userEmail,
+          password_hash: authenticatedStudent.password,
+          year: dynamicYear,
+          role: dynamicRole,
+        })
+        .select()
+        .single();
+
+      if (createErr) {
+        console.error('Error creating user record for student:', createErr);
+        authUser = {
+          id: authenticatedStudent.id,
+          full_name: authenticatedStudent.name,
+          username: baseUsername,
+          email: authenticatedStudent.email,
+          year: dynamicYear,
+          role: dynamicRole,
+        };
+      } else {
+        authUser = createdUser;
+        // Also create initial profile
+        await supabase.from('profiles').upsert({
+          user_id: createdUser.id,
+          name: authenticatedStudent.name,
+          year: dynamicYear,
+        }, { onConflict: 'user_id' });
+      }
     }
 
-    const token = generateToken(user);
+    const token = generateToken(authUser);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Login successful',
       token,
-      user: serializeAuthUser(user),
+      user: serializeAuthUser(authUser),
     });
   } catch (err) {
     console.error('Login error:', err);

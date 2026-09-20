@@ -11,3 +11,8 @@ node_modules/
 # Build folders
 dist/
 build/
+
+# Sensitive data / Passwords
+backend/data/
+*password*.csv
+*passwords*.csv

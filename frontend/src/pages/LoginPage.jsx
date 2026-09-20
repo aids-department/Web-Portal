@@ -31,7 +31,8 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://web-portal-760h.onrender.com/api/auth/login', {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://web-portal-760h.onrender.com');
+      const response = await fetch(`${apiBase}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,14 +99,14 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
-                Username or email
+                Roll number or email
               </span>
               <input
                 type="text"
                 name="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
-                placeholder="you@aids.dept"
+                placeholder="Roll number (e.g. 23d102) or email"
                 className="border border-brand-ink-faint px-3 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
               />
             </div>
