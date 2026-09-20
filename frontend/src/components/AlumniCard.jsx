@@ -2,6 +2,16 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { User } from "lucide-react";
 
+const PlaceholderAvatar = ({ size = "md" }) => (
+  <div
+    className={`grid place-items-center ${
+      size === "lg" ? "w-[180px] h-[180px] bg-brand-blue" : "w-[150px] h-[150px] bg-brand-blue-tint"
+    }`}
+  >
+    <User className={size === "lg" ? "text-[#a8b6cc]" : "text-[#8a9bb8]"} size={size === "lg" ? 48 : 36} />
+  </div>
+);
+
 export default function AlumniCard({ alumni }) {
   const [open, setOpen] = useState(false);
 
@@ -24,12 +34,6 @@ export default function AlumniCard({ alumni }) {
     .join(' ');
   const roleDotCompany = [alumni.role, alumni.company].filter(Boolean).join(' · ');
 
-  const PlaceholderAvatar = ({ size = "md" }) => (
-    <div className={`w-full h-full grid place-items-center bg-brand-blue-tint ${size === "lg" ? "bg-brand-blue" : ""}`}>
-      <User className={`${size === "lg" ? "text-[#a8b6cc]" : "text-[#8a9bb8]"}`} size={size === "lg" ? 48 : 36} />
-    </div>
-  );
-
   return (
     <>
       {/* ================= DIRECTORY TILE ================= */}
@@ -37,9 +41,9 @@ export default function AlumniCard({ alumni }) {
         onClick={() => setOpen(true)}
         className="font-brand text-left bg-white p-[18px] flex flex-col gap-2.5 hover:bg-[#f7f9fc]"
       >
-        <div className="w-[110px] h-[110px] mx-auto rounded-xl bg-brand-blue-tint border-2 border-[#c3cfe3] overflow-hidden">
+        <div className="w-fit mx-auto bg-brand-blue-tint border border-[#c3cfe3]">
           {alumni.imageUrl ? (
-            <img src={alumni.imageUrl} alt={alumni.name} className="w-full h-full object-cover object-top scale-[0.85]" />
+            <img src={alumni.imageUrl} alt={alumni.name} className="max-w-[150px] h-auto block" />
           ) : (
             <PlaceholderAvatar />
           )}
@@ -75,10 +79,10 @@ export default function AlumniCard({ alumni }) {
               </button>
             </div>
 
-            <div className="bg-brand-navy px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-10 grid grid-cols-[150px_minmax(0,1fr)] gap-7 items-start">
-              <div className="w-[150px] h-[150px] rounded-xl bg-brand-blue border border-[#3d5077] overflow-hidden">
+            <div className="bg-brand-navy px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-10 grid grid-cols-[minmax(150px,180px)_minmax(0,1fr)] gap-7 items-start">
+              <div className="w-fit bg-brand-blue border border-[#3d5077]">
                 {alumni.imageUrl ? (
-                  <img src={alumni.imageUrl} alt={alumni.name} className="w-full h-full object-cover object-top scale-[0.85]" />
+                  <img src={alumni.imageUrl} alt={alumni.name} className="max-w-[180px] h-auto block" />
                 ) : (
                   <PlaceholderAvatar size="lg" />
                 )}
