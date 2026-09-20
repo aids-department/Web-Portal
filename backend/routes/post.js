@@ -7,7 +7,9 @@ const { uploadFile, deleteFile } = require('../lib/storage');
 const { verifyToken, verifyAdmin } = require('../middleware/auth');
 const { serializePost, serializeComment, serializeReply } = require('../lib/serializers');
 
-const AUTHOR_SELECT = 'author:users(id, username, full_name)';
+// `posts`/`comments`/`replies` each have two FKs into `users` (author_id and
+// deleted_by), so PostgREST can't infer which one to embed without a hint.
+const AUTHOR_SELECT = 'author:users!author_id(id, username, full_name)';
 
 // ── Multer (images on posts, buffered in memory then pushed to Storage) ──────
 const upload = multer({
