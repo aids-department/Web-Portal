@@ -35,7 +35,7 @@ const MemberPhoto = ({ src, alt }) => {
   const hasPhoto = src && src !== "/user-icon.jpg" && !imgError;
 
   return (
-    <div className="w-fit mx-auto bg-brand-blue-tint border border-[#c3cfe3]">
+    <div className="w-fit self-center bg-brand-blue-tint border border-[#c3cfe3]">
       {hasPhoto ? (
         <img
           src={src}

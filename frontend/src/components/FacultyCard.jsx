@@ -9,7 +9,7 @@ const FacultyCard = ({ faculty }) => {
 
   return (
     <div className="font-brand bg-white p-5 flex flex-col gap-2.5">
-      <div className="w-fit mx-auto bg-brand-blue-tint border border-[#c3cfe3]">
+      <div className="w-fit self-center bg-brand-blue-tint border border-[#c3cfe3]">
         <img
           src={faculty.imageUrl}
           alt={faculty.name}

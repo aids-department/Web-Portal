@@ -39,9 +39,9 @@ export default function AlumniCard({ alumni }) {
       {/* ================= DIRECTORY TILE ================= */}
       <button
         onClick={() => setOpen(true)}
-        className="font-brand text-left bg-white p-[18px] flex flex-col gap-2.5 hover:bg-[#f7f9fc]"
+        className="w-full font-brand text-left bg-white p-[18px] flex flex-col gap-2.5 hover:bg-[#f7f9fc]"
       >
-        <div className="w-fit mx-auto bg-brand-blue-tint border border-[#c3cfe3]">
+        <div className="w-fit self-center bg-brand-blue-tint border border-[#c3cfe3]">
           {alumni.imageUrl ? (
             <img src={alumni.imageUrl} alt={alumni.name} className="max-w-[150px] h-auto block" />
           ) : (

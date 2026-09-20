@@ -41,7 +41,7 @@ export default function StaffInfo() {
       >
         {staffData.map((staff) => (
           <div key={staff.name} className="font-brand bg-white p-5 flex flex-col gap-2.5">
-            <div className="w-fit mx-auto bg-brand-blue-tint border border-[#c3cfe3]">
+            <div className="w-fit self-center bg-brand-blue-tint border border-[#c3cfe3]">
               <img
                 src={staff.img}
                 alt={staff.name}
