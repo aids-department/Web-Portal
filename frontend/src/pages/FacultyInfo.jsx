@@ -120,11 +120,11 @@ const FacultyInfo = () => {
       {/* HOD */}
       <div className="px-5 sm:px-8 lg:px-12 pb-5">
         <div className="grid grid-cols-1 sm:grid-cols-[minmax(150px,220px)_minmax(0,2fr)] gap-6 border border-brand-edge p-6">
-          <div className="bg-brand-blue">
+          <div className="w-fit bg-brand-blue">
             <img
               src={hod.imageUrl}
               alt={hod.name}
-              className="w-full h-auto block"
+              className="max-w-[200px] h-auto block"
               onError={(e) => {
                 e.currentTarget.src = "https://via.placeholder.com/300x300?text=No+Image";
               }}

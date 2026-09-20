@@ -9,11 +9,11 @@ const FacultyCard = ({ faculty }) => {
 
   return (
     <div className="font-brand bg-white p-5 flex flex-col gap-2.5">
-      <div className="bg-brand-blue-tint border border-[#c3cfe3]">
+      <div className="w-fit mx-auto bg-brand-blue-tint border border-[#c3cfe3]">
         <img
           src={faculty.imageUrl}
           alt={faculty.name}
-          className="w-full h-auto block"
+          className="max-w-[160px] h-auto block"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/300x300/6b7280/ffffff?text=No+Image';
           }}
