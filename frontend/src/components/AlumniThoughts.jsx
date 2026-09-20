@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Quote, Send } from "lucide-react";
 
-const API_BASE = "https://web-portal-760h.onrender.com";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://web-portal-760h.onrender.com');
 
 export default function AlumniThoughts() {
   const [thoughts, setThoughts] = useState([]);

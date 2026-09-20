@@ -34,3 +34,8 @@ build/
 
 # Your events data (optional – see note below)
 # events.json        ← remove the # if you DON'T want to share real events
+
+# Sensitive data / Passwords
+data/
+*password*.csv
+*passwords*.csv
