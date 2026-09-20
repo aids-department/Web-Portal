@@ -4,7 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 const TABS = [
   { label: 'Faculty', to: '/about/faculty' },
   { label: 'Staff', to: '/about/staff' },
-  { label: 'Syllabus', to: '/about/syllabus' },
   { label: 'Team', to: '/team-info' },
 ];
 
