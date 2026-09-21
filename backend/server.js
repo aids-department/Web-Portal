@@ -14,6 +14,7 @@ const fs = require("fs");
 
 const supabase = require("./config/supabaseClient");
 const { uploadFile, deleteFile } = require("./lib/storage");
+const { computeRoleAndYear } = require("./lib/studentBatches");
 const {
   serializeAuthUser,
   serializeAdminAuth,
@@ -267,32 +268,8 @@ app.post('/api/auth/signup', async (req, res) => {
 // Any batches prior to the latest 4 are alumni.
 // ============================================
 async function getRoleAndYearForBatch(passOutYear) {
-  const pYear = parseInt(passOutYear, 10);
-  if (isNaN(pYear)) {
-    return { role: 'user', year: '1' };
-  }
-
-  // Fetch all distinct pass_out_year values from students table
-  const { data: rows } = await supabase
-    .from('students')
-    .select('pass_out_year');
-
-  const uniqueBatches = Array.from(
-    new Set((rows || []).map((r) => parseInt(r.pass_out_year, 10)).filter((n) => !isNaN(n)))
-  ).sort((a, b) => b - a); // descending, e.g. [2030, 2029, 2028, 2027, 2026, 2020]
-
-  // Top 4 batches are current students
-  const studentBatches = uniqueBatches.slice(0, 4);
-
-  const batchIndex = studentBatches.indexOf(pYear);
-  if (batchIndex !== -1) {
-    // Current student: newest batch (index 0) = 1st year, ..., 4th batch (index 3) = 4th year
-    const yearString = String(batchIndex + 1);
-    return { role: 'user', year: yearString };
-  }
-
-  // Not in the latest 4 batches -> Alumni
-  return { role: 'alumni', year: '4' };
+  const { data: rows } = await supabase.from('students').select('pass_out_year');
+  return computeRoleAndYear(passOutYear, (rows || []).map((r) => r.pass_out_year));
 }
 
 // LOGIN

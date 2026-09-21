@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import HeroCanvas from '../components/HeroCanvas';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     identifier: '', // Can be username or email
     password: ''
@@ -115,14 +117,26 @@ const LoginPage = () => {
               <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
                 Password
               </span>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="border border-brand-ink-faint px-3 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="w-full border border-brand-ink-faint pl-3 pr-11 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 px-3 grid place-items-center text-brand-ink-soft hover:text-brand-navy"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
