@@ -112,11 +112,6 @@ export default function Profile() {
           )}
         </div>
         <div className="min-w-0 flex flex-col gap-2.5">
-          {kicker && (
-            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-brand-red">
-              {kicker}
-            </span>
-          )}
           <h1 className="m-0 text-[30px] sm:text-[36px] lg:text-[40px] leading-[1.05] font-semibold tracking-[-0.02em] text-white">
             {displayName}
           </h1>
