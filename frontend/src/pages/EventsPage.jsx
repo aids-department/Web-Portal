@@ -1,6 +1,6 @@
 // frontend/src/pages/EventsPage.jsx
 import React, { useState, useEffect } from 'react';
-import { Search, CalendarDays } from 'lucide-react';
+import { Search, CalendarDays, List, LayoutGrid } from 'lucide-react';
 
 import UpcomingEventCard from '../components/UpcomingEventCard';
 import PastEventCard from '../components/PastEventCard';
@@ -13,6 +13,8 @@ const EventsPage = () => {
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming' | 'past' | 'calendar'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventsData, setEventsData] = useState([]);
+  // Each tab keeps its own layout; defaults match the original design
+  const [viewMode, setViewMode] = useState({ upcoming: 'list', past: 'grid' });
 
   useEffect(() => {
     fetch('https://web-portal-760h.onrender.com/api/events')
@@ -31,6 +33,9 @@ const EventsPage = () => {
   const filteredEvents = displayedEvents.filter(e =>
     (e.eventName || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const layout = viewMode[activeTab];
+  const EventCard = activeTab === 'upcoming' ? UpcomingEventCard : PastEventCard;
 
   if (selectedEvent) {
     return <EventDetails event={selectedEvent} onBack={() => setSelectedEvent(null)} />;
@@ -91,17 +96,39 @@ const EventsPage = () => {
         <CalendarEmbed />
       ) : (
         <>
-          {/* Search */}
-          <div className="flex items-stretch border-2 border-brand-navy max-w-md">
-            <span className="px-3 grid place-items-center text-brand-ink-faint">
-              <Search size={16} />
-            </span>
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search events..."
-              className="flex-1 py-3 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
-            />
+          {/* Search + Layout Toggle */}
+          <div className="flex items-stretch gap-3 flex-wrap">
+            <div className="flex items-stretch border-2 border-brand-navy flex-1 min-w-[220px] max-w-md">
+              <span className="px-3 grid place-items-center text-brand-ink-faint">
+                <Search size={16} />
+              </span>
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search events..."
+                className="flex-1 min-w-0 py-3 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+              />
+            </div>
+            <div className="flex border-2 border-brand-navy" role="group" aria-label="Layout">
+              {[
+                { mode: 'list', label: 'List', Icon: List },
+                { mode: 'grid', label: 'Grid', Icon: LayoutGrid },
+              ].map(({ mode, label, Icon }) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(v => ({ ...v, [activeTab]: mode }))}
+                  aria-pressed={layout === mode}
+                  className={`flex items-center gap-1.5 px-3.5 text-[11.5px] font-semibold transition-colors ${
+                    layout === mode
+                      ? 'bg-brand-navy text-white'
+                      : 'text-brand-ink-soft hover:bg-brand-ground'
+                  }`}
+                >
+                  <Icon size={15} />
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Events List & Dynamic Sidebar Calendar */}
@@ -115,19 +142,29 @@ const EventsPage = () => {
                     Try adjusting your search or check back later.
                   </p>
                 </div>
-              ) : activeTab === 'upcoming' ? (
-                <div className="flex flex-col gap-3.5">
+              ) : layout === 'list' ? (
+                <div
+                  className={
+                    activeTab === 'upcoming'
+                      ? 'flex flex-col gap-3.5'
+                      : 'flex flex-col gap-px bg-brand-edge border border-brand-edge'
+                  }
+                >
                   {filteredEvents.map(event => (
-                    <UpcomingEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
+                    <EventCard key={event._id} event={event} onOpenModal={setSelectedEvent} layout="list" />
                   ))}
                 </div>
               ) : (
                 <div
-                  className="grid gap-px bg-brand-edge border border-brand-edge"
-                  style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
+                  className={
+                    activeTab === 'upcoming'
+                      ? 'grid gap-3.5'
+                      : 'grid gap-px bg-brand-edge border border-brand-edge'
+                  }
+                  style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${activeTab === 'upcoming' ? 240 : 200}px, 1fr))` }}
                 >
                   {filteredEvents.map(event => (
-                    <PastEventCard key={event._id} event={event} onOpenModal={setSelectedEvent} />
+                    <EventCard key={event._id} event={event} onOpenModal={setSelectedEvent} layout="grid" />
                   ))}
                 </div>
               )}

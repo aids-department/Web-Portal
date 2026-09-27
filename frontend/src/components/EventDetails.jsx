@@ -43,6 +43,7 @@ const EventDetails = ({ event, onBack }) => {
   ].filter(Boolean);
 
   const winner = event.winner || event.winningTeam;
+  const posterSrc = event.poster || event.image;
 
   return (
     <div className="font-brand">
@@ -54,39 +55,59 @@ const EventDetails = ({ event, onBack }) => {
         <span className="text-[12px] text-brand-ink-soft">{event.eventName}</span>
       </div>
 
-      <div className="min-h-[220px] sm:min-h-[280px] bg-brand-blue grid place-items-center overflow-hidden">
-        {event.poster ? (
-          <img src={event.poster} alt={event.eventName} className="w-full h-full object-cover grayscale" />
-        ) : (
-          <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-[#a8b6cc]">
-            Event photograph
-          </span>
+      {/* Split header: poster at its natural proportions beside the event summary */}
+      <div className="bg-brand-navy flex flex-col md:flex-row md:h-[360px] lg:h-[420px]">
+        {posterSrc && (
+          <div className="flex-none md:max-w-[55%] bg-brand-navy-deep grid place-items-center overflow-hidden md:border-r-2 border-brand-blue">
+            <img
+              src={posterSrc}
+              alt={event.eventName}
+              className="block w-full max-h-[420px] md:w-auto md:max-h-none md:h-full object-contain grayscale"
+            />
+          </div>
         )}
+        <div className="flex-1 min-w-0 px-5 sm:px-8 lg:px-12 py-8 sm:py-10 flex flex-col justify-center gap-4">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span
+              className="px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
+              style={{ background: tag.bg, color: tag.fg }}
+            >
+              {event.eventType || 'Event'}
+            </span>
+            {winner && (
+              <span className="text-[12px] font-semibold text-brand-red">Champion: {winner}</span>
+            )}
+          </div>
+          <h1 className="m-0 text-[28px] sm:text-[34px] lg:text-[42px] leading-[1.08] font-semibold tracking-[-0.02em] text-white max-w-[22ch] md:line-clamp-3">
+            {event.eventName}
+          </h1>
+          <div className="flex flex-col gap-1 text-[13px] leading-[1.5] text-brand-on-navy">
+            <span className="tabular-nums">
+              {formatDate(event.startDate)}
+              {event.startDate && ` · ${formatTime(event.startDate)}`}
+            </span>
+            <span className="text-brand-on-navy-muted">
+              {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On campus'}
+            </span>
+          </div>
+          {hasRegistration && (
+            <div className="pt-1">
+              <button
+                onClick={() => window.open(event.registrationLink, '_blank')}
+                className="px-5 py-[13px] bg-brand-red text-white text-[12.5px] font-semibold"
+              >
+                Register now
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,320px)]">
         <div className="min-w-0 px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-10 flex flex-col gap-5 lg:border-r border-brand-edge">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span
-                className="px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
-                style={{ background: tag.bg, color: tag.fg }}
-              >
-                {event.eventType || 'Event'}
-              </span>
-              <span className="text-[12px] text-brand-ink-soft tabular-nums">
-                {formatDate(event.startDate)}
-              </span>
-            </div>
-            <h1 className="m-0 text-[28px] sm:text-[34px] lg:text-[38px] leading-[1.1] font-semibold tracking-[-0.02em] text-brand-navy max-w-[24ch]">
-              {event.eventName}
-            </h1>
-            {winner && (
-              <span className="text-[13px] font-semibold text-brand-red">
-                Champion: {winner}
-              </span>
-            )}
-          </div>
+          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
+            About this event
+          </span>
 
           <p className="m-0 max-w-[76ch] text-[15px] leading-[1.75] text-[#3a3838] whitespace-pre-line">
             {event.description || 'No description provided.'}

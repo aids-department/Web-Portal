@@ -2,7 +2,7 @@
 import React from 'react';
 import { eventTagStyle } from '../utils/eventTagStyle';
 
-const UpcomingEventCard = ({ event, onOpenModal }) => {
+const UpcomingEventCard = ({ event, onOpenModal, layout = 'list' }) => {
 
   // --- DATE FORMATTER (unchanged) ---
   const formatDate = (dateString) => {
@@ -18,13 +18,19 @@ const UpcomingEventCard = ({ event, onOpenModal }) => {
 
   const tag = eventTagStyle(event.eventType);
   const hasRegistration = !!(event.registrationLink && event.registrationLink !== 'NO_LINK');
+  const isGrid = layout === 'grid';
 
   return (
     <button
       onClick={() => onOpenModal(event)}
-      className="font-brand w-full text-left grid grid-cols-1 sm:grid-cols-[minmax(120px,180px)_minmax(0,2fr)] gap-4 border border-brand-edge p-4 hover:border-brand-navy"
+      className={`font-brand w-full text-left border border-brand-edge p-4 hover:border-brand-navy ${
+        isGrid
+          ? 'h-full flex flex-col gap-3'
+          : 'grid grid-cols-1 sm:grid-cols-[150px_minmax(0,1fr)] gap-3 sm:gap-4'
+      }`}
     >
-      <div className="min-h-[120px] bg-brand-blue grid place-items-center overflow-hidden">
+      {/* In list view the photo stretches to the row height on sm+ */}
+      <div className={`bg-brand-blue grid place-items-center overflow-hidden ${isGrid ? 'h-[140px]' : 'h-[140px] sm:h-auto'}`}>
         {event.poster || event.image ? (
           <img
             src={event.poster || event.image}
@@ -37,28 +43,55 @@ const UpcomingEventCard = ({ event, onOpenModal }) => {
           </span>
         )}
       </div>
-      <div className="min-w-0 flex flex-col gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span
-            className="px-2 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
-            style={{ background: tag.bg, color: tag.fg }}
-          >
-            {event.eventType || 'Event'}
+      {isGrid ? (
+        <div className="min-w-0 flex-1 flex flex-col gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              className="px-2 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
+              style={{ background: tag.bg, color: tag.fg }}
+            >
+              {event.eventType || 'Event'}
+            </span>
+            <span className="text-[11.5px] text-brand-ink-soft tabular-nums">
+              {formatDate(event.startDate || event.date)}
+            </span>
+          </div>
+          <h3 className="m-0 text-[17px] font-semibold text-brand-navy leading-[1.3]">
+            {event.eventName || event.title}
+          </h3>
+          <span className="text-[12.5px] leading-[1.5] text-brand-ink-soft">
+            {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On Campus'}
           </span>
-          <span className="text-[11.5px] text-brand-ink-soft tabular-nums">
-            {formatDate(event.startDate || event.date)}
+          <span className="mt-auto text-[11.5px] font-semibold text-brand-red">
+            {hasRegistration ? 'Details and registration' : 'Details'}
           </span>
         </div>
-        <h3 className="m-0 text-[17px] font-semibold text-brand-navy leading-[1.3]">
-          {event.eventName || event.title}
-        </h3>
-        <span className="text-[12.5px] leading-[1.5] text-brand-ink-soft">
-          {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On Campus'}
-        </span>
-        <span className="mt-auto text-[11.5px] font-semibold text-brand-red">
-          {hasRegistration ? 'Details and registration' : 'Details'}
-        </span>
-      </div>
+      ) : (
+        // Compact list row: every line is clamped so all rows share one height
+        <div className="min-w-0 flex flex-col gap-1.5">
+          <div className="flex items-center gap-2 min-w-0 whitespace-nowrap">
+            <span
+              className="flex-none px-2 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
+              style={{ background: tag.bg, color: tag.fg }}
+            >
+              {event.eventType || 'Event'}
+            </span>
+            <span className="min-w-0 truncate text-[11.5px] text-brand-ink-soft tabular-nums">
+              {formatDate(event.startDate || event.date)} ·{' '}
+              {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On Campus'}
+            </span>
+            <span className="flex-none ml-auto pl-2 text-[11.5px] font-semibold text-brand-red">
+              {hasRegistration ? 'Details and registration' : 'Details'}
+            </span>
+          </div>
+          <h3 className="m-0 text-[16px] font-semibold text-brand-navy leading-[1.3] line-clamp-1">
+            {event.eventName || event.title}
+          </h3>
+          <p className="m-0 text-[12.5px] leading-[1.55] min-h-[3.1em] text-brand-ink-soft line-clamp-2">
+            {event.description}
+          </p>
+        </div>
+      )}
     </button>
   );
 };
