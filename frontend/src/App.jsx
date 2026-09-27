@@ -7,6 +7,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HeroCanvas from "./components/HeroCanvas";
 import BrickBreakerGame from "./components/BrickBreakerGame";
+import { ArrowRight, Building2, CalendarDays, Trophy, Award, GraduationCap, MessagesSquare, UserRound } from "lucide-react";
+import projectExpoImg from "./assets/project_expo.jpeg";
 
 // Pages from App 1
 import Codenigma from "./pages/Codenigma";
@@ -97,13 +99,13 @@ function DashboardPage() {
     const user = JSON.parse(localStorage.getItem("user") || "null");
 
     const tiles = [
-        { label: "About", body: "Faculty, staff and the full syllabus by semester.", to: "/about/faculty" },
-        { label: "Events", body: "Workshops, talks and contests with a marked calendar.", to: "/events" },
-        { label: "Leaderboard", body: "Coding contest standings and rankings.", to: "/leaderboards" },
-        { label: "Achievements", body: "A gallery of what students have won and built.", to: "/achievements" },
-        { label: "Alumni", body: "Browse the alumni directory.", to: "/alumni" },
-        { label: "Posts", body: "Open discussion and forum for students.", to: "/posts" },
-        { label: "Your profile", body: "Skills, links and achievements.", to: user ? "/profile" : "/login" },
+        { label: "About", body: "Faculty, staff and the full syllabus by semester.", to: "/about/faculty", icon: Building2 },
+        { label: "Events", body: "Workshops, talks and contests with a marked calendar.", to: "/events", icon: CalendarDays, image: "/images/events/devfest.jpeg" },
+        { label: "Leaderboard", body: "Coding contest standings and rankings.", to: "/leaderboards", icon: Trophy },
+        { label: "Achievements", body: "A gallery of what students have won and built.", to: "/achievements", icon: Award, image: projectExpoImg },
+        { label: "Alumni", body: "Browse the alumni directory.", to: "/alumni", icon: GraduationCap },
+        { label: "Posts", body: "Open discussion and forum for students.", to: "/posts", icon: MessagesSquare },
+        { label: "Your profile", body: "Skills, links and achievements.", to: user ? "/profile" : "/login", icon: UserRound },
     ];
 
     return (
@@ -213,21 +215,40 @@ function DashboardPage() {
                         The portal at a glance
                     </h2>
                 </div>
-                <div
-                    className="grid gap-px bg-brand-edge border border-brand-edge"
-                    style={{ gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}
-                >
-                    {tiles.map((t) => (
-                        <Link
-                            key={t.label}
-                            to={t.to}
-                            className="bg-white p-5 flex flex-col gap-2 hover:bg-[#f7f9fc]"
-                        >
-                            <span className="text-[15.5px] font-semibold text-brand-navy">{t.label}</span>
-                            <span className="text-[12.5px] leading-[1.6] text-brand-ink-soft">{t.body}</span>
-                        </Link>
-                    ))}
-                </div>
+                <ul className="m-0 p-0 list-none grid grid-cols-1 lg:grid-cols-2 gap-px bg-brand-edge border border-brand-edge">
+                    {tiles.map((t) => {
+                        const Icon = t.icon;
+                        return (
+                            <li key={t.label} className="lg:[&:last-child:nth-child(odd)]:col-span-2">
+                                <Link
+                                    to={t.to}
+                                    className="group h-full bg-white flex items-center gap-4 sm:gap-6 p-3 sm:p-4 pr-4 sm:pr-6 hover:bg-[#f7f9fc]"
+                                >
+                                    <div className="flex-none w-[88px] h-[64px] sm:w-[160px] sm:h-[100px] overflow-hidden bg-brand-navy grid place-items-center">
+                                        {t.image ? (
+                                            <img
+                                                src={t.image}
+                                                alt=""
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <Icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" strokeWidth={1.5} />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                        <span className="text-[15px] sm:text-[16.5px] font-semibold text-brand-navy">{t.label}</span>
+                                        <span className="text-[12.5px] sm:text-[13px] leading-[1.6] text-brand-ink-soft">{t.body}</span>
+                                    </div>
+                                    <ArrowRight
+                                        className="flex-none w-5 h-5 text-brand-red transition-transform group-hover:translate-x-1"
+                                        strokeWidth={1.75}
+                                    />
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
             </section>
         </div>
     );
