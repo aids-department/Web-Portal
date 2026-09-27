@@ -109,34 +109,36 @@ function DashboardPage() {
     return (
         <div className="font-brand">
             {/* HERO */}
-            <div className="bg-brand-navy grid items-stretch" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 360px), 1fr))" }}>
-                <div className="px-5 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-[60px] flex flex-col gap-6 border-r-2 border-brand-blue">
-                    <span className="text-[11px] font-medium tracking-[0.22em] uppercase text-brand-red">
-                        Undergraduate and postgraduate
-                    </span>
-                    <h1 className="m-0 text-[38px] sm:text-[48px] lg:text-[60px] leading-[1.03] font-semibold tracking-[-0.02em] text-white max-w-[16ch]">
-                        Artificial Intelligence and Data Science
-                    </h1>
-                    <p className="m-0 max-w-[52ch] text-[15px] leading-[1.62] text-brand-on-navy">
-                        Our mission is to foster innovation and excellence in Artificial Intelligence and Data
-                        Science through cutting-edge research, industry collaboration, and a dynamic learning
-                        environment.
-                    </p>
-                    <div className="flex gap-3 flex-wrap pt-1">
-                        <Link
-                            to="/about/syllabus"
-                            className="px-5 py-[13px] bg-brand-red text-white font-semibold text-[12.5px]"
-                        >
-                            Explore the programme
-                        </Link>
-                        <Link
-                            to="/events"
-                            className="px-5 py-[13px] border border-[#4a5a7a] text-white font-medium text-[12.5px]"
-                        >
-                            Upcoming events
-                        </Link>
+            <div className="bg-brand-navy grid items-stretch lg:min-h-[calc(100svh-56px)]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 360px), 1fr))" }}>
+                <div className="px-5 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-[60px] flex flex-col gap-6 lg:gap-10 border-r-2 border-brand-blue">
+                    <div className="flex flex-col gap-6 lg:gap-7 my-auto">
+                        <span className="text-[11px] lg:text-[12px] font-medium tracking-[0.22em] uppercase text-brand-red">
+                            Undergraduate and postgraduate
+                        </span>
+                        <h1 className="m-0 text-[38px] sm:text-[48px] lg:text-[60px] xl:text-[72px] leading-[1.03] font-semibold tracking-[-0.02em] text-white max-w-[16ch]">
+                            Artificial Intelligence and Data Science
+                        </h1>
+                        <p className="m-0 max-w-[52ch] text-[15px] lg:text-[16px] xl:text-[17px] leading-[1.62] text-brand-on-navy">
+                            Our mission is to foster innovation and excellence in Artificial Intelligence and Data
+                            Science through cutting-edge research, industry collaboration, and a dynamic learning
+                            environment.
+                        </p>
+                        <div className="flex gap-3 flex-wrap pt-1">
+                            <Link
+                                to="/about/syllabus"
+                                className="px-5 lg:px-6 py-[13px] lg:py-[15px] bg-brand-red text-white font-semibold text-[12.5px] lg:text-[13.5px]"
+                            >
+                                Explore the programme
+                            </Link>
+                            <Link
+                                to="/events"
+                                className="px-5 lg:px-6 py-[13px] lg:py-[15px] border border-[#4a5a7a] text-white font-medium text-[12.5px] lg:text-[13.5px]"
+                            >
+                                Upcoming events
+                            </Link>
+                        </div>
                     </div>
-                    <div className="flex gap-8 flex-wrap border-t border-[#23345c] pt-5 mt-auto">
+                    <div className="flex gap-8 flex-wrap border-t border-[#23345c] pt-5">
                         {DASHBOARD_STATS.map((s) => (
                             <div key={s.label} className="flex flex-col gap-1.5">
                                 <span className="text-[26px] leading-none font-semibold text-white tabular-nums">
