@@ -38,4 +38,7 @@ build/
 # Sensitive data / Passwords
 data/
 *password*.csv
-*passwords*.csv
+*passwords*.csv
+Untitled form (Responses).xlsx
+supabase/
+photos/

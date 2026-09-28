@@ -4,6 +4,8 @@ import { User, Building, Code } from "lucide-react";
 import AlumniCard from "../components/AlumniCard";
 import AlumniThoughts from "../components/AlumniThoughts";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://web-portal-760h.onrender.com');
+
 export default function Alumni() {
   const [alumni, setAlumni] = useState([]);
   const [filteredAlumni, setFilteredAlumni] = useState([]);
@@ -41,7 +43,7 @@ export default function Alumni() {
     const fetchAlumni = async () => {
       try {
         setLoading(true);
-        const response = await fetch("https://web-portal-760h.onrender.com/api/alumni");
+        const response = await fetch(`${API_BASE}/api/alumni`);
         if (!response.ok) throw new Error("Failed to fetch alumni");
         const data = await response.json();
         setAlumni(data);

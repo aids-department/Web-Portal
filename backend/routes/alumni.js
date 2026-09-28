@@ -12,7 +12,7 @@ const validateAlumni = [
   body("passOutYear")
     .isInt({ min: 2000 })
     .withMessage("Valid pass out year is required"),
-  body("company").trim().notEmpty().withMessage("Company is required"),
+  body("company").optional({ values: "null" }).trim(),
 ];
 
 const ALUMNI_FIELD_MAP = {
@@ -28,6 +28,17 @@ const ALUMNI_FIELD_MAP = {
   achievements: "achievements",
   imageUrl: "image_url",
   isVerified: "is_verified",
+  currentStatus: "current_status",
+  workLocation: "work_location",
+  industry: "industry",
+  higherStudiesDegree: "higher_studies_degree",
+  higherStudiesUniversity: "higher_studies_university",
+  higherStudiesLocation: "higher_studies_location",
+  higherStudiesSpecialization: "higher_studies_specialization",
+  startupName: "startup_name",
+  startupRole: "startup_role",
+  startupDescription: "startup_description",
+  startupLocation: "startup_location",
 };
 
 function toColumns(body) {
