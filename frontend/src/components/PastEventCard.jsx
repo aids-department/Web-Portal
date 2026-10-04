@@ -1,9 +1,12 @@
 // frontend/src/components/PastEventCard.jsx
 import React from 'react';
-import { Trophy } from 'lucide-react';
-import { eventTagStyle } from '../utils/eventTagStyle';
+import { Trophy, CalendarDays } from 'lucide-react';
+import { EventTypeTag } from './UpcomingEventCard';
+import { Spotlight } from './ui/SpotlightCard';
+import { useSpotlight } from './ui/useSpotlight';
 
 const PastEventCard = ({ event, onOpenModal, layout = 'grid' }) => {
+  const { ref, onMouseMove } = useSpotlight();
 
   // --- DATE FORMATTER (unchanged) ---
   const formatDate = (dateString) => {
@@ -17,71 +20,62 @@ const PastEventCard = ({ event, onOpenModal, layout = 'grid' }) => {
     });
   };
 
-  const tag = eventTagStyle(event.eventType);
   const winner = event.winner || event.winningTeam;
   const isList = layout === 'list';
 
   const thumbnail = (
     <div
-      className={`bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center overflow-hidden ${
-        isList ? 'flex-none self-stretch w-[96px] sm:w-[150px]' : 'h-[88px]'
+      className={`relative grid place-items-center overflow-hidden rounded-xl border border-line bg-canvas-elevated ${
+        isList ? 'w-[96px] flex-none self-stretch sm:w-[150px]' : 'h-[120px]'
       }`}
     >
       {event.poster || event.image ? (
         <img
           src={event.poster || event.image}
           alt={event.eventName}
-          className="w-full h-full object-cover grayscale"
+          loading="lazy"
+          className="h-full w-full object-cover opacity-70 grayscale transition-[filter,opacity,transform] duration-500 ease-expo group-hover:scale-[1.03] group-hover:opacity-100 group-hover:grayscale-0"
         />
       ) : (
-        <span className="text-[8.5px] font-medium tracking-[0.14em] uppercase text-[#5f6e88]">
-          Photograph
-        </span>
+        <CalendarDays className="h-6 w-6 text-fg-muted/50" strokeWidth={1.25} />
       )}
     </div>
   );
 
-  const typeTag = (
-    <span
-      className="flex-none self-start px-2 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
-      style={{ background: tag.bg, color: tag.fg }}
-    >
-      {event.eventType || 'Event'}
-    </span>
-  );
-
   const winnerLine = winner && (
-    <span className="flex items-center gap-1.5 text-[11.5px] font-semibold text-brand-red min-w-0">
+    <span className="flex min-w-0 items-center gap-1.5 text-[12px] font-medium text-amber-300/90">
       <Trophy size={13} className="flex-none" />
       <span className="truncate">{winner}</span>
     </span>
   );
 
   const dateLine = (
-    <span className={`text-[11.5px] leading-[1.4] text-brand-ink-soft tabular-nums ${isList ? 'truncate' : ''}`}>
+    <span className={`font-mono text-[11px] leading-[1.5] tabular-nums text-fg-muted ${isList ? 'truncate' : ''}`}>
       {formatDate(event.endDate || event.startDate)} ·{' '}
       {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On Campus'}
     </span>
   );
 
+  const shell =
+    'group surface edge-highlight surface-interactive w-full text-left p-4';
+
   if (isList) {
     // Compact list row: every line is clamped so all rows share one height
     return (
-      <button
-        onClick={() => onOpenModal(event)}
-        className="font-brand w-full text-left bg-white p-4 hover:bg-[#f7f9fc] flex gap-4"
-      >
+      <button ref={ref} onMouseMove={onMouseMove} onClick={() => onOpenModal(event)} className={`${shell} flex gap-4`}>
+        <Spotlight />
+        <span aria-hidden="true" className="gradient-border" />
         {thumbnail}
-        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
-          <div className="flex items-center gap-3 min-w-0">
-            {typeTag}
+        <div className="relative flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex min-w-0 items-center gap-3">
+            <EventTypeTag type={event.eventType} />
             {winnerLine}
           </div>
-          <h3 className="m-0 text-[14.5px] font-semibold text-brand-navy leading-[1.3] line-clamp-1">
+          <h3 className="line-clamp-1 text-[15px] font-semibold leading-snug tracking-tight text-fg">
             {event.eventName || event.title}
           </h3>
           {dateLine}
-          <p className="m-0 text-[12px] leading-[1.55] min-h-[3.1em] text-brand-ink-soft line-clamp-2">
+          <p className="line-clamp-2 min-h-[3.1em] text-[12.5px] leading-relaxed text-fg-muted">
             {event.description}
           </p>
         </div>
@@ -90,17 +84,16 @@ const PastEventCard = ({ event, onOpenModal, layout = 'grid' }) => {
   }
 
   return (
-    <button
-      onClick={() => onOpenModal(event)}
-      className="font-brand w-full text-left bg-white p-4 hover:bg-[#f7f9fc] flex flex-col gap-2"
-    >
+    <button ref={ref} onMouseMove={onMouseMove} onClick={() => onOpenModal(event)} className={`${shell} flex h-full flex-col gap-2.5`}>
+      <Spotlight />
+      <span aria-hidden="true" className="gradient-border" />
       {thumbnail}
-      {typeTag}
-      <h3 className="m-0 text-[14.5px] font-semibold text-brand-navy leading-[1.3]">
+      <EventTypeTag type={event.eventType} className="relative self-start" />
+      <h3 className="relative text-[15px] font-semibold leading-snug tracking-tight text-fg">
         {event.eventName || event.title}
       </h3>
-      {dateLine}
-      {winnerLine}
+      <span className="relative">{dateLine}</span>
+      {winnerLine && <span className="relative mt-auto">{winnerLine}</span>}
     </button>
   );
 };

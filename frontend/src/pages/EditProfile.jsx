@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, X, FileText } from "lucide-react";
+import { Upload, X, FileText, Plus, PencilLine, Trash2, AlertTriangle } from "lucide-react";
+import PageHeader from "../components/ui/PageHeader";
+import Modal from "../components/ui/Modal";
+import { Reveal } from "../components/ui/Reveal";
 
 const STATUS_STYLE = {
-  approved: { bg: '#e4eaf4', fg: '#1b3a6b' },
-  rejected: { bg: '#ffe0d9', fg: '#ae1800' },
-  new: { bg: '#eae7e7', fg: '#444141' },
+  approved: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+  rejected: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
+  new: 'border-white/10 bg-white/[0.05] text-fg-muted',
 };
 
 export default function EditProfile() {
@@ -284,66 +287,60 @@ export default function EditProfile() {
   const visibleAchievements = achievements.filter((a) => !a.markedForDeletion);
 
   return (
-    <div className="font-brand bg-brand-ground px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px]">
-      <div className="max-w-[820px] mx-auto flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">Account</span>
-          <h1 className="m-0 text-[32px] sm:text-[38px] font-semibold tracking-[-0.02em] text-brand-navy">
-            Edit profile
-          </h1>
-          <p className="m-0 text-[13.5px] text-brand-ink-soft">Update your information and showcase your achievements.</p>
-        </div>
+    <div className="container-ln pb-8">
+      <div className="mx-auto flex max-w-[820px] flex-col gap-5">
+        <PageHeader
+          eyebrow="Account"
+          title="Edit profile"
+          description="Update your information and showcase your achievements."
+          spacing="pt-14 pb-4 sm:pt-20 sm:pb-6 lg:pt-24"
+        />
 
         {/* Identity */}
-        <div className="bg-white border border-brand-edge p-5 sm:p-6 flex flex-col sm:flex-row gap-6">
-          <div className="flex flex-col items-center gap-3 shrink-0">
-            <div className="w-28 h-28 bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center overflow-hidden">
-              {profileImage?.url ? (
-                <img src={profileImage.url} alt="Profile" className="w-full h-full object-cover grayscale" />
-              ) : (
-                <span className="text-[30px] font-semibold text-[#5f6e88]">{name.charAt(0).toUpperCase() || "U"}</span>
-              )}
+        <Reveal className="surface edge-highlight flex flex-col gap-6 p-5 sm:flex-row sm:p-6">
+          <div className="flex shrink-0 flex-col items-center gap-3">
+            <div className="relative">
+              <div aria-hidden="true" className="absolute -inset-2 rounded-3xl bg-accent/25 blur-xl" />
+              <div className="relative grid h-28 w-28 place-items-center overflow-hidden rounded-2xl border border-white/10 bg-canvas-elevated">
+                {profileImage?.url ? (
+                  <img src={profileImage.url} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-[30px] font-semibold text-gradient">{name.charAt(0).toUpperCase() || "U"}</span>
+                )}
+              </div>
             </div>
-            <label className="flex items-center gap-2 px-3 py-2 border border-brand-ink-faint text-[11.5px] font-medium text-brand-ink-soft cursor-pointer">
+            <label className="btn-secondary btn-sm cursor-pointer">
               <Upload size={13} />
               Change photo
               <input type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files[0])} />
             </label>
             {imageFile && (
-              <button onClick={handleImageUpload} className="px-3 py-2 bg-brand-navy text-white text-[11.5px] font-semibold w-full">
+              <button onClick={handleImageUpload} className="btn-primary btn-sm w-full">
                 Upload image
               </button>
             )}
           </div>
 
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="grid flex-1 grid-cols-1 gap-3.5 sm:grid-cols-2">
             <Field label="Full name" value={name} onChange={setName} placeholder="As on the roll list" />
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Year</span>
-              <select
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="border border-brand-ink-faint px-3 py-2.5 text-[13px] text-brand-navy outline-none focus:border-brand-navy bg-white"
-              >
+            <label className="flex flex-col">
+              <span className="field-label">Year</span>
+              <select value={year} onChange={(e) => setYear(e.target.value)} className="field">
                 <option value="">Select year</option>
                 <option value="1st Year">1st Year</option>
                 <option value="2nd Year">2nd Year</option>
                 <option value="3rd Year">3rd Year</option>
                 <option value="4th Year">4th Year</option>
               </select>
-            </div>
+            </label>
             <Field label="Date of birth" type="date" value={dob} onChange={setDob} />
             <Field label="Register number" value={registerNumber} onChange={setRegisterNumber} placeholder="21AD000" />
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Email</span>
-              <input
-                value={user?.email || ""}
-                disabled
-                className="border border-brand-edge bg-brand-ground px-3 py-2.5 text-[13px] text-brand-ink-soft outline-none"
-              />
-            </div>
+            <label className="flex flex-col sm:col-span-2">
+              <span className="field-label">Email</span>
+              <input value={user?.email || ""} disabled className="field cursor-not-allowed" />
+            </label>
           </div>
-        </div>
+        </Reveal>
 
         {/* About */}
         <Section title="About">
@@ -352,7 +349,7 @@ export default function EditProfile() {
             onChange={(e) => setBio(e.target.value)}
             placeholder="Write a short bio about yourself…"
             rows={4}
-            className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] leading-[1.6] text-brand-ink outline-none focus:border-brand-navy resize-none"
+            className="field resize-none py-3 leading-[1.6]"
           />
         </Section>
 
@@ -368,22 +365,22 @@ export default function EditProfile() {
         {/* Resume */}
         <Section title="Résumé">
           {resume?.url ? (
-            <div className="flex items-center gap-3.5 border border-brand-edge p-3.5">
-              <div className="w-[42px] h-[54px] shrink-0 bg-brand-blue-tint border border-[#c3cfe3] grid place-items-center text-[8px] font-medium text-[#5f6e88]">
-                PDF
+            <div className="flex items-center gap-3.5 rounded-xl border border-line bg-white/[0.03] p-3.5">
+              <div className="icon-tile h-[52px] w-[42px] shrink-0 rounded-lg">
+                <FileText className="h-4 w-4 text-fg-muted" strokeWidth={1.5} />
               </div>
-              <div className="flex-1 min-w-0 flex flex-col gap-1">
-                <span className="text-[13px] font-medium text-brand-navy truncate">{resume.filename || "Resume"}</span>
-                <a href={resume.url} target="_blank" rel="noopener noreferrer" className="text-[12px] text-brand-blue">
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="truncate text-[13.5px] font-medium text-fg">{resume.filename || "Resume"}</span>
+                <a href={resume.url} target="_blank" rel="noopener noreferrer" className="w-fit text-[12.5px] text-accent-bright hover:text-indigo-300">
                   View resume
                 </a>
               </div>
-              <button onClick={() => setResume(null)} className="text-brand-red" title="Remove resume">
+              <button onClick={() => setResume(null)} className="btn-icon h-8 w-8 hover:bg-rose-500/10 hover:text-rose-300" title="Remove resume" aria-label="Remove resume">
                 <X size={16} />
               </button>
             </div>
           ) : (
-            <label className="flex items-center gap-2.5 border border-dashed border-brand-ink-faint px-3.5 py-3 cursor-pointer text-[12.5px] text-brand-ink-soft w-fit">
+            <label className="flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-dashed border-white/15 px-4 py-6 text-[13px] text-fg-muted transition-colors hover:border-line-accent hover:bg-accent/[0.04] hover:text-fg">
               <Upload size={15} />
               Upload resume (PDF)
               <input
@@ -399,41 +396,21 @@ export default function EditProfile() {
         {/* Skills */}
         <Section title="Skills">
           <div className="flex flex-col gap-3">
-            <div className="border border-brand-edge p-3.5 flex flex-col gap-2">
-              <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-brand-blue">AI &amp; Data Science</span>
-              <div className="flex flex-wrap gap-1.5">
-                {aiSkills.filter(s => !skills.includes(s)).map((skill) => (
-                  <button
-                    key={skill}
-                    onClick={() => setSkills([...skills, skill])}
-                    className="px-2.5 py-1 border border-brand-edge text-[11px] text-brand-blue"
-                  >
-                    + {skill}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="border border-brand-edge p-3.5 flex flex-col gap-2">
-              <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-brand-red">Web development</span>
-              <div className="flex flex-wrap gap-1.5">
-                {webSkills.filter(s => !skills.includes(s)).map((skill) => (
-                  <button
-                    key={skill}
-                    onClick={() => setSkills([...skills, skill])}
-                    className="px-2.5 py-1 border border-brand-edge text-[11px] text-brand-red-deep"
-                  >
-                    + {skill}
-                  </button>
-                ))}
-              </div>
-            </div>
-
+            <SkillSuggestions title="AI & Data Science" skills={aiSkills.filter(s => !skills.includes(s))} onAdd={(skill) => setSkills([...skills, skill])} />
+            <SkillSuggestions title="Web development" skills={webSkills.filter(s => !skills.includes(s))} onAdd={(skill) => setSkills([...skills, skill])} />
             {skills.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span key={skill} className="px-3 py-[7px] bg-brand-navy text-white text-[12px] flex items-center gap-2">
+                  <span key={skill} className="pill py-1 pl-3 pr-1.5 text-[12.5px]">
                     {skill}
-                    <X className="w-3 h-3 cursor-pointer" onClick={() => handleRemoveSkill(skill)} />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSkill(skill)}
+                      aria-label={`Remove ${skill}`}
+                      className="grid h-4 w-4 place-items-center rounded-full text-indigo-200/70 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </span>
                 ))}
               </div>
@@ -443,7 +420,7 @@ export default function EditProfile() {
               onChange={(e) => setNewSkill(e.target.value)}
               onKeyDown={handleAddSkill}
               placeholder="Add a custom skill and press Enter…"
-              className="border border-brand-ink-faint px-3.5 py-2.5 text-[13px] text-brand-ink outline-none focus:border-brand-navy"
+              className="field"
             />
           </div>
         </Section>
@@ -452,34 +429,34 @@ export default function EditProfile() {
         <Section
           title="Achievements"
           action={
-            <button onClick={() => setShowAddModal(true)} className="px-3.5 py-2 bg-brand-red text-white text-[11.5px] font-semibold">
+            <button onClick={() => setShowAddModal(true)} className="btn-primary btn-sm">
+              <Plus size={14} />
               Add
             </button>
           }
         >
           {visibleAchievements.length === 0 ? (
-            <p className="m-0 text-[13px] text-brand-ink-soft">No achievements yet. Click "Add" to create one!</p>
+            <p className="text-[13px] text-fg-muted">No achievements yet. Click "Add" to create one!</p>
           ) : (
             <div className="flex flex-col gap-2.5">
               {visibleAchievements.map((a, index) => {
                 const st = STATUS_STYLE[a.localStatus] || STATUS_STYLE.new;
                 return (
-                  <div key={a._id || index} className="border border-brand-edge p-3.5 flex flex-col gap-2">
-                    <div className="flex justify-between items-start gap-3">
-                      <span className="text-[14px] font-semibold text-brand-navy">{a.title}</span>
-                      <span
-                        className="px-2 py-1 text-[9.5px] font-semibold tracking-[0.08em] uppercase shrink-0"
-                        style={{ background: st.bg, color: st.fg }}
-                      >
+                  <div key={a._id || index} className="flex flex-col gap-2 rounded-xl border border-line bg-white/[0.02] p-4 transition-colors hover:border-line-hover">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="text-[14px] font-semibold text-fg">{a.title}</span>
+                      <span className={`shrink-0 rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.1em] ${st}`}>
                         {a.localStatus}
                       </span>
                     </div>
-                    <p className="m-0 text-[12.5px] text-brand-ink-soft">{a.description}</p>
-                    <div className="flex gap-4">
-                      <button onClick={() => handleEditAchievement(achievements.indexOf(a))} className="text-[11.5px] font-medium text-brand-blue">
+                    <p className="text-[13px] text-fg-muted">{a.description}</p>
+                    <div className="flex gap-1 pt-1">
+                      <button onClick={() => handleEditAchievement(achievements.indexOf(a))} className="btn-ghost btn-sm -ml-3">
+                        <PencilLine size={13} />
                         Edit
                       </button>
-                      <button onClick={() => handleDeleteAchievement(achievements.indexOf(a))} className="text-[11.5px] font-medium text-brand-red">
+                      <button onClick={() => handleDeleteAchievement(achievements.indexOf(a))} className="btn-ghost btn-sm hover:bg-rose-500/10 hover:text-rose-300">
+                        <Trash2 size={13} />
                         Delete
                       </button>
                     </div>
@@ -491,87 +468,102 @@ export default function EditProfile() {
         </Section>
 
         {/* Save / Cancel */}
-        <div className="flex gap-3">
-          <button onClick={() => handleNavigateWithCheck("/profile")} className="flex-1 py-3 border border-brand-ink-faint text-[13px] font-medium text-brand-ink-soft">
+        <div className="flex gap-3 pt-2">
+          <button onClick={() => handleNavigateWithCheck("/profile")} className="btn-secondary btn-lg flex-1">
             Cancel
           </button>
-          <button onClick={handleSubmit} className="flex-1 py-3 bg-brand-red text-white text-[13px] font-semibold">
+          <button onClick={handleSubmit} className="btn-primary btn-lg flex-1">
             Save profile
           </button>
         </div>
       </div>
 
       {showUnsavedToast && (
-        <div className="fixed top-4 right-4 bg-brand-red-tint text-brand-red-deep px-5 py-3.5 z-[9999]">
-          <p className="m-0 text-[13px] font-semibold">Unsaved changes — save before leaving.</p>
+        <div className="fixed right-4 top-20 z-[9999] flex items-center gap-2.5 rounded-xl border border-amber-500/30 bg-canvas-elevated/95 px-4 py-3 shadow-popover backdrop-blur-xl animate-fade-in">
+          <AlertTriangle className="h-4 w-4 text-amber-300" />
+          <p className="text-[13px] font-medium text-fg">Unsaved changes — save before leaving.</p>
         </div>
       )}
 
       {/* Add Achievement Modal */}
       {showAddModal && (
-        <>
-          <div onClick={() => setShowAddModal(false)} className="fixed inset-0 z-[9998] bg-black/50" />
-          <div className="font-brand fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90vw] max-w-[480px] bg-white border border-brand-edge">
-            <div className="bg-brand-navy px-6 py-4">
-              <h2 className="m-0 text-[15px] font-semibold text-white">Add achievement</h2>
-            </div>
-            <div className="p-6 flex flex-col gap-3.5">
-              <Field label="Title" value={modalTitle} onChange={setModalTitle} placeholder="e.g. Winner at GDG In Campus" />
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Description</span>
-                <textarea
-                  value={modalDesc}
-                  onChange={(e) => setModalDesc(e.target.value)}
-                  placeholder="Describe your achievement…"
-                  rows={4}
-                  className="border border-brand-ink-faint px-3 py-2.5 text-[13.5px] leading-[1.6] text-brand-ink outline-none focus:border-brand-navy resize-none"
-                />
-              </div>
-              <label className="flex items-center gap-2.5 border border-dashed border-brand-ink-faint px-3.5 py-3 cursor-pointer text-[12.5px] text-brand-ink-soft w-fit">
-                <FileText size={15} />
-                {certificateFile ? certificateFile.name : "Attach certificate (PDF, optional)"}
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  className="hidden"
-                  onChange={(e) => setCertificateFile(e.target.files[0])}
-                />
-              </label>
-              <div className="flex gap-2.5 pt-1">
-                <button onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 border border-brand-ink-faint text-[13px] font-medium text-brand-ink-soft">
-                  Cancel
-                </button>
-                <button onClick={handleSaveNewAchievement} className="flex-1 py-2.5 bg-brand-navy text-white text-[13px] font-semibold">
-                  Save
-                </button>
-              </div>
+        <Modal onBackdropClick={() => setShowAddModal(false)} onEscape={() => setShowAddModal(false)} z="z-[9999]" className="max-w-[480px]">
+          <div className="border-b border-line px-6 py-4">
+            <h2 className="text-[15px] font-semibold text-fg">Add achievement</h2>
+          </div>
+          <div className="flex flex-col gap-4 p-6">
+            <Field label="Title" value={modalTitle} onChange={setModalTitle} placeholder="e.g. Winner at GDG In Campus" />
+            <label className="flex flex-col">
+              <span className="field-label">Description</span>
+              <textarea
+                value={modalDesc}
+                onChange={(e) => setModalDesc(e.target.value)}
+                placeholder="Describe your achievement…"
+                rows={4}
+                className="field resize-none leading-[1.6]"
+              />
+            </label>
+            <label className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border border-dashed border-white/15 px-4 py-3.5 text-[13px] text-fg-muted transition-colors hover:border-line-accent hover:text-fg">
+              <FileText size={15} />
+              <span className="truncate">{certificateFile ? certificateFile.name : "Attach certificate (PDF, optional)"}</span>
+              <input
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => setCertificateFile(e.target.files[0])}
+              />
+            </label>
+            <div className="flex gap-2.5 pt-1">
+              <button onClick={() => setShowAddModal(false)} className="btn-secondary flex-1">
+                Cancel
+              </button>
+              <button onClick={handleSaveNewAchievement} className="btn-primary flex-1">
+                Save
+              </button>
             </div>
           </div>
-        </>
+        </Modal>
       )}
     </div>
   );
 }
 
 const Section = ({ title, action, children }) => (
-  <div className="bg-white border border-brand-edge p-5 sm:p-6 flex flex-col gap-3.5">
+  <Reveal className="surface flex flex-col gap-4 p-5 sm:p-6">
     <div className="flex items-center justify-between gap-3">
-      <h2 className="m-0 text-[15px] font-semibold text-brand-navy">{title}</h2>
+      <h2 className="text-[15px] font-semibold tracking-tight text-fg">{title}</h2>
       {action}
     </div>
     {children}
+  </Reveal>
+);
+
+const SkillSuggestions = ({ title, skills, onAdd }) => (
+  <div className="flex flex-col gap-2.5 rounded-xl border border-line bg-white/[0.02] p-4">
+    <span className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-fg-muted">{title}</span>
+    <div className="flex flex-wrap gap-1.5">
+      {skills.map((skill) => (
+        <button
+          key={skill}
+          onClick={() => onAdd(skill)}
+          className="rounded-full px-2.5 py-1 text-[11.5px] text-fg-muted shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] transition-[background-color,color,box-shadow] duration-200 hover:bg-accent/10 hover:text-indigo-100 hover:shadow-[inset_0_0_0_1px_rgba(94,106,210,0.4)]"
+        >
+          + {skill}
+        </button>
+      ))}
+    </div>
   </div>
 );
 
 const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
-  <div className="flex flex-col gap-1.5">
-    <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">{label}</span>
+  <label className="flex flex-col">
+    <span className="field-label">{label}</span>
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="border border-brand-ink-faint px-3 py-2.5 text-[13px] text-brand-ink outline-none focus:border-brand-navy placeholder:text-brand-ink-faint"
+      className="field"
     />
-  </div>
+  </label>
 );

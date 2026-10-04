@@ -17,9 +17,9 @@ const CommentForm = ({ onSubmit, placeholder }) => {
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="field flex-1 py-3"
       />
-      <button type="submit" className="px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800">
+      <button type="submit" className="btn-primary">
         Send
       </button>
     </form>

@@ -3,6 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import CommentThread from '../components/CommentThread';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ChevronRight, Share2, MessageSquare } from 'lucide-react';
+import { LoadingState, Alert } from '../components/ui/States';
+import { EASE } from '../components/ui/motion';
+import { UpvoteButton } from '../components/PostActions';
 
 const BASE_URL = 'https://web-portal-760h.onrender.com';
 
@@ -105,17 +110,18 @@ const PostDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
-        <p className="text-brand-ink-soft italic text-[13.5px]">Loading post…</p>
+      <div className="container-ln">
+        <LoadingState label="Loading post" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10 flex flex-col items-start gap-4">
-        <p className="text-brand-red-deep text-[13.5px]">{error}</p>
-        <button onClick={() => navigate('/posts')} className="px-[18px] py-2.5 bg-brand-navy text-white text-[12.5px] font-semibold">
+      <div className="container-ln flex flex-col items-start gap-4 py-16">
+        <Alert>{error}</Alert>
+        <button onClick={() => navigate('/posts')} className="btn-secondary">
+          <ArrowLeft size={14} />
           Back to Posts
         </button>
       </div>
@@ -127,96 +133,88 @@ const PostDetailPage = () => {
   const when = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
   return (
-    <div className="font-brand">
-      <div className="px-5 sm:px-8 lg:px-12 py-4 border-b border-brand-edge flex items-center gap-2 flex-wrap">
-        <button onClick={() => navigate('/posts')} className="text-[12px] font-medium text-brand-blue hover:underline">
+    <div className="container-ln pb-8">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 pt-8 text-[13px]">
+        <button onClick={() => navigate('/posts')} className="btn-ghost btn-sm -ml-3">
+          <ArrowLeft size={14} />
           Posts
         </button>
-        <span className="text-[12px] text-brand-ink-faint">/</span>
-        <span className="text-[12px] text-brand-ink-soft truncate max-w-[40ch]">{post.title}</span>
-        <button
-          onClick={handleShare}
-          className="ml-auto px-3.5 py-1.5 bg-brand-navy text-white text-[11.5px] font-semibold"
-        >
+        <ChevronRight size={14} className="text-fg-muted/60" />
+        <span className="max-w-[40ch] truncate text-fg-muted">{post.title}</span>
+        <button onClick={handleShare} className="btn-secondary btn-sm ml-auto">
+          <Share2 size={13} />
           Share
         </button>
-      </div>
+      </nav>
 
-      <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-8 lg:py-9 max-w-[900px] flex flex-col gap-6">
-        <div className="grid grid-cols-[48px_1fr] sm:grid-cols-[64px_1fr] gap-4">
+      <div className="mx-auto mt-5 flex max-w-[900px] flex-col gap-5">
+        <motion.article
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="surface edge-highlight grid grid-cols-[44px_1fr] gap-3 p-5 sm:grid-cols-[60px_1fr] sm:gap-4 sm:p-7"
+        >
           <div className="flex flex-col items-center gap-1">
-            <button
-              onClick={handleUpvote}
-              title={hasUpvoted ? "Remove upvote" : "Upvote post"}
-              className={`flex flex-col items-center gap-0.5 px-2.5 py-2 rounded transition-colors ${
-                hasUpvoted
-                  ? 'bg-brand-red-tint text-brand-red font-semibold'
-                  : 'hover:bg-brand-ground text-brand-ink-soft hover:text-brand-navy'
-              }`}
-            >
-              <span className="text-[14px] leading-none">▲</span>
-              <span className="text-[15px] font-semibold tabular-nums">{post.upvotes?.length || 0}</span>
-            </button>
+            <UpvoteButton active={hasUpvoted} count={post.upvotes?.length || 0} onClick={handleUpvote} size="lg" />
           </div>
-          <div className="min-w-0 flex flex-col gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11.5px] text-brand-ink-soft">{displayName}</span>
-              <span className="text-[11.5px] text-brand-ink-soft">· {when}</span>
-              {post.isEdited && <span className="text-[11px] italic text-brand-ink-faint">(edited)</span>}
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-fg-muted">
+              <span className={post.isAnonymous ? '' : 'font-medium text-fg'}>{displayName}</span>
+              <span>· {when}</span>
+              {post.isEdited && <span className="pill-neutral text-[10.5px]">edited</span>}
             </div>
-            <h1 className="m-0 text-[24px] sm:text-[30px] leading-[1.2] font-semibold text-brand-navy max-w-[28ch]">
-              {post.title}
+            <h1 className="max-w-[28ch] text-2xl font-semibold leading-[1.2] tracking-tight sm:text-3xl">
+              <span className="text-gradient">{post.title}</span>
             </h1>
-            <p className="m-0 max-w-[76ch] text-[14.5px] leading-[1.75] text-[#3a3838] whitespace-pre-line">
+            <p className="max-w-[76ch] whitespace-pre-line text-[15px] leading-[1.75] text-fg/85">
               {post.content}
             </p>
 
             {post.images?.length > 0 && (
-              <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              <div className={`grid gap-1.5 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 {post.images.map((img, i) => (
-                  <div key={i} className="border border-brand-edge overflow-hidden">
-                    <img src={img.url} alt="" className="w-full object-cover max-h-96" />
+                  <div key={i} className="overflow-hidden rounded-xl border border-line bg-canvas-elevated">
+                    <img src={img.url} alt="" className="max-h-96 w-full object-cover" />
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="flex gap-4 flex-wrap border-t border-brand-row pt-3">
-              <span className="text-[12px] font-medium text-brand-blue tabular-nums">
+            <div className="flex flex-wrap gap-4 border-t border-line pt-3">
+              <span className="flex items-center gap-1.5 font-mono text-[12px] tabular-nums text-fg-muted">
+                <MessageSquare size={13} />
                 {post.comments?.length || 0} replies
               </span>
             </div>
           </div>
-        </div>
+        </motion.article>
 
-        <div className="border border-brand-edge p-4 flex flex-col gap-3">
-          <form onSubmit={handleAddComment} className="flex flex-col gap-2.5">
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Add a reply"
-              className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy placeholder:text-brand-ink-faint"
-            />
-            <div className="flex justify-between items-center gap-3.5 flex-wrap">
-              <label className="flex items-center gap-2 text-[12.5px] text-[#3a3838]">
-                <input
-                  type="checkbox"
-                  checked={mode === 'Anonymous'}
-                  onChange={(e) => setMode(e.target.checked ? 'Anonymous' : 'Public')}
-                  className="w-3.5 h-3.5"
-                />
-                Reply anonymously
-              </label>
-              <button type="submit" className="px-[17px] py-2.5 bg-brand-navy text-white text-[12px] font-semibold">
-                Reply
-              </button>
-            </div>
-          </form>
-        </div>
+        <form onSubmit={handleAddComment} className="surface flex flex-col gap-3 p-4 focus-within:border-line-accent">
+          <input
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Add a reply"
+            className="field py-3"
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3.5">
+            <label className="flex cursor-pointer items-center gap-2 text-[13px] text-fg-muted">
+              <input
+                type="checkbox"
+                checked={mode === 'Anonymous'}
+                onChange={(e) => setMode(e.target.checked ? 'Anonymous' : 'Public')}
+                className="h-3.5 w-3.5 rounded accent-[#5E6AD2]"
+              />
+              Reply anonymously
+            </label>
+            <button type="submit" className="btn-primary btn-sm">
+              Reply
+            </button>
+          </div>
+        </form>
 
-        <div className="flex flex-col border-t-2 border-brand-navy pt-1">
+        <div className="flex flex-col gap-1">
           {!post.comments || post.comments.length === 0 ? (
-            <p className="pt-4 text-[13px] italic text-brand-ink-soft">No comments yet. Be the first!</p>
+            <p className="pt-2 text-[13px] text-fg-muted">No comments yet. Be the first!</p>
           ) : (
             post.comments.map((comment) => (
               <CommentThread

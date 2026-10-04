@@ -1,30 +1,23 @@
 import React from 'react';
+import SpotlightCard from './ui/SpotlightCard';
 
 const StaffCard = ({ staff }) => {
   return (
-    <div
-      className="relative rounded-lg overflow-hidden shadow-lg group"
-    >
-      <img
-        src={staff.imageUrl}
-        alt={staff.name}
-        className="w-5/6 h-auto object-cover transition-transform duration-300 transform group-hover:scale-110 mx-auto"
-      />
-      {/* Overlay for the background */}
-      <div
-        className="absolute inset-0 bg-gray-200 opacity-0 group-hover:opacity-90 transition-opacity duration-300"
-      ></div>
-      {/* Overlay for the text content */}
-      <div
-        className="absolute inset-0 flex flex-col justify-center items-center text-gray-800 p-4 text-center"
-      >
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300">
-            <h3 className="text-xl font-bold mb-2">{staff.name}</h3>
-            <p className="text-sm mb-1">{staff.designation}</p>
-            <p className="text-xs mb-1">{staff.mailId}</p>
-        </div>
+    <SpotlightCard interactive className="overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl">
+        <img
+          src={staff.imageUrl}
+          alt={staff.name}
+          className="h-full w-full object-cover transition-transform duration-500 ease-expo group-hover:scale-[1.03]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/20 to-transparent" />
       </div>
-    </div>
+      <div className="flex flex-col gap-1 p-5">
+        <h3 className="h-card">{staff.name}</h3>
+        <p className="text-[13px] text-accent-bright">{staff.designation}</p>
+        <p className="truncate text-xs text-fg-muted">{staff.mailId}</p>
+      </div>
+    </SpotlightCard>
   );
 };
 

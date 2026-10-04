@@ -1,54 +1,53 @@
 // frontend/src/components/MemberCard.jsx
 import React from "react";
+import { Mail } from "lucide-react";
+import SpotlightCard from "./ui/SpotlightCard";
 
 const MemberCard = ({ member }) => {
   const isAssociationRole = member.domain === "Association";
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 hover:shadow-md transition">
-      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 lg:gap-8">
+    <SpotlightCard interactive className="h-full">
+      <div className="flex flex-col items-center gap-5 p-5 sm:flex-row sm:gap-6 sm:p-6">
         {/* Profile Image */}
-        <img
-          src={member.image}
-          alt={member.name}
-          className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full object-cover border border-gray-300 flex-shrink-0"
-          style={{ imageRendering: '-webkit-optimize-contrast' }}
-          loading="eager"
-        />
+        <div className="relative flex-shrink-0">
+          <div aria-hidden="true" className="absolute -inset-1 rounded-full bg-gradient-to-b from-accent/50 to-transparent opacity-60 blur-md transition-opacity duration-300 group-hover:opacity-100" />
+          <img
+            src={member.image}
+            alt={member.name}
+            className="relative h-20 w-20 rounded-full border border-white/10 object-cover sm:h-24 sm:w-24 lg:h-28 lg:w-28"
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
+            loading="eager"
+          />
+        </div>
 
         {/* Details */}
-        <div className="flex-1 text-center sm:text-left w-full">
+        <div className="w-full flex-1 text-center sm:text-left">
           {/* Name */}
-          <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900">
+          <h3 className="text-lg font-semibold tracking-tight text-fg sm:text-xl">
             {member.name}
           </h3>
 
           {/* Position + Domain */}
-          <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 sm:mt-1.5 lg:mt-2">
-            <span className="font-semibold text-gray-800">
-              {member.position}
-            </span>
-            {" "}
-            ·{" "}
-            <span>
-              {isAssociationRole ? "Association" : member.domain}
-            </span>
+          <p className="mt-1.5 flex flex-wrap items-center justify-center gap-1.5 text-[13px] text-fg-muted sm:justify-start">
+            <span className="pill">{member.position}</span>
+            <span>{isAssociationRole ? "Association" : member.domain}</span>
           </p>
 
           {/* Meta Information */}
-          <div className="mt-2 sm:mt-3 lg:mt-4 grid grid-cols-1 gap-1 sm:gap-1.5 lg:gap-2 text-xs sm:text-sm lg:text-base text-gray-500">
+          <div className="mt-3 grid grid-cols-1 gap-1.5 border-t border-line pt-3 text-[13px] text-fg-muted">
             <p>
-              <span className="font-medium text-gray-700">Year:</span>{" "}
-              {member.year}
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.14em]">Year</span>{" "}
+              <span className="text-fg">{member.year}</span>
             </p>
-            <p className="break-all">
-              <span className="font-medium text-gray-700">Email:</span>{" "}
+            <p className="flex items-center justify-center gap-1.5 break-all sm:justify-start">
+              <Mail className="h-3.5 w-3.5 flex-none" strokeWidth={1.75} />
               {member.email}
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </SpotlightCard>
   );
 };
 

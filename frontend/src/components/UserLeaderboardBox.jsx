@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { Users, Trophy, Sparkles } from "lucide-react";
+import SpotlightCard from "./ui/SpotlightCard";
+import { LoadingState } from "./ui/States";
+import { Reveal, Stagger, StaggerItem } from "./ui/Reveal";
 
 const cleanStudentName = (name) => {
   if (!name) return "";
@@ -18,10 +22,22 @@ const formatRows = (rows) => {
   }));
 };
 
-const rankStyle = (rank) => ({
-  bg: rank === 1 ? "#dd2b0f" : rank <= 3 ? "#e4eaf4" : "transparent",
-  fg: rank === 1 ? "#ffffff" : "#0e1c3d",
-});
+// Rank chip: #1 glows in the accent, #2–3 get a quiet highlight, the rest stay neutral
+const rankClass = (rank) =>
+  rank === 1
+    ? "bg-accent text-white shadow-glow"
+    : rank <= 3
+    ? "bg-white/[0.08] text-fg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]"
+    : "text-fg-muted";
+
+function SideCard({ title, children }) {
+  return (
+    <div className="surface flex flex-col gap-3 p-5">
+      <span className="eyebrow border-b border-line pb-3">{title}</span>
+      {children}
+    </div>
+  );
+}
 
 // --- Enigma Leaderboard Component ---
 const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
@@ -108,55 +124,47 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
   ];
 
   if (loading) {
-    return (
-      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
-        <p className="text-brand-ink-soft italic text-[13.5px]">Loading leaderboard…</p>
-      </div>
-    );
+    return <LoadingState label="Loading leaderboard" />;
   }
 
   return (
-    <div className="font-brand px-5 sm:px-8 lg:px-12 py-6 sm:py-7 lg:py-8 flex flex-col gap-6">
-      <div className="flex gap-2 flex-wrap">
+    <div className="flex flex-col gap-6 py-6">
+      <div className="tabs w-fit">
         {["first_years", "non_first_years"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveSubTab(tab)}
-            className={`px-3.5 py-2 text-[12px] font-semibold ${
-              activeSubTab === tab ? "bg-brand-navy text-white" : "border border-brand-edge text-brand-ink-soft"
-            }`}
+            className={`tab ${activeSubTab === tab ? "tab-active" : ""}`}
           >
             {tab === "first_years" ? "First Years" : "Non First Years"}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(230px,1fr)] gap-6 items-start">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse">
-            <thead>
-              <tr className="border-b border-brand-edge">
-                <th className="w-[70px] text-left py-2.5 pr-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Rank</th>
-                <th className="text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Name</th>
-                <th className="w-[100px] text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Year</th>
-                <th className="w-[100px] text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft">Score</th>
-                <th className="w-[100px] text-left py-2.5 pl-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-ink-soft hidden sm:table-cell">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentLeaderboard.map((row) => {
-                const rs = rankStyle(row.rank);
-                return (
-                  <tr key={row.roll} className="border-b border-brand-row">
-                    <td className="py-3.5 pr-3">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(250px,1fr)]">
+        <Reveal className="surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="table-ln min-w-[560px]">
+              <thead>
+                <tr>
+                  <th className="w-[80px]">Rank</th>
+                  <th>Name</th>
+                  <th className="w-[100px]">Year</th>
+                  <th className="w-[100px]">Score</th>
+                  <th className="hidden w-[100px] sm:table-cell">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentLeaderboard.map((row) => (
+                  <tr key={row.roll} className={row.rank === 1 ? "bg-accent/[0.06]" : ""}>
+                    <td>
                       <span
-                        className="inline-block min-w-[26px] px-1.5 py-1 text-center text-[12.5px] font-semibold tabular-nums"
-                        style={{ background: rs.bg, color: rs.fg }}
+                        className={`inline-grid h-7 min-w-[28px] place-items-center rounded-md px-1.5 font-mono text-[12.5px] font-medium tabular-nums ${rankClass(row.rank)}`}
                       >
                         {row.rank}
                       </span>
                     </td>
-                    <td className="py-3.5 px-3">
+                    <td>
                       <button
                         onClick={() => {
                           if (row.roll && /^[a-fA-F0-9]{24}$/.test(row.roll)) {
@@ -165,53 +173,65 @@ const EnigmaLeaderboard = ({ activeSubTab, setActiveSubTab }) => {
                             toast.error("Profile not available");
                           }
                         }}
-                        className="text-[14px] font-medium text-brand-blue border-b border-[#c3cfe3]"
+                        className="text-left text-[14px] font-medium text-fg underline decoration-white/15 underline-offset-4 transition-colors hover:text-accent-bright hover:decoration-accent/60"
                       >
                         {row.name}
                       </button>
                     </td>
-                    <td className="py-3.5 px-3 text-[13px] text-brand-ink-soft">{row.yearDisplay}</td>
-                    <td className="py-3.5 px-3 text-[13.5px] font-semibold text-brand-navy tabular-nums">{row.score}</td>
-                    <td className="py-3.5 pl-3 text-[13px] text-brand-ink-soft tabular-nums hidden sm:table-cell">
+                    <td className="font-mono text-[13px] text-fg-muted">{row.yearDisplay}</td>
+                    <td className="font-mono text-[13.5px] font-medium tabular-nums text-fg">{row.score}</td>
+                    <td className="hidden font-mono text-[13px] tabular-nums text-fg-muted sm:table-cell">
                       {row.timeDisplay}
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        <aside className="flex flex-col gap-5">
-          <div className="bg-brand-navy px-[18px] py-4 flex flex-col gap-1.5">
-            <span className="text-[26px] leading-none font-semibold text-white tabular-nums">
-              {participationCount}
-            </span>
-            <span className="text-[10px] leading-none tracking-[0.14em] uppercase text-brand-on-navy-muted">
-              Participants
-            </span>
+                ))}
+              </tbody>
+            </table>
           </div>
+        </Reveal>
 
-          <div className="border border-brand-edge p-[18px] flex flex-col gap-2.5">
-            <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
-              Codenigma winners
-            </span>
-            <ol className="m-0 pl-4 flex flex-col gap-1 text-[13px] text-[#3a3838]">
-              {codenigmaWinners.map((winner, index) => (
-                <li key={index}>{winner}</li>
+        <Stagger as="aside" className="flex flex-col gap-4">
+          <StaggerItem>
+            <SpotlightCard variant="gradient">
+              <div className="flex items-center justify-between p-5">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-3xl font-semibold leading-none tracking-tight text-fg tabular-nums">
+                    {participationCount}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">
+                    Participants
+                  </span>
+                </div>
+                <span className="icon-tile h-10 w-10">
+                  <Users className="h-[18px] w-[18px] text-accent-bright" strokeWidth={1.5} />
+                </span>
+              </div>
+            </SpotlightCard>
+          </StaggerItem>
+
+          <StaggerItem>
+            <SideCard title="Codenigma winners">
+              <ol className="m-0 flex list-none flex-col gap-2 p-0 text-[13px] text-fg/85">
+                {codenigmaWinners.map((winner, index) => (
+                  <li key={index} className="flex items-center gap-2.5">
+                    <span className="grid h-5 w-5 flex-none place-items-center rounded font-mono text-[10.5px] text-fg-muted shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
+                      {index + 1}
+                    </span>
+                    {winner}
+                  </li>
+                ))}
+              </ol>
+            </SideCard>
+          </StaggerItem>
+
+          <StaggerItem>
+            <SideCard title="Organisers">
+              {organizers.map((org, i) => (
+                <p key={i} className="m-0 text-[13px] text-fg/85">{org}</p>
               ))}
-            </ol>
-          </div>
-
-          <div className="border border-brand-edge p-[18px] flex flex-col gap-2">
-            <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
-              Organisers
-            </span>
-            {organizers.map((org, i) => (
-              <p key={i} className="m-0 text-[13px] text-[#3a3838]">{org}</p>
-            ))}
-          </div>
-        </aside>
+            </SideCard>
+          </StaggerItem>
+        </Stagger>
       </div>
     </div>
   );
@@ -229,79 +249,96 @@ const GenesisLeaderboard = () => {
 
   const organizers = ["Anto Nickson J (IV Year)", "Kuhan M (IV Year)"];
 
-  const podiumRule = { 1: "#dd2b0f", 2: "#1b3a6b", 3: "#605d5d" };
-
   return (
-    <div className="font-brand px-5 sm:px-8 lg:px-12 py-6 sm:py-7 lg:py-8 flex flex-col gap-7">
+    <div className="flex flex-col gap-7 py-6">
       {/* Podium */}
-      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+      <Stagger className="grid gap-4 md:grid-cols-3">
         {leaderboardData.map((p) => (
-          <div
-            key={p.rank}
-            className="border border-brand-edge p-[22px] flex flex-col gap-2.5"
-            style={{ borderTop: `4px solid ${podiumRule[p.rank]}` }}
-          >
-            <span className="text-[32px] font-semibold tabular-nums" style={{ color: podiumRule[p.rank] }}>
-              {p.rank}
-            </span>
-            <h3 className="m-0 text-[17px] font-semibold leading-[1.25] text-brand-navy">{p.projectName}</h3>
-            <span className="text-[12.5px] font-medium text-brand-blue">{p.team}</span>
-            <span className="text-[12.5px] text-brand-ink-soft">Led by {p.lead}</span>
-          </div>
+          <StaggerItem key={p.rank} className="h-full">
+            <SpotlightCard variant={p.rank === 1 ? "gradient" : "default"} interactive className={`h-full ${p.rank === 1 ? "border-line-accent" : ""}`}>
+              <div className="flex h-full flex-col gap-3 p-6">
+                <div className="flex items-start justify-between">
+                  <span
+                    className={`font-mono text-4xl font-medium tabular-nums ${
+                      p.rank === 1 ? "text-shimmer" : "text-fg-muted"
+                    }`}
+                  >
+                    {String(p.rank).padStart(2, "0")}
+                  </span>
+                  {p.rank === 1 ? (
+                    <span className="pill">
+                      <Trophy className="h-3 w-3" />
+                      Winner
+                    </span>
+                  ) : (
+                    <Sparkles className="h-4 w-4 text-fg-muted/60" strokeWidth={1.5} />
+                  )}
+                </div>
+                <h3 className="mt-2 text-lg font-semibold leading-snug tracking-tight text-fg">{p.projectName}</h3>
+                <span className="text-[13px] font-medium text-accent-bright">{p.team}</span>
+                <span className="mt-auto border-t border-line pt-3 text-[13px] text-fg-muted">Led by {p.lead}</span>
+              </div>
+            </SpotlightCard>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
 
       {/* Full table */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(230px,1fr)] gap-6 items-start">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse">
-            <thead>
-              <tr className="border-b-2 border-brand-navy">
-                <th className="w-[70px] text-left py-2.5 pr-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Rank</th>
-                <th className="text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Project</th>
-                <th className="text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy hidden sm:table-cell">Team</th>
-                <th className="w-[90px] text-left py-2.5 px-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Year</th>
-                <th className="text-left py-2.5 pl-3 text-[10.5px] font-semibold tracking-[0.16em] uppercase text-brand-navy">Team lead</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboardData.map((row) => (
-                <tr key={row.rank} className="border-b border-brand-row">
-                  <td className="py-3.5 pr-3 text-[13px] font-semibold text-brand-navy tabular-nums">{row.rank}</td>
-                  <td className="py-3.5 px-3 text-[14px] font-medium text-brand-navy">{row.projectName}</td>
-                  <td className="py-3.5 px-3 text-[13.5px] text-brand-blue hidden sm:table-cell">{row.team}</td>
-                  <td className="py-3.5 px-3 text-[13px] text-brand-ink-soft">{row.year}</td>
-                  <td
-                    className="py-3.5 pl-3 relative text-[13.5px] font-medium text-brand-navy cursor-pointer"
-                    onMouseEnter={() => setHoveredLead(row)}
-                    onMouseLeave={() => setHoveredLead(null)}
-                  >
-                    {row.lead}
-                    {hoveredLead?.rank === row.rank && (
-                      <div className="absolute top-full left-0 mt-1 bg-white border border-brand-edge shadow-lg p-3 z-10 w-52">
-                        <p className="m-0 mb-1 text-[11px] font-semibold tracking-[0.1em] uppercase text-brand-ink-soft">
-                          Team members
-                        </p>
-                        {row.members.map((m, i) => (
-                          <p key={i} className="m-0 text-[13px] text-[#3a3838]">{m}</p>
-                        ))}
-                      </div>
-                    )}
-                  </td>
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(250px,1fr)]">
+        <Reveal className="surface">
+          <div className="overflow-x-auto rounded-2xl">
+            <table className="table-ln min-w-[560px]">
+              <thead>
+                <tr>
+                  <th className="w-[80px]">Rank</th>
+                  <th>Project</th>
+                  <th className="hidden sm:table-cell">Team</th>
+                  <th className="w-[90px]">Year</th>
+                  <th>Team lead</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {leaderboardData.map((row) => (
+                  <tr key={row.rank}>
+                    <td>
+                      <span className={`inline-grid h-7 min-w-[28px] place-items-center rounded-md px-1.5 font-mono text-[12.5px] font-medium ${rankClass(row.rank)}`}>
+                        {row.rank}
+                      </span>
+                    </td>
+                    <td className="text-[14px] font-medium text-fg">{row.projectName}</td>
+                    <td className="hidden text-[13.5px] text-accent-bright sm:table-cell">{row.team}</td>
+                    <td className="font-mono text-[13px] text-fg-muted">{row.year}</td>
+                    <td
+                      className="relative cursor-pointer text-[13.5px] font-medium text-fg underline decoration-dotted decoration-white/25 underline-offset-4"
+                      onMouseEnter={() => setHoveredLead(row)}
+                      onMouseLeave={() => setHoveredLead(null)}
+                    >
+                      {row.lead}
+                      {hoveredLead?.rank === row.rank && (
+                        <div className="absolute left-0 top-full z-10 mt-1 w-56 animate-fade-in rounded-xl border border-line bg-canvas-elevated/95 p-3.5 no-underline shadow-popover backdrop-blur-xl">
+                          <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-fg-muted">
+                            Team members
+                          </p>
+                          {row.members.map((m, i) => (
+                            <p key={i} className="py-0.5 text-[13px] text-fg/90">{m}</p>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Reveal>
 
-        <aside className="border border-brand-edge p-[18px] flex flex-col gap-2">
-          <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy border-b-2 border-brand-navy pb-2">
-            Organisers
-          </span>
-          {organizers.map((org, i) => (
-            <p key={i} className="m-0 text-[13px] text-[#3a3838]">{org}</p>
-          ))}
-        </aside>
+        <Reveal as="aside" delay={0.08}>
+          <SideCard title="Organisers">
+            {organizers.map((org, i) => (
+              <p key={i} className="m-0 text-[13px] text-fg/85">{org}</p>
+            ))}
+          </SideCard>
+        </Reveal>
       </div>
     </div>
   );

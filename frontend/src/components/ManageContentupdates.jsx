@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { Trash2, Plus, MessageSquare } from "lucide-react";
+import PageHeader from "./ui/PageHeader";
 
 export default function UpdateContent() {
     const [updateText, setUpdateText] = useState("");
@@ -49,55 +50,60 @@ export default function UpdateContent() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
+        <div className="mx-auto flex max-w-4xl flex-col gap-5">
+            <PageHeader compact eyebrow="Dashboard" title="Recent Updates" />
+
             {/* Post Update Form */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <Plus className="w-5 h-5 text-blue-600" />
-                    <h2 className="text-xl font-bold text-gray-800">Post Recent Update</h2>
+            <div className="surface edge-highlight p-6">
+                <div className="mb-4 flex items-center gap-2.5">
+                    <span className="icon-tile h-8 w-8">
+                        <Plus className="h-4 w-4 text-accent-bright" />
+                    </span>
+                    <h2 className="text-[15px] font-semibold tracking-tight text-fg">Post Recent Update</h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-3">
                     <textarea
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all min-h-[120px]"
+                        className="field min-h-[120px] resize-y py-3"
                         placeholder="Enter update message (e.g., Results are out!)..."
                         value={updateText}
                         onChange={(e) => setUpdateText(e.target.value)}
                         required
                     />
-                    <button
-                        type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 transition-all shadow-md"
-                    >
+                    <button type="submit" className="btn-primary btn-lg w-full">
                         Publish Update
                     </button>
                 </form>
             </div>
 
             {/* Existing Updates List */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <MessageSquare className="w-5 h-5 text-gray-600" />
-                    <h2 className="text-lg font-bold text-gray-800">Current Updates</h2>
+            <div className="surface p-6">
+                <div className="mb-4 flex items-center justify-between gap-2">
+                    <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-fg">
+                        <MessageSquare className="h-4 w-4 text-fg-muted" />
+                        Current Updates
+                    </h2>
+                    <span className="font-mono text-[11px] text-fg-muted">{updates.length}</span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                     {updates.length > 0 ? (
                         updates.map((u) => (
-                            <div key={u._id} className="flex justify-between items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-                                <div>
-                                    <p className="text-gray-900 font-medium text-sm">{u.title}</p>
-                                    <p className="text-gray-400 text-xs">ID: {u._id}</p>
+                            <div key={u._id} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white/[0.02] p-3.5 transition-colors hover:bg-white/[0.04]">
+                                <div className="min-w-0">
+                                    <p className="text-[14px] font-medium text-fg">{u.title}</p>
+                                    <p className="truncate font-mono text-[11px] text-fg-muted">ID: {u._id}</p>
                                 </div>
                                 <button
                                     onClick={() => handleDelete(u._id)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="btn-icon h-8 w-8 flex-none hover:bg-rose-500/10 hover:text-rose-300"
                                     title="Delete update"
+                                    aria-label="Delete update"
                                 >
                                     <Trash2 size={16} />
                                 </button>
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500 italic text-center text-sm">No updates found in database.</p>
+                        <p className="py-4 text-center text-[13px] text-fg-muted">No updates found in database.</p>
                     )}
                 </div>
             </div>

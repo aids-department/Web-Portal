@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
-import { User, Building, Code } from "lucide-react";
+import { User, Building, Code, SlidersHorizontal, Users } from "lucide-react";
+import PageHeader from "../components/ui/PageHeader";
+import { LoadingState, EmptyState } from "../components/ui/States";
 import AlumniCard from "../components/AlumniCard";
 import AlumniThoughts from "../components/AlumniThoughts";
 
@@ -156,10 +158,10 @@ export default function Alumni() {
 
   const suggestionIcon = (type) => {
     switch (type) {
-      case 'name': return <User className="text-brand-blue" size={14} />;
-      case 'company': return <Building className="text-brand-blue" size={14} />;
-      case 'skill': return <Code className="text-brand-blue" size={14} />;
-      default: return <FaSearch className="text-brand-ink-faint" size={12} />;
+      case 'name': return <User className="text-accent-bright" size={14} />;
+      case 'company': return <Building className="text-accent-bright" size={14} />;
+      case 'skill': return <Code className="text-accent-bright" size={14} />;
+      default: return <FaSearch className="text-fg-muted" size={12} />;
     }
   };
 
@@ -170,86 +172,79 @@ export default function Alumni() {
 
   if (loading) {
     return (
-      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
-        <p className="text-brand-ink-soft italic text-[13.5px]">Loading alumni…</p>
+      <div className="container-ln">
+        <LoadingState label="Loading alumni" />
       </div>
     );
   }
 
   return (
-    <div className="font-brand px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] flex flex-col gap-5.5 gap-y-5">
-      <div className="flex flex-col gap-2.5">
-        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-          {alumni.length} profiles
-        </span>
-        <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
-          Alumni directory
-        </h1>
-      </div>
-
-      {/* Search */}
-      <div ref={searchRef} className="relative max-w-lg">
-        <div className="flex items-stretch border-2 border-brand-navy">
-          <span className="px-3.5 grid place-items-center text-brand-ink-soft">
-            <FaSearch size={14} />
-          </span>
+    <div className="container-ln flex flex-col gap-6 pb-8">
+      <PageHeader eyebrow={`${alumni.length} profiles`} title="Alumni directory" spacing="pt-14 pb-4 sm:pt-20 sm:pb-6 lg:pt-24">
+        {/* Search */}
+        <div ref={searchRef} className="relative mt-8 max-w-xl">
+          <FaSearch size={14} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted" />
           <input
             type="text"
             placeholder="Name, company or skill"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
-            className="flex-1 py-3.5 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+            aria-label="Search alumni"
+            className="field py-3.5 pl-11 text-[14px]"
           />
+          {showSuggestions && suggestions.length > 0 && (
+            <div
+              onMouseDown={(e) => e.preventDefault()}
+              className="absolute left-0 right-0 top-full z-30 mt-2 max-h-64 animate-fade-in overflow-y-auto rounded-xl border border-line bg-canvas-elevated/95 p-1.5 shadow-popover backdrop-blur-xl"
+            >
+              {suggestions.map((s, i) => (
+                <div
+                  key={i}
+                  className="flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2.5 transition-colors duration-150 hover:bg-white/[0.06]"
+                  onClick={() => {
+                    setSearchTerm(s.value);
+                    setShowSuggestions(false);
+                  }}
+                >
+                  <span className="flex items-center gap-2.5 text-[13px] text-fg">
+                    {suggestionIcon(s.type)}
+                    {s.value}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">{s.type}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        {showSuggestions && suggestions.length > 0 && (
-          <div
-            onMouseDown={(e) => e.preventDefault()}
-            className="absolute top-full left-0 right-0 mt-1 bg-white border border-brand-edge shadow-lg z-30 max-h-56 overflow-y-auto"
-          >
-            {suggestions.map((s, i) => (
-              <div
-                key={i}
-                className="px-3.5 py-2.5 hover:bg-brand-ground cursor-pointer border-b border-brand-row last:border-b-0 flex items-center justify-between gap-2"
-                onClick={() => {
-                  setSearchTerm(s.value);
-                  setShowSuggestions(false);
-                }}
-              >
-                <span className="flex items-center gap-2 text-[13px] text-brand-ink">
-                  {suggestionIcon(s.type)}
-                  {s.value}
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.1em] text-brand-ink-faint">{s.type}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      </PageHeader>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,240px)_minmax(0,3fr)] gap-6 items-start">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(220px,250px)_minmax(0,3fr)]">
         {/* Filters */}
-        <aside className="border border-brand-edge bg-brand-ground p-5 flex flex-col gap-5 min-w-[230px]">
-          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-navy">Filter</span>
+        <aside className="surface flex min-w-[230px] flex-col gap-5 p-5 lg:sticky lg:top-24">
+          <span className="eyebrow flex items-center gap-2">
+            <SlidersHorizontal size={12} />
+            Filter
+          </span>
 
-          <div className="flex flex-col gap-2 border-t border-brand-edge pt-3.5">
-            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+          <label className="flex flex-col gap-2">
+            <span className="field-label mb-0 font-mono text-[10px] uppercase tracking-[0.16em]">
               Pass out year
             </span>
             <select
               value={filters.passOutYear}
               onChange={(e) => setFilters({ ...filters, passOutYear: e.target.value })}
-              className="border border-brand-ink-faint bg-white px-3 py-2.5 text-[12.5px] text-brand-navy outline-none"
+              className="field"
             >
               <option>All</option>
               {passOutYears.map((year) => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </select>
-          </div>
+          </label>
 
-          <div className="flex flex-col gap-2 border-t border-brand-edge pt-3.5">
-            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+          <label className="flex flex-col gap-2">
+            <span className="field-label mb-0 font-mono text-[10px] uppercase tracking-[0.16em]">
               Company
             </span>
             <input
@@ -258,15 +253,15 @@ export default function Alumni() {
               placeholder="e.g. Google"
               value={filters.company}
               onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-              className="border border-brand-ink-faint bg-white px-3 py-2.5 text-[12.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+              className="field"
             />
             <datalist id="alumni-companies">
               {companies.map((c) => <option key={c} value={c} />)}
             </datalist>
-          </div>
+          </label>
 
-          <div className="flex flex-col gap-2 border-t border-brand-edge pt-3.5">
-            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+          <label className="flex flex-col gap-2">
+            <span className="field-label mb-0 font-mono text-[10px] uppercase tracking-[0.16em]">
               Skills
             </span>
             <input
@@ -274,26 +269,23 @@ export default function Alumni() {
               placeholder="e.g. Python, ML"
               value={filters.skills}
               onChange={(e) => setFilters({ ...filters, skills: e.target.value })}
-              className="border border-brand-ink-faint bg-white px-3 py-2.5 text-[12.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+              className="field"
             />
-          </div>
+          </label>
 
-          <button
-            onClick={clearFilters}
-            className="self-start px-3.5 py-2.5 border border-brand-ink-faint bg-white text-[11.5px] font-medium text-brand-ink-soft hover:bg-brand-ground"
-          >
+          <button onClick={clearFilters} className="btn-secondary btn-sm self-start">
             Clear all
           </button>
         </aside>
 
         {/* Results */}
-        <div className="min-w-0 flex flex-col gap-3.5">
-          <span className="text-[12.5px] text-brand-ink-soft">
-            Showing {filteredAlumni.length} of {alumni.length}
+        <div className="flex min-w-0 flex-col gap-4">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
+            Showing <span className="text-fg">{filteredAlumni.length}</span> of {alumni.length}
           </span>
 
           {error && (
-            <div className="bg-brand-red-tint text-brand-red-deep px-3.5 py-3 text-[13px]">
+            <div className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-[13px] text-rose-300">
               Error: {error}
             </div>
           )}
@@ -301,26 +293,22 @@ export default function Alumni() {
           {filteredAlumni.length > 0 ? (
             <div
               className="grid gap-4"
-              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
+              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}
             >
               {filteredAlumni.map((alum) => (
-                <div key={alum._id} className="border border-brand-edge">
+                <div key={alum._id} className="animate-fade-in">
                   <AlumniCard alumni={alum} />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="border border-brand-edge p-10 text-center">
-              <p className="m-0 text-[13.5px] text-brand-ink-soft">
-                No alumni found matching your filters.
-              </p>
-            </div>
+            <EmptyState icon={Users} title="No alumni found matching your filters." />
           )}
         </div>
       </div>
 
       {/* Alumni Thoughts Carousel */}
-      <div className="mt-6 sm:mt-8">
+      <div className="mt-10 border-t border-line pt-14 sm:mt-14">
         <AlumniThoughts />
       </div>
     </div>

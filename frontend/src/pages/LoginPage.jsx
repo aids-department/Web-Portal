@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
-import HeroCanvas from '../components/HeroCanvas';
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import AuthShell, { BrandMark } from '../components/ui/AuthShell';
+import { Alert } from '../components/ui/States';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -61,98 +62,74 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="font-brand bg-brand-ground px-5 sm:px-8 lg:px-11 py-8 sm:py-9 lg:py-11">
-      <div className="max-w-[940px] mx-auto border border-brand-edge grid grid-cols-1 md:grid-cols-2">
-        {/* Info panel */}
-        <div className="relative bg-brand-navy-deep p-8 flex flex-col justify-between gap-10 min-h-[300px] md:min-h-[420px] overflow-hidden">
-          <div className="relative z-10 flex items-center gap-2.5">
-            <div className="w-6 h-6 bg-white grid place-items-center">
-              <div className="w-2 h-2 bg-brand-red" />
-            </div>
-            <span className="font-bold text-[12.5px] tracking-[0.14em] text-white">AI &amp; DS</span>
-          </div>
-          <div className="absolute inset-0 opacity-80">
-            <HeroCanvas />
-          </div>
-          <div className="relative z-10 flex flex-col gap-3">
-            <h2 className="m-0 text-[28px] leading-[1.15] font-semibold text-white max-w-[16ch]">
-              Members see more of the department
+    <AuthShell
+      canvas
+      maxWidth="max-w-[940px]"
+      aside={
+        <>
+          <BrandMark />
+          <div className="flex flex-col gap-3">
+            <h2 className="max-w-[16ch] text-3xl font-semibold leading-[1.1] tracking-tight">
+              <span className="text-gradient">Members see more of the department</span>
             </h2>
-            <p className="m-0 max-w-[40ch] text-[13.5px] leading-[1.65] text-brand-on-navy">
+            <p className="max-w-[40ch] text-[14px] leading-relaxed text-fg-muted">
               Posts need an account to keep discussion tied to real members. Everything else stays open to visitors.
             </p>
           </div>
-        </div>
-
-        {/* Form panel */}
-        <div className="bg-white p-8 flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <h1 className="m-0 text-[30px] font-semibold tracking-[-0.02em] text-brand-navy">Sign in</h1>
-            <span className="text-[13px] text-brand-ink-soft">Login to AI &amp; DS Department</span>
-          </div>
-          <div className="h-0.5 bg-brand-navy" />
-
-          {error && (
-            <div className="bg-brand-red-tint text-brand-red-deep px-3.5 py-3 text-[13px]">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
-                Roll number or email
-              </span>
-              <input
-                type="text"
-                name="identifier"
-                value={formData.identifier}
-                onChange={handleChange}
-                placeholder="Roll number (e.g. 23d102) or email"
-                className="border border-brand-ink-faint px-3 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
-                Password
-              </span>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className="w-full border border-brand-ink-faint pl-3 pr-11 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  aria-pressed={showPassword}
-                  className="absolute inset-y-0 right-0 px-3 grid place-items-center text-brand-ink-soft hover:text-brand-navy"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="text-left px-[18px] py-3.5 bg-brand-red text-white font-semibold text-[13px] disabled:opacity-50"
-            >
-              {loading ? 'Signing in…' : 'Sign in'}
-            </button>
-          </form>
-
-
-
-        </div>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">Sign in</h1>
+        <span className="text-[14px] text-fg-muted">Login to AI &amp; DS Department</span>
       </div>
-    </div>
+      <div className="hairline" />
+
+      {error && <Alert>{error}</Alert>}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <label className="flex flex-col">
+          <span className="field-label">Roll number or email</span>
+          <input
+            type="text"
+            name="identifier"
+            value={formData.identifier}
+            onChange={handleChange}
+            placeholder="Roll number (e.g. 23d102) or email"
+            className="field py-3"
+          />
+        </label>
+
+        <label className="flex flex-col">
+          <span className="field-label">Password</span>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              className="field py-3 pr-11"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              className="absolute inset-y-0 right-0 grid place-items-center px-3 text-fg-muted transition-colors hover:text-fg"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </label>
+
+        <button type="submit" disabled={loading} className="btn-primary btn-lg mt-2 w-full">
+          {loading ? 'Signing in…' : 'Sign in'}
+          {!loading && <ArrowRight className="h-4 w-4" />}
+        </button>
+      </form>
+    </AuthShell>
   );
 };
 

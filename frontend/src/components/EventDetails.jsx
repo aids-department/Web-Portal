@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Calendar, Download } from 'lucide-react';
-import { eventTagStyle } from '../utils/eventTagStyle';
+import { motion } from 'framer-motion';
+import { Calendar, Download, ArrowLeft, ArrowUpRight, ChevronRight, ChevronDown, CalendarDays, MapPin, Trophy } from 'lucide-react';
+import { EventTypeTag } from './UpcomingEventCard';
+import { Reveal } from './ui/Reveal';
+import { EASE } from './ui/motion';
 import { getGoogleCalendarUrl, downloadVCalendar } from '../utils/calendarUtils';
 
 const EventDetails = ({ event, onBack }) => {
@@ -21,7 +24,6 @@ const EventDetails = ({ event, onBack }) => {
       hour: '2-digit', minute: '2-digit'
     }) : '';
 
-  const tag = eventTagStyle(event.eventType);
   const hasRegistration = !!(event.registrationLink && event.registrationLink !== 'NO_LINK');
 
   const facts = [
@@ -46,136 +48,148 @@ const EventDetails = ({ event, onBack }) => {
   const posterSrc = event.poster || event.image;
 
   return (
-    <div className="font-brand">
-      <div className="px-5 sm:px-8 lg:px-12 py-4 border-b border-brand-edge flex items-center gap-2 flex-wrap">
-        <button onClick={onBack} className="text-[12px] font-medium text-brand-blue hover:underline">
+    <div className="container-ln pb-8">
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 pt-8 text-[13px]">
+        <button onClick={onBack} className="btn-ghost btn-sm -ml-3">
+          <ArrowLeft size={14} />
           Events
         </button>
-        <span className="text-[12px] text-brand-ink-faint">/</span>
-        <span className="text-[12px] text-brand-ink-soft">{event.eventName}</span>
-      </div>
+        <ChevronRight size={14} className="text-fg-muted/60" />
+        <span className="truncate text-fg-muted">{event.eventName}</span>
+      </nav>
 
       {/* Split header: poster at its natural proportions beside the event summary */}
-      <div className="bg-brand-navy flex flex-col md:flex-row md:h-[360px] lg:h-[420px]">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="surface edge-highlight mt-5 flex flex-col overflow-hidden md:h-[360px] md:flex-row lg:h-[420px]"
+      >
         {posterSrc && (
-          <div className="flex-none md:max-w-[55%] bg-brand-navy-deep grid place-items-center overflow-hidden md:border-r-2 border-brand-blue">
+          <div className="relative grid flex-none place-items-center overflow-hidden border-b border-line bg-canvas-deep md:max-w-[55%] md:border-b-0 md:border-r">
             <img
               src={posterSrc}
               alt={event.eventName}
-              className="block w-full max-h-[420px] md:w-auto md:max-h-none md:h-full object-contain grayscale"
+              className="block max-h-[420px] w-full object-contain md:h-full md:max-h-none md:w-auto"
             />
           </div>
         )}
-        <div className="flex-1 min-w-0 px-5 sm:px-8 lg:px-12 py-8 sm:py-10 flex flex-col justify-center gap-4">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span
-              className="px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.1em] uppercase"
-              style={{ background: tag.bg, color: tag.fg }}
-            >
-              {event.eventType || 'Event'}
-            </span>
+        <div className="relative flex min-w-0 flex-1 flex-col justify-center gap-5 px-6 py-8 sm:px-10 sm:py-10">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/20 blur-[80px]" />
+          <div className="relative flex flex-wrap items-center gap-2.5">
+            <EventTypeTag type={event.eventType} />
             {winner && (
-              <span className="text-[12px] font-semibold text-brand-red">Champion: {winner}</span>
+              <span className="flex items-center gap-1.5 text-[12.5px] font-medium text-amber-300/90">
+                <Trophy size={13} />
+                Champion: {winner}
+              </span>
             )}
           </div>
-          <h1 className="m-0 text-[28px] sm:text-[34px] lg:text-[42px] leading-[1.08] font-semibold tracking-[-0.02em] text-white max-w-[22ch] md:line-clamp-3">
-            {event.eventName}
+          <h1 className="relative max-w-[22ch] text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl lg:text-5xl md:line-clamp-3">
+            <span className="text-gradient">{event.eventName}</span>
           </h1>
-          <div className="flex flex-col gap-1 text-[13px] leading-[1.5] text-brand-on-navy">
-            <span className="tabular-nums">
+          <div className="relative flex flex-col gap-1.5 text-[14px] leading-[1.5] text-fg-muted">
+            <span className="flex items-center gap-2 tabular-nums">
+              <CalendarDays size={14} />
               {formatDate(event.startDate)}
               {event.startDate && ` · ${formatTime(event.startDate)}`}
             </span>
-            <span className="text-brand-on-navy-muted">
+            <span className="flex items-center gap-2">
+              <MapPin size={14} />
               {event.eventMode === 'Online' ? 'Online Event' : event.venue || 'On campus'}
             </span>
           </div>
           {hasRegistration && (
-            <div className="pt-1">
+            <div className="relative pt-1">
               <button
                 onClick={() => window.open(event.registrationLink, '_blank')}
-                className="px-5 py-[13px] bg-brand-red text-white text-[12.5px] font-semibold"
+                className="btn-primary btn-lg"
               >
                 Register now
+                <ArrowUpRight size={16} />
               </button>
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,320px)]">
-        <div className="min-w-0 px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-10 flex flex-col gap-5 lg:border-r border-brand-edge">
-          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-            About this event
-          </span>
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(260px,340px)]">
+        <Reveal className="flex min-w-0 flex-col gap-5">
+          <span className="eyebrow-accent">About this event</span>
 
-          <p className="m-0 max-w-[76ch] text-[15px] leading-[1.75] text-[#3a3838] whitespace-pre-line">
+          <p className="max-w-[76ch] whitespace-pre-line text-[15px] leading-[1.8] text-fg/85">
             {event.description || 'No description provided.'}
           </p>
 
           {extraSections.map((s) => (
-            <div key={s.key} className="border border-brand-edge">
+            <div key={s.key} className={`surface overflow-hidden transition-colors ${openSection === s.key ? 'border-line-accent' : ''}`}>
               <button
                 onClick={() => toggle(s.key)}
-                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-[12.5px] font-semibold text-brand-navy hover:bg-brand-ground"
+                aria-expanded={openSection === s.key}
+                className="flex w-full items-center justify-between gap-3 px-5 py-3.5 text-[14px] font-medium text-fg transition-colors hover:bg-white/[0.03]"
               >
                 {s.title}
-                <span className="text-brand-ink-faint">{openSection === s.key ? '−' : '+'}</span>
+                <ChevronDown
+                  size={16}
+                  className={`text-fg-muted transition-transform duration-300 ease-expo ${openSection === s.key ? 'rotate-180' : ''}`}
+                />
               </button>
               {openSection === s.key && (
-                <div className="px-4 py-3 text-[13px] leading-[1.6] text-brand-ink-soft whitespace-pre-line border-t border-brand-row">
+                <div className="animate-fade-in whitespace-pre-line border-t border-line px-5 py-4 text-[13.5px] leading-[1.7] text-fg-muted">
                   {s.content}
                 </div>
               )}
             </div>
           ))}
-        </div>
+        </Reveal>
 
-        <aside className="px-5 sm:px-8 lg:px-8 py-8 sm:py-9 lg:py-10 bg-brand-ground flex flex-col gap-5 min-w-[260px]">
-          <div className="flex flex-col gap-3">
-            {facts.map((f) => (
-              <div key={f.k} className="border-t border-brand-edge pt-2.5 flex flex-col gap-1">
-                <span className="text-[9.5px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
+        <Reveal as="aside" delay={0.08} className="flex min-w-[260px] flex-col gap-4">
+          <div className="surface flex flex-col p-5">
+            {facts.map((f, i) => (
+              <div key={f.k} className={`flex flex-col gap-1 py-3 ${i > 0 ? 'border-t border-line' : 'pt-0'}`}>
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">
                   {f.k}
                 </span>
-                <span className="text-[13.5px] font-medium text-brand-navy">{f.v}</span>
+                <span className="text-[14px] font-medium text-fg">{f.v}</span>
               </div>
             ))}
           </div>
 
           {hasRegistration ? (
-            <div className="border border-brand-navy bg-white p-[18px] flex flex-col gap-2.5">
-              <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-red">
+            <div className="surface flex flex-col gap-3 border-line-accent bg-[linear-gradient(to_bottom,rgba(94,106,210,0.12),rgba(255,255,255,0.02))] p-5">
+              <span className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-accent-bright">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                 Registration open
               </span>
               <button
                 onClick={() => window.open(event.registrationLink, '_blank')}
-                className="px-[18px] py-[13px] bg-brand-red text-white text-[12.5px] font-semibold"
+                className="btn-primary w-full"
               >
                 Register
               </button>
             </div>
           ) : (
-            <div className="border border-brand-edge bg-white p-[18px] flex flex-col gap-2">
-              <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-ink-soft">
+            <div className="surface flex flex-col gap-2 p-5">
+              <span className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-fg-muted">
                 No registration
               </span>
-              <span className="text-[12.5px] leading-[1.6] text-[#3a3838]">
+              <span className="text-[13px] leading-[1.6] text-fg/85">
                 Open to all students of the department.
               </span>
             </div>
           )}
 
           {/* Google Calendar & vCalendar Sync */}
-          <div className="border border-brand-edge bg-white p-[18px] flex flex-col gap-2.5">
-            <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-navy">
+          <div className="surface flex flex-col gap-2.5 p-5">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-fg-muted">
               Calendar Sync
             </span>
             <a
               href={getGoogleCalendarUrl(event)}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-brand-navy text-white text-[12px] font-semibold flex items-center justify-center gap-2 hover:bg-brand-blue transition-colors text-center"
+              className="btn-secondary w-full"
             >
               <Calendar size={14} />
               Add to Google Calendar
@@ -183,13 +197,13 @@ const EventDetails = ({ event, onBack }) => {
             <button
               type="button"
               onClick={() => downloadVCalendar(event)}
-              className="px-3 py-2 border border-brand-edge text-brand-navy text-[11.5px] font-medium flex items-center justify-center gap-1.5 hover:bg-brand-ground transition-colors"
+              className="btn-ghost btn-sm w-full"
             >
               <Download size={13} />
               Download vCalendar (.ics)
             </button>
           </div>
-        </aside>
+        </Reveal>
       </div>
     </div>
   );

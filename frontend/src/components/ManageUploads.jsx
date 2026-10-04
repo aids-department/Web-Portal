@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, Download, Eye, FileText, User, Search, AlertTriangle, X } from "lucide-react";
+import PageHeader from "./ui/PageHeader";
+import SpotlightCard from "./ui/SpotlightCard";
+import Modal from "./ui/Modal";
+import { EmptyState } from "./ui/States";
 
 export default function ManageUploads() {
   const [uploads, setUploads] = useState([]);
@@ -68,137 +72,118 @@ export default function ManageUploads() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto p-8 font-sans relative">
-      
+    <div className="relative mx-auto max-w-4xl">
+
       {/* ✅ CUSTOM DELETE MODAL OVERLAY */}
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform scale-100 transition-all">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-red-100 rounded-full text-red-600">
-                <AlertTriangle size={28} />
+        <Modal z="z-50" className="max-w-md">
+          <div className="p-6">
+            <div className="mb-4 flex items-start gap-4">
+              <div className="grid h-12 w-12 flex-none place-items-center rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-300">
+                <AlertTriangle size={24} strokeWidth={1.75} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Delete Resource?</h3>
-                <p className="text-gray-500 text-sm mt-1">This action cannot be undone. The file will be permanently removed.</p>
+                <h3 className="text-lg font-semibold tracking-tight text-fg">Delete Resource?</h3>
+                <p className="mt-1 text-[13.5px] text-fg-muted">This action cannot be undone. The file will be permanently removed.</p>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
-              <button 
-                onClick={() => setDeleteId(null)}
-                className="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors border border-gray-200"
-              >
+            <div className="mt-6 flex justify-end gap-2.5">
+              <button onClick={() => setDeleteId(null)} className="btn-secondary">
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors shadow-md flex items-center gap-2"
+                className="btn bg-rose-600 text-white shadow-[0_0_0_1px_rgba(244,63,94,0.5),0_4px_12px_rgba(244,63,94,0.3),inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:bg-rose-500"
               >
                 {loading ? "Deleting..." : "Yes, Delete It"}
               </button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* HEADER + SEARCH BAR */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-800">Manage Resources</h1>
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-            Total: {uploads.length}
-          </span>
-        </div>
-
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+      <PageHeader
+        compact
+        eyebrow="Question papers"
+        title="Manage Resources"
+        actions={<span className="pill font-mono text-[12px]">Total: {uploads.length}</span>}
+      >
+        <div className="relative mt-6">
+          <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted" size={18} />
           <input
             type="text"
             placeholder="Search by subject, code, or author..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none text-base transition-all"
+            className="field py-3 pl-11 text-[14px]"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </div>
+      </PageHeader>
 
       {/* LIST */}
       {filteredUploads.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <p className="text-gray-500">
-            {uploads.length === 0 ? "No uploads found." : "No matches found."}
-          </p>
-        </div>
+        <EmptyState icon={FileText} title={uploads.length === 0 ? "No uploads found." : "No matches found."} />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredUploads.map((u) => {
             const niceName = `${u.subjectCode}_${u.examType}_Sem${u.semester}`;
             const isBank = u.examType === "Question Bank";
 
             return (
-              <div key={u._id} className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                
-                {/* AUTHOR BADGE */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
-                  <User size={12} />
-                  {u.author ? u.author.username : "Unknown"}
-                </div>
-
-                <div className="flex items-start gap-4 pr-32">
-                  <div className={`p-3 rounded-lg shrink-0 ${isBank ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
-                     <FileText size={24} />
+              <SpotlightCard key={u._id}>
+                <div className="p-5 sm:p-6">
+                  {/* AUTHOR BADGE */}
+                  <div className="pill-neutral absolute right-4 top-4">
+                    <User size={12} />
+                    {u.author ? u.author.username : "Unknown"}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 leading-snug">
-                      {u.subjectName}
-                    </h3>
-                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600">
-                      <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-xs font-bold text-gray-500">
-                        {u.subjectCode}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
-                        isBank ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
-                      }`}>
-                        {u.examType}
-                      </span>
-                      <span className="text-gray-400">•</span>
-                      <span>Semester {u.semester}</span>
+
+                  <div className="flex items-start gap-4 pr-28">
+                    <div className={`icon-tile h-11 w-11 shrink-0 ${isBank ? 'text-violet-300' : 'text-fg-muted'}`}>
+                       <FileText size={20} strokeWidth={1.5} />
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
-                      Uploaded {new Date(u.uploadedAt).toLocaleString()}
-                    </p>
+                    <div className="min-w-0">
+                      <h3 className="text-[16px] font-semibold leading-snug tracking-tight text-fg">
+                        {u.subjectName}
+                      </h3>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-fg-muted">
+                        <span className="rounded-md border border-line bg-white/[0.04] px-2 py-0.5 font-mono text-[11.5px] text-fg/80">
+                          {u.subjectCode}
+                        </span>
+                        <span className={`rounded-full border px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-wider ${
+                          isBank ? 'border-violet-400/30 bg-violet-500/10 text-violet-200' : 'border-line-accent bg-accent/10 text-indigo-200'
+                        }`}>
+                          {u.examType}
+                        </span>
+                        <span className="text-fg-muted/50">•</span>
+                        <span>Semester {u.semester}</span>
+                      </div>
+                      <p className="mt-2 font-mono text-[11px] text-fg-muted">
+                        Uploaded {new Date(u.uploadedAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* ACTIONS */}
+                  <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">
+                    <a href={u.fileUrl} target="_blank" rel="noreferrer" className="btn-ghost btn-sm">
+                      <Eye size={15} /> View
+                    </a>
+
+                    <a href={getDownloadUrl(u.fileUrl, niceName)} className="btn-ghost btn-sm">
+                      <Download size={15} /> Download
+                    </a>
+
+                    {/* ✅ TRIGGER MODAL ON CLICK */}
+                    <button onClick={() => confirmDelete(u._id)} className="btn-danger btn-sm ml-1">
+                      <Trash2 size={15} /> Delete
+                    </button>
                   </div>
                 </div>
-
-                {/* ACTIONS */}
-                <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                  <a
-                    href={u.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
-                  >
-                    <Eye size={16} /> View
-                  </a>
-
-                  <a
-                    href={getDownloadUrl(u.fileUrl, niceName)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
-                  >
-                    <Download size={16} /> Download
-                  </a>
-
-                  {/* ✅ TRIGGER MODAL ON CLICK */}
-                  <button
-                    onClick={() => confirmDelete(u._id)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition ml-2"
-                  >
-                    <Trash2 size={16} /> Delete
-                  </button>
-                </div>
-              </div>
+              </SpotlightCard>
             );
           })}
         </div>

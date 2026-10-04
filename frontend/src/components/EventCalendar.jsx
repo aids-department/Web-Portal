@@ -78,42 +78,32 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
     : [];
 
   return (
-    <aside className="font-brand border border-brand-edge p-5 flex flex-col gap-4 min-w-[280px] bg-white shadow-sm">
+    <aside className="surface edge-highlight flex min-w-[280px] flex-col gap-4 p-5">
       {/* Month Navigation Header */}
-      <div className="flex items-center justify-between gap-2 border-b border-brand-edge pb-3">
+      <div className="flex items-center justify-between gap-2 border-b border-line pb-4">
         <div>
-          <span className="text-[15px] font-semibold text-brand-navy">
+          <span className="text-[15px] font-semibold tracking-tight text-fg">
             {MONTH_NAMES[month]} {year}
           </span>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10.5px] text-brand-ink-soft">Google vCalendar Sync</span>
+          <div className="mt-1 flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">Google vCalendar Sync</span>
           </div>
         </div>
 
         <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={prevMonth}
-            aria-label="Previous month"
-            className="p-1 border border-brand-edge hover:border-brand-navy text-brand-navy transition-colors"
-          >
+          <button type="button" onClick={prevMonth} aria-label="Previous month" className="btn-icon h-7 w-7">
             <ChevronLeft size={16} />
           </button>
           <button
             type="button"
             onClick={jumpToToday}
-            className="px-2 py-1 text-[10.5px] font-semibold border border-brand-edge hover:border-brand-navy text-brand-navy"
+            className="rounded-md px-2 py-1 text-[11px] font-medium text-fg-muted shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] transition-colors hover:bg-white/[0.05] hover:text-fg"
             title="Go to current month"
           >
             Today
           </button>
-          <button
-            type="button"
-            onClick={nextMonth}
-            aria-label="Next month"
-            className="p-1 border border-brand-edge hover:border-brand-navy text-brand-navy transition-colors"
-          >
+          <button type="button" onClick={nextMonth} aria-label="Next month" className="btn-icon h-7 w-7">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -124,7 +114,7 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
         {DAY_NAMES.map((d, i) => (
           <span
             key={i}
-            className="text-center text-[9.5px] font-semibold tracking-[0.08em] uppercase text-brand-ink-soft pb-1"
+            className="pb-1 text-center font-mono text-[10px] font-medium uppercase text-fg-muted"
           >
             {d}
           </span>
@@ -137,13 +127,13 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
               key={i}
               type="button"
               onClick={() => setSelectedDate(c.date)}
-              className={`aspect-square grid place-items-center text-[12px] tabular-nums transition-all relative ${
+              className={`relative grid aspect-square place-items-center rounded-lg text-[12px] tabular-nums transition-[background-color,box-shadow,color] duration-200 ${
                 c.isSelected
-                  ? 'bg-brand-navy text-white font-bold ring-2 ring-brand-red'
+                  ? 'bg-accent font-semibold text-white shadow-glow'
                   : c.isMarked
-                  ? 'bg-brand-red text-white font-semibold hover:opacity-90'
-                  : 'text-[#3a3838] hover:bg-brand-ground'
-              } ${c.isToday && !c.isSelected ? 'border border-brand-navy font-semibold' : 'border border-transparent'}`}
+                  ? 'bg-accent/15 font-semibold text-indigo-200 shadow-[inset_0_0_0_1px_rgba(94,106,210,0.4)] hover:bg-accent/25'
+                  : 'text-fg/80 hover:bg-white/[0.06] hover:text-fg'
+              } ${c.isToday && !c.isSelected ? 'font-semibold text-fg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35)]' : ''}`}
               title={
                 c.isMarked
                   ? `${c.events.length} event(s) on ${c.date.toLocaleDateString()}`
@@ -152,7 +142,7 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
             >
               {c.n}
               {c.isMarked && !c.isSelected && (
-                <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-white" />
+                <span className="absolute bottom-1 h-1 w-1 rounded-full bg-accent-bright shadow-[0_0_6px_rgba(104,114,217,0.9)]" />
               )}
             </button>
           )
@@ -161,36 +151,36 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
 
       {/* Selected Date Details */}
       {selectedDate && (
-        <div className="border border-brand-edge bg-brand-ground p-3 flex flex-col gap-2">
-          <div className="flex items-center justify-between text-[11.5px] font-semibold text-brand-navy">
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-white/[0.03] p-3 animate-fade-in">
+          <div className="flex items-center justify-between text-[12px] font-medium text-fg">
             <span>
               {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
             <button
               onClick={() => setSelectedDate(null)}
-              className="text-[11px] text-brand-ink-soft hover:text-brand-red underline"
+              className="text-[11.5px] text-fg-muted transition-colors hover:text-fg"
             >
               Clear
             </button>
           </div>
 
           {selectedDayEvents.length === 0 ? (
-            <span className="text-[12px] text-brand-ink-soft italic">No events scheduled for this day.</span>
+            <span className="text-[12px] text-fg-muted">No events scheduled for this day.</span>
           ) : (
             <div className="flex flex-col gap-2">
               {selectedDayEvents.map((ev) => (
                 <div
                   key={ev._id}
-                  className="bg-white border border-brand-edge p-2 flex flex-col gap-1 text-[12px]"
+                  className="flex flex-col gap-1 rounded-lg border border-line bg-canvas-elevated p-2.5 text-[12px]"
                 >
-                  <span className="font-semibold text-brand-navy">{ev.eventName || ev.title}</span>
-                  <div className="flex items-center justify-between text-[10.5px] text-brand-ink-soft">
+                  <span className="font-medium text-fg">{ev.eventName || ev.title}</span>
+                  <div className="flex items-center justify-between text-[11px] text-fg-muted">
                     <span>{ev.eventMode === 'Online' ? 'Online' : ev.venue || 'On Campus'}</span>
                     <a
                       href={getGoogleCalendarUrl(ev)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-brand-red font-medium hover:underline flex items-center gap-0.5"
+                      className="flex items-center gap-0.5 font-medium text-accent-bright hover:underline"
                     >
                       + Google Cal
                     </a>
@@ -198,7 +188,7 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
                   {onSelectEvent && (
                     <button
                       onClick={() => onSelectEvent(ev)}
-                      className="text-left text-[11px] text-brand-blue font-medium hover:underline mt-0.5"
+                      className="mt-0.5 text-left text-[11.5px] font-medium text-fg-muted transition-colors hover:text-fg"
                     >
                       View details →
                     </button>
@@ -211,25 +201,21 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
       )}
 
       {/* Legend */}
-      <div className="flex flex-col gap-1.5 border-t border-brand-edge pt-3 text-[11.5px] text-[#3a3838]">
+      <div className="flex items-center gap-4 border-t border-line pt-3 text-[11.5px] text-fg-muted">
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-brand-red shrink-0" />
+          <span className="h-3 w-3 shrink-0 rounded bg-accent/30 shadow-[inset_0_0_0_1px_rgba(94,106,210,0.6)]" />
           <span>Scheduled Event</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 border border-brand-navy shrink-0" />
+          <span className="h-3 w-3 shrink-0 rounded shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]" />
           <span>Today</span>
         </div>
       </div>
 
       {/* Google Calendar & vCalendar Integration Links */}
-      <div className="flex flex-col gap-2 border-t border-brand-edge pt-3">
+      <div className="flex flex-col gap-2 border-t border-line pt-3">
         {onViewFullCalendar && (
-          <button
-            type="button"
-            onClick={onViewFullCalendar}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-brand-navy text-white text-[11.5px] font-semibold hover:bg-brand-blue transition-colors"
-          >
+          <button type="button" onClick={onViewFullCalendar} className="btn-primary btn-sm w-full">
             <CalendarIcon size={14} />
             Full Google Calendar View
           </button>
@@ -240,7 +226,7 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
             href={GOOGLE_CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-2 py-1.5 border border-brand-edge text-brand-navy text-[11px] font-medium hover:bg-brand-ground transition-colors"
+            className="btn-secondary btn-sm text-[12px]"
             title="Open in Google Calendar"
           >
             <ExternalLink size={12} />
@@ -249,7 +235,7 @@ const EventCalendar = ({ events = [], onViewFullCalendar, onSelectEvent }) => {
           <a
             href={VCALENDAR_ICS_URL}
             download="aids_department_calendar.ics"
-            className="flex items-center justify-center gap-1.5 px-2 py-1.5 border border-brand-edge text-brand-navy text-[11px] font-medium hover:bg-brand-ground transition-colors"
+            className="btn-secondary btn-sm text-[12px]"
             title="Download vCalendar (.ics) format"
           >
             <Download size={12} />

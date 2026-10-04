@@ -2,6 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Award, ExternalLink, X, Image as ImageIcon } from "lucide-react";
+import PageHeader from "../components/ui/PageHeader";
+import SpotlightCard from "../components/ui/SpotlightCard";
+import Modal from "../components/ui/Modal";
+import { Reveal } from "../components/ui/Reveal";
+import { LoadingState, EmptyState } from "../components/ui/States";
 
 export default function UserAchievements() {
   const [achievements, setAchievements] = useState([]);
@@ -23,90 +28,83 @@ export default function UserAchievements() {
   }, []);
 
   return (
-    <div className="font-brand px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] flex flex-col gap-6">
-      <div className="flex flex-col gap-2.5">
-        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-          Student achievements
-        </span>
-        <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
-          Achievements
-        </h1>
-        <p className="m-0 max-w-[70ch] text-[14px] leading-[1.7] text-brand-ink-soft">
-          What students of the department have won, published and built.
-        </p>
-      </div>
+    <div className="container-ln pb-8">
+      <PageHeader
+        eyebrow="Student achievements"
+        title="Achievements"
+        description="What students of the department have won, published and built."
+      />
 
       {loading ? (
-        <p className="text-brand-ink-soft italic text-[13.5px]">Loading achievements…</p>
+        <LoadingState label="Loading achievements" />
       ) : achievements.length === 0 ? (
-        <div className="border border-brand-edge p-12 text-center flex flex-col items-center gap-3">
-          <Award className="text-brand-ink-faint" size={36} />
-          <p className="m-0 text-brand-ink-soft text-[14px]">No student achievements published yet.</p>
-        </div>
+        <EmptyState icon={Award} title="No student achievements published yet." />
       ) : (
         <div style={{ columns: "3 300px", columnGap: "20px" }}>
-          {achievements.map((a) => {
+          {achievements.map((a, i) => {
             const certUrl = a.certificate?.url || a.image || a.certificateUrl;
 
             return (
-              <div
-                key={a._id}
-                className="break-inside-avoid mb-5 border border-brand-edge bg-white flex flex-col hover:border-brand-navy transition-colors shadow-sm"
-              >
-                <div className="h-[180px] bg-brand-ground border-b border-brand-edge overflow-hidden relative group">
-                  {certUrl ? (
-                    <img
-                      src={certUrl}
-                      alt={a.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
-                      onClick={() => setSelectedCert({ title: a.title, url: certUrl })}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-brand-navy flex flex-col items-center justify-center gap-2">
-                      <Award className="text-brand-red" size={28} />
-                      <span className="text-[9.5px] font-medium tracking-[0.14em] uppercase text-[#a8b6cc]">
-                        Student Achievement
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-[18px] flex flex-col gap-2.5">
-                  <h3 className="m-0 text-[16.5px] leading-[1.3] font-semibold text-brand-navy">
-                    {a.title}
-                  </h3>
-                  <p className="m-0 text-[13px] leading-[1.65] text-[#3a3838] whitespace-pre-line">
-                    {a.description}
-                  </p>
-
-                  <div className="border-t border-brand-row pt-2.5 flex items-center justify-between gap-2.5 flex-wrap">
-                    <span className="text-[11.5px] font-medium text-brand-blue">
-                      {a.userId?.fullName || a.userId?.username || "Student"}{" "}
-                      {a.userId?.year ? `(${a.userId.year} Year)` : ""}
-                    </span>
-                    {a.createdAt && (
-                      <span className="text-[11.5px] text-brand-ink-soft">
-                        {format(new Date(a.createdAt), "dd MMM yyyy")}
-                      </span>
+              <Reveal key={a._id} delay={Math.min(i, 6) * 0.05} className="mb-5 break-inside-avoid">
+                <SpotlightCard interactive className="overflow-hidden">
+                  <div className="relative h-[200px] overflow-hidden rounded-t-2xl border-b border-line bg-canvas-elevated">
+                    {certUrl ? (
+                      <img
+                        src={certUrl}
+                        alt={a.title}
+                        loading="lazy"
+                        className="h-full w-full cursor-zoom-in object-cover opacity-85 transition-[transform,opacity] duration-500 ease-expo group-hover:scale-[1.03] group-hover:opacity-100"
+                        onClick={() => setSelectedCert({ title: a.title, url: certUrl })}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[radial-gradient(ellipse_at_center,rgba(94,106,210,0.18),transparent_70%)]">
+                        <span className="icon-tile h-12 w-12">
+                          <Award className="text-accent-bright" size={22} strokeWidth={1.5} />
+                        </span>
+                        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">
+                          Student Achievement
+                        </span>
+                      </div>
                     )}
                   </div>
 
-                  {certUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCert({ title: a.title, url: certUrl })}
-                      className="mt-1 text-left text-[11.5px] font-medium text-brand-red flex items-center gap-1 hover:underline"
-                    >
-                      <ImageIcon size={12} />
-                      View Certificate / Photo
-                    </button>
-                  )}
-                </div>
-              </div>
+                  <div className="flex flex-col gap-3 p-5">
+                    <h3 className="text-[17px] font-semibold leading-snug tracking-tight text-fg">
+                      {a.title}
+                    </h3>
+                    <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-fg-muted">
+                      {a.description}
+                    </p>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 border-t border-line pt-3">
+                      <span className="text-[12.5px] font-medium text-fg">
+                        {a.userId?.fullName || a.userId?.username || "Student"}{" "}
+                        <span className="text-fg-muted">{a.userId?.year ? `(${a.userId.year} Year)` : ""}</span>
+                      </span>
+                      {a.createdAt && (
+                        <span className="font-mono text-[11px] text-fg-muted">
+                          {format(new Date(a.createdAt), "dd MMM yyyy")}
+                        </span>
+                      )}
+                    </div>
+
+                    {certUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCert({ title: a.title, url: certUrl })}
+                        className="flex w-fit items-center gap-1.5 text-left text-[12.5px] font-medium text-accent-bright transition-colors hover:text-indigo-300"
+                      >
+                        <ImageIcon size={13} />
+                        View Certificate / Photo
+                      </button>
+                    )}
+                  </div>
+                </SpotlightCard>
+              </Reveal>
             );
           })}
         </div>
@@ -114,43 +112,36 @@ export default function UserAchievements() {
 
       {/* Certificate Lightbox Modal */}
       {selectedCert && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[999]"
-          onClick={() => setSelectedCert(null)}
+        <Modal
+          onBackdropClick={() => setSelectedCert(null)}
+          onEscape={() => setSelectedCert(null)}
+          className="flex max-h-[90vh] max-w-3xl flex-col"
         >
-          <div
-            className="bg-white max-w-3xl w-full max-h-[90vh] border-2 border-brand-navy flex flex-col shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-5 py-3.5 bg-brand-navy text-white flex items-center justify-between gap-3">
-              <strong className="text-[14px] truncate">{selectedCert.title}</strong>
-              <div className="flex items-center gap-3 shrink-0">
-                <a
-                  href={selectedCert.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[12px] text-brand-on-navy hover:text-white flex items-center gap-1"
-                >
-                  <ExternalLink size={13} />
-                  Open full size
-                </a>
-                <button
-                  onClick={() => setSelectedCert(null)}
-                  className="p-1 hover:text-brand-red transition-colors"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 overflow-auto bg-slate-900 flex items-center justify-center p-2">
-              <img
-                src={selectedCert.url}
-                alt={selectedCert.title}
-                className="max-w-full max-h-[75vh] object-contain"
-              />
+          <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+            <strong className="truncate text-[14px] font-medium text-fg">{selectedCert.title}</strong>
+            <div className="flex shrink-0 items-center gap-1">
+              <a
+                href={selectedCert.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-ghost btn-sm"
+              >
+                <ExternalLink size={13} />
+                Open full size
+              </a>
+              <button onClick={() => setSelectedCert(null)} aria-label="Close" className="btn-icon h-8 w-8">
+                <X size={18} />
+              </button>
             </div>
           </div>
-        </div>
+          <div className="flex flex-1 items-center justify-center overflow-auto bg-canvas-deep p-2">
+            <img
+              src={selectedCert.url}
+              alt={selectedCert.title}
+              className="max-h-[75vh] max-w-full object-contain"
+            />
+          </div>
+        </Modal>
       )}
     </div>
   );

@@ -3,11 +3,17 @@ import { format } from "date-fns";
 
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import { MotionConfig, motion, useScroll, useTransform } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HeroCanvas from "./components/HeroCanvas";
 import BrickBreakerGame from "./components/BrickBreakerGame";
-import { ArrowRight, Building2, CalendarDays, Trophy, Award, GraduationCap, MessagesSquare, UserRound } from "lucide-react";
+import AmbientBackground from "./components/ui/AmbientBackground";
+import SpotlightCard from "./components/ui/SpotlightCard";
+import { Reveal, Stagger, StaggerItem } from "./components/ui/Reveal";
+import { EASE } from "./components/ui/motion";
+import { EmptyState } from "./components/ui/States";
+import { ArrowRight, ArrowUpRight, Building2, CalendarDays, Trophy, Award, GraduationCap, MessagesSquare, UserRound, Construction, Megaphone } from "lucide-react";
 import projectExpoImg from "./assets/project_expo.jpeg";
 
 // Pages from App 1
@@ -29,7 +35,7 @@ import EventsAdminPage from "./components/EventsAdminPage";
 import AdminDashboard from "./components/AdminDashboard";
 import ProfessionalAdminLayout from "./components/ProfessionalAdminLayout";
 import ManageUploads from "./components/ManageUploads";
-import ManageContent from "./components/ManageContent"; 
+import ManageContent from "./components/ManageContent";
 import UpdateContent from "./components/ManageContentupdates.jsx";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
@@ -42,7 +48,6 @@ import UserAchievements from "./pages/UserAchievements";
 import AdminLogin from "./pages/AdminLogin";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import PostDetailPage from './pages/PostDetailPage';
-import "./style.css";
 
 
 // ScrollNumber Component
@@ -98,157 +103,207 @@ function DashboardPage() {
 
     const user = JSON.parse(localStorage.getItem("user") || "null");
 
+    // Hero parallax: content fades, shrinks and drifts down over the first half of the scroll
+    const heroRef = useRef(null);
+    const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+    const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+    const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+    const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
+
+    // `span` drives the asymmetric bento layout on desktop (6-column grid)
     const tiles = [
-        { label: "About", body: "Faculty, staff and the full syllabus by semester.", to: "/about/faculty", icon: Building2 },
-        { label: "Events", body: "Workshops, talks and contests with a marked calendar.", to: "/events", icon: CalendarDays, image: "/images/events/devfest.jpeg" },
-        { label: "Leaderboard", body: "Coding contest standings and rankings.", to: "/leaderboards", icon: Trophy },
-        { label: "Achievements", body: "A gallery of what students have won and built.", to: "/achievements", icon: Award, image: projectExpoImg },
-        { label: "Alumni", body: "Browse the alumni directory.", to: "/alumni", icon: GraduationCap },
-        { label: "Posts", body: "Open discussion and forum for students.", to: "/posts", icon: MessagesSquare },
-        { label: "Your profile", body: "Skills, links and achievements.", to: user ? "/profile" : "/login", icon: UserRound },
+        { label: "Events", body: "Workshops, talks and contests with a marked calendar.", to: "/events", icon: CalendarDays, image: "/images/events/devfest.jpeg", span: "lg:col-span-4 lg:row-span-2" },
+        { label: "About", body: "Faculty, staff and the full syllabus by semester.", to: "/about/faculty", icon: Building2, span: "lg:col-span-2" },
+        { label: "Leaderboard", body: "Coding contest standings and rankings.", to: "/leaderboards", icon: Trophy, span: "lg:col-span-2" },
+        { label: "Achievements", body: "A gallery of what students have won and built.", to: "/achievements", icon: Award, image: projectExpoImg, span: "lg:col-span-2 lg:row-span-2" },
+        { label: "Alumni", body: "Browse the alumni directory.", to: "/alumni", icon: GraduationCap, span: "lg:col-span-2" },
+        { label: "Posts", body: "Open discussion and forum for students.", to: "/posts", icon: MessagesSquare, span: "lg:col-span-2" },
+        { label: "Your profile", body: "Skills, links and achievements.", to: user ? "/profile" : "/login", icon: UserRound, span: "md:col-span-2 lg:col-span-4" },
     ];
 
     return (
-        <div className="font-brand">
+        <div>
             {/* HERO */}
-            <div className="bg-brand-navy grid items-stretch lg:min-h-[calc(100svh-56px)]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 360px), 1fr))" }}>
-                <div className="px-5 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-[60px] flex flex-col gap-6 lg:gap-10 border-r-2 border-brand-blue">
-                    <div className="flex flex-col gap-6 lg:gap-7 my-auto">
-                        <span className="text-[11px] lg:text-[12px] font-medium tracking-[0.22em] uppercase text-brand-red">
+            <section ref={heroRef} className="relative overflow-hidden">
+                <motion.div
+                    style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+                    className="container-ln grid items-center gap-12 pb-20 pt-16 sm:pt-20 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:py-24"
+                >
+                    <div className="flex flex-col gap-7">
+                        <motion.span
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, ease: EASE }}
+                            className="pill w-fit py-1 pl-1.5 pr-3 text-[12px]"
+                        >
+                            <span className="rounded-full bg-accent px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-white">UG · PG</span>
                             Undergraduate and postgraduate
-                        </span>
-                        <h1 className="m-0 text-[38px] sm:text-[48px] lg:text-[60px] xl:text-[72px] leading-[1.03] font-semibold tracking-[-0.02em] text-white max-w-[16ch]">
-                            Artificial Intelligence and Data Science
-                        </h1>
-                        <p className="m-0 max-w-[52ch] text-[15px] lg:text-[16px] xl:text-[17px] leading-[1.62] text-brand-on-navy">
+                        </motion.span>
+                        <motion.h1
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, ease: EASE, delay: 0.05 }}
+                            className="h-display max-w-[14ch] lg:text-[5.25rem] xl:text-8xl"
+                        >
+                            <span className="text-gradient">Artificial Intelligence and </span>
+                            <span className="text-shimmer">Data Science</span>
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, ease: EASE, delay: 0.12 }}
+                            className="max-w-[52ch] text-base leading-relaxed text-fg-muted sm:text-lg xl:text-xl"
+                        >
                             Our mission is to foster innovation and excellence in Artificial Intelligence and Data
                             Science through cutting-edge research, industry collaboration, and a dynamic learning
                             environment.
-                        </p>
-                        <div className="flex gap-3 flex-wrap pt-1">
-                            <Link
-                                to="/about/syllabus"
-                                className="px-5 lg:px-6 py-[13px] lg:py-[15px] bg-brand-red text-white font-semibold text-[12.5px] lg:text-[13.5px]"
-                            >
+                        </motion.p>
+                        <motion.div
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, ease: EASE, delay: 0.18 }}
+                            className="flex flex-wrap gap-3"
+                        >
+                            <Link to="/about/syllabus" className="btn-primary btn-lg">
                                 Explore the programme
+                                <ArrowRight className="h-4 w-4" />
                             </Link>
-                            <Link
-                                to="/events"
-                                className="px-5 lg:px-6 py-[13px] lg:py-[15px] border border-[#4a5a7a] text-white font-medium text-[12.5px] lg:text-[13.5px]"
-                            >
+                            <Link to="/events" className="btn-secondary btn-lg">
                                 Upcoming events
                             </Link>
-                        </div>
+                        </motion.div>
+
+                        <Stagger className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            {DASHBOARD_STATS.map((s) => (
+                                <StaggerItem key={s.label} className="surface-glass edge-highlight px-4 py-3.5">
+                                    <div className="text-2xl font-semibold tracking-tight text-fg tabular-nums">
+                                        <ScrollNumber target={s.num} suffix={s.value.includes("+") ? "+" : ""} />
+                                    </div>
+                                    <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted">
+                                        {s.label}
+                                    </div>
+                                </StaggerItem>
+                            ))}
+                        </Stagger>
                     </div>
-                    <div className="flex gap-8 flex-wrap border-t border-[#23345c] pt-5">
-                        {DASHBOARD_STATS.map((s) => (
-                            <div key={s.label} className="flex flex-col gap-1.5">
-                                <span className="text-[26px] leading-none font-semibold text-white tabular-nums">
-                                    <ScrollNumber target={s.num} suffix={s.value.includes("+") ? "+" : ""} />
-                                </span>
-                                <span className="text-[10.5px] leading-none tracking-[0.14em] uppercase text-brand-on-navy-muted">
-                                    {s.label}
+
+                    {/* Mock "application window" framing the interactive canvas */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 24 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
+                        className="relative"
+                    >
+                        <div aria-hidden="true" className="absolute -inset-10 rounded-[40px] bg-accent/20 blur-[80px]" />
+                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-canvas-elevated/80 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_24px_80px_rgba(0,0,0,0.6),0_0_120px_rgba(94,106,210,0.15)] backdrop-blur-xl">
+                            <div className="flex items-center gap-2 border-b border-line px-4 py-3">
+                                <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                                <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                                <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                                <span className="ml-3 font-mono text-[10.5px] tracking-wider text-fg-muted">neural-field.canvas</span>
+                                <span className="ml-auto flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-accent-bright">
+                                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-bright" />
+                                    Live
                                 </span>
                             </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="relative bg-brand-navy-deep min-h-[300px] lg:min-h-[440px]">
-                    <HeroCanvas />
-                    <div className="absolute left-[22px] bottom-5 flex flex-col gap-1 pointer-events-none">
-                        <span className="text-[10px] leading-none tracking-[0.18em] uppercase text-brand-red">
-                            Interactive
-                        </span>
-                        <span className="text-[11px] leading-[1.4] text-brand-on-navy-muted">
-                            Move the cursor. Points settling from noise into structure.
-                        </span>
-                    </div>
-                </div>
-            </div>
+                            <div className="relative aspect-[620/470] bg-[radial-gradient(ellipse_at_center,rgba(94,106,210,0.10),transparent_70%)]">
+                                <HeroCanvas />
+                            </div>
+                            <div className="flex flex-col gap-1 border-t border-line px-4 py-3">
+                                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-bright">Interactive</span>
+                                <span className="text-xs text-fg-muted">Move the cursor. Points settling from noise into structure.</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            </section>
 
             {/* RECENT UPDATES */}
-            <section className="px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-[46px] border-b-2 border-brand-navy">
-                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-[22px]">
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-                            Recent updates
-                        </span>
-                        <h2 className="m-0 text-[30px] font-semibold tracking-[-0.01em] text-brand-navy">
-                            What is happening
-                        </h2>
-                    </div>
-                    <Link to="/posts" className="text-[12.5px] font-semibold text-brand-red">
-                        All updates
-                    </Link>
+            <section className="border-t border-line py-16 sm:py-24">
+                <div className="container-ln">
+                    <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-4">
+                        <div className="flex flex-col gap-3">
+                            <span className="eyebrow-accent">Recent updates</span>
+                            <h2 className="h-page text-3xl sm:text-4xl lg:text-5xl">
+                                <span className="text-gradient">What is happening</span>
+                            </h2>
+                        </div>
+                        <Link to="/posts" className="btn-ghost group">
+                            All updates
+                            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                        </Link>
+                    </Reveal>
+                    {updates.length > 0 ? (
+                        <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {updates.map((u, i) => (
+                                <StaggerItem key={u._id} className={i === 0 && updates.length > 2 ? "sm:col-span-2" : ""}>
+                                    <SpotlightCard className="h-full" interactive>
+                                        <div className="flex h-full flex-col gap-4 p-6">
+                                            <span className="pill w-fit">
+                                                <Megaphone className="h-3 w-3" />
+                                                Update
+                                            </span>
+                                            <h3 className={`font-semibold leading-snug tracking-tight text-fg ${i === 0 && updates.length > 2 ? "text-xl sm:text-2xl" : "text-lg"}`}>
+                                                {u.title}
+                                            </h3>
+                                            <span className="mt-auto border-t border-line pt-3 font-mono text-[11px] uppercase tracking-wider text-fg-muted">
+                                                {format(new Date(u.createdAt), "dd MMM yyyy")}
+                                            </span>
+                                        </div>
+                                    </SpotlightCard>
+                                </StaggerItem>
+                            ))}
+                        </Stagger>
+                    ) : (
+                        <EmptyState icon={Megaphone} title="No updates available at the moment." />
+                    )}
                 </div>
-                {updates.length > 0 ? (
-                    <div
-                        className="grid gap-px bg-brand-edge border border-brand-edge"
-                        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))" }}
-                    >
-                        {updates.map((u) => (
-                            <div key={u._id} className="bg-white p-5 flex flex-col gap-2">
-                                <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-red">
-                                    Update
-                                </span>
-                                <h3 className="m-0 text-[16.5px] leading-[1.32] font-semibold text-brand-navy">
-                                    {u.title}
-                                </h3>
-                                <span className="mt-auto border-t border-brand-row pt-2.5 text-[11.5px] text-brand-ink-soft">
-                                    {format(new Date(u.createdAt), "dd MMM yyyy")}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-brand-ink-soft italic text-[13.5px]">No updates available at the moment.</p>
-                )}
             </section>
 
             {/* WHERE TO GO */}
-            <section className="px-5 sm:px-8 lg:px-12 py-8 sm:py-9 lg:py-[46px]">
-                <div className="flex flex-col gap-2 mb-[22px]">
-                    <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-                        Where to go
-                    </span>
-                    <h2 className="m-0 text-[30px] font-semibold tracking-[-0.01em] text-brand-navy">
-                        The portal at a glance
-                    </h2>
-                </div>
-                <ul className="m-0 p-0 list-none grid grid-cols-1 lg:grid-cols-2 gap-px bg-brand-edge border border-brand-edge">
-                    {tiles.map((t) => {
-                        const Icon = t.icon;
-                        return (
-                            <li key={t.label} className="lg:[&:last-child:nth-child(odd)]:col-span-2">
-                                <Link
-                                    to={t.to}
-                                    className="group h-full bg-white flex items-center gap-4 sm:gap-6 p-3 sm:p-4 pr-4 sm:pr-6 hover:bg-[#f7f9fc]"
-                                >
-                                    <div className="flex-none w-[88px] h-[64px] sm:w-[160px] sm:h-[100px] overflow-hidden bg-brand-navy grid place-items-center">
-                                        {t.image ? (
-                                            <img
-                                                src={t.image}
-                                                alt=""
-                                                loading="lazy"
-                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <Icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" strokeWidth={1.5} />
+            <section className="border-t border-line py-16 sm:py-24">
+                <div className="container-ln">
+                    <Reveal className="mb-10 flex flex-col gap-3">
+                        <span className="eyebrow-accent">Where to go</span>
+                        <h2 className="h-page text-3xl sm:text-4xl lg:text-5xl">
+                            <span className="text-gradient">The portal at a glance</span>
+                        </h2>
+                    </Reveal>
+                    <Stagger as="ul" className="m-0 grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-2 lg:auto-rows-[180px] lg:grid-cols-6">
+                        {tiles.map((t) => {
+                            const Icon = t.icon;
+                            return (
+                                <StaggerItem as="li" key={t.label} className={`min-h-[160px] ${t.span}`}>
+                                    <SpotlightCard as={Link} to={t.to} interactive className="block h-full overflow-hidden">
+                                        {t.image && (
+                                            <>
+                                                <img
+                                                    src={t.image}
+                                                    alt=""
+                                                    loading="lazy"
+                                                    className="absolute inset-0 h-full w-full object-cover opacity-40 transition-[transform,opacity] duration-500 ease-expo group-hover:scale-[1.03] group-hover:opacity-55"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/70 to-canvas/10" />
+                                            </>
                                         )}
-                                    </div>
-                                    <div className="flex-1 min-w-0 flex flex-col gap-1">
-                                        <span className="text-[15px] sm:text-[16.5px] font-semibold text-brand-navy">{t.label}</span>
-                                        <span className="text-[12.5px] sm:text-[13px] leading-[1.6] text-brand-ink-soft">{t.body}</span>
-                                    </div>
-                                    <ArrowRight
-                                        className="flex-none w-5 h-5 text-brand-red transition-transform group-hover:translate-x-1"
-                                        strokeWidth={1.75}
-                                    />
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
+                                        <div className="relative flex h-full flex-col justify-between gap-6 p-6">
+                                            <div className="flex items-start justify-between">
+                                                <span className="icon-tile h-10 w-10">
+                                                    <Icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+                                                </span>
+                                                <ArrowUpRight className="h-5 w-5 text-fg-muted transition-[transform,color] duration-200 ease-expo group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" strokeWidth={1.75} />
+                                            </div>
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className={`font-semibold tracking-tight text-fg ${t.image ? "text-2xl" : "text-lg"}`}>{t.label}</span>
+                                                <span className="text-sm leading-relaxed text-fg-muted">{t.body}</span>
+                                            </div>
+                                        </div>
+                                    </SpotlightCard>
+                                </StaggerItem>
+                            );
+                        })}
+                    </Stagger>
+                </div>
             </section>
         </div>
     );
@@ -257,59 +312,50 @@ function DashboardPage() {
 // PLACEHOLDER PAGES (From App 2)
 // ============================================
 
+function ComingSoon({ eyebrow, title, description, note }) {
+  return (
+    <div className="mx-auto max-w-3xl py-10 sm:py-16">
+      <Reveal className="flex flex-col gap-4 text-center">
+        <span className="eyebrow-accent mx-auto">{eyebrow}</span>
+        <h1 className="h-page"><span className="text-gradient">{title}</span></h1>
+        <p className="mx-auto max-w-xl text-base leading-relaxed text-fg-muted sm:text-lg">{description}</p>
+      </Reveal>
+      <Reveal delay={0.1} className="mt-10">
+        <SpotlightCard>
+          <div className="flex items-center gap-3 border-b border-line px-6 py-4">
+            <span className="icon-tile h-9 w-9">
+              <Construction className="h-4 w-4 text-accent-bright" strokeWidth={1.75} />
+            </span>
+            <p className="text-sm text-fg-muted">{note}</p>
+          </div>
+          <div className="flex justify-center p-6">
+            <BrickBreakerGame />
+          </div>
+        </SpotlightCard>
+      </Reveal>
+    </div>
+  );
+}
+
 function ConnectPage() {
   return (
-    <div className="font-brand bg-white border border-brand-edge p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
-      <div className="flex flex-col gap-2 border-b border-brand-edge pb-4">
-        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-          Under Development
-        </span>
-        <h1 className="m-0 text-[28px] sm:text-[36px] font-semibold text-brand-navy">
-          Connect
-        </h1>
-        <p className="m-0 text-[13.5px] text-brand-ink-soft">
-          We are working on dedicated tools to help students connect with peers, clubs, and mentors.
-        </p>
-      </div>
-
-      <div className="border border-brand-edge bg-brand-ground p-4">
-        <p className="m-0 text-[13px] text-brand-navy font-medium">
-          🚧 Connect features are coming soon. Meanwhile, enjoy a quick game to pass the time:
-        </p>
-      </div>
-
-      <div className="flex justify-center py-2">
-        <BrickBreakerGame />
-      </div>
-    </div>
+    <ComingSoon
+      eyebrow="Under Development"
+      title="Connect"
+      description="We are working on dedicated tools to help students connect with peers, clubs, and mentors."
+      note="Connect features are coming soon. Meanwhile, enjoy a quick game to pass the time:"
+    />
   );
 }
 
 function ProjectsPage() {
   return (
-    <div className="font-brand bg-white border border-brand-edge p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
-      <div className="flex flex-col gap-2 border-b border-brand-edge pb-4">
-        <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-          Showcase
-        </span>
-        <h1 className="m-0 text-[28px] sm:text-[36px] font-semibold text-brand-navy">
-          Projects
-        </h1>
-        <p className="m-0 text-[13.5px] text-brand-ink-soft">
-          A dedicated repository of cutting-edge AI and Data Science student and faculty projects.
-        </p>
-      </div>
-
-      <div className="border border-brand-edge bg-brand-ground p-4">
-        <p className="m-0 text-[13px] text-brand-navy font-medium">
-          🚧 The project showcase is launching soon. Meanwhile, enjoy a quick game to pass the time:
-        </p>
-      </div>
-
-      <div className="flex justify-center py-2">
-        <BrickBreakerGame />
-      </div>
-    </div>
+    <ComingSoon
+      eyebrow="Showcase"
+      title="Projects"
+      description="A dedicated repository of cutting-edge AI and Data Science student and faculty projects."
+      note="The project showcase is launching soon. Meanwhile, enjoy a quick game to pass the time:"
+    />
   );
 }
 
@@ -318,139 +364,17 @@ function ProjectsPage() {
 // ============================================
 function MainLayout({ children, fullBleed = false }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
+    <div className="relative isolate flex min-h-screen flex-col overflow-x-clip">
+      <AmbientBackground />
       <Navbar />
       <main className="flex-1">
         {fullBleed ? (
           <div className="w-full h-full">{children}</div>
         ) : (
-          <div className="max-w-7xl mx-auto p-8">{children}</div>
+          <div className="container-ln py-8">{children}</div>
         )}
       </main>
       <Footer />
-    </div>
-  );
-}
-
-// ============================================
-// ADMIN LAYOUT COMPONENT
-// ============================================
-function AdminLayout({ children }) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 font-sans relative overflow-hidden">
-      {/* Professional background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(59,130,246,0.08)_1px,transparent_0)] bg-[length:24px_24px]"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/20 to-transparent rounded-full -translate-y-48 translate-x-48"></div>
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-100/20 to-transparent rounded-full translate-y-40 -translate-x-40"></div>
-      {/* ADMIN NAVBAR */}
-      <nav className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white shadow-2xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                  Admin Portal
-                </h1>
-                <p className="text-blue-200 text-xs">Management Dashboard</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => {
-                localStorage.removeItem('adminAuth');
-                localStorage.removeItem('adminData');
-                window.location.href = '/admin-login';
-              }}
-              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg transition-all duration-300 text-red-200 hover:text-white text-sm"
-            >
-              Logout
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <a
-              href="/adminpage"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-400 to-indigo-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📊</span>
-              </div>
-              <span className="text-xs font-medium text-center">Dashboard</span>
-            </a>
-            
-            <a
-              href="/adminpage/events"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📅</span>
-              </div>
-              <span className="text-xs font-medium text-center">Events</span>
-            </a>
-            
-            <a
-              href="/adminpage/manage-uploads"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📁</span>
-              </div>
-              <span className="text-xs font-medium text-center">Uploads</span>
-            </a>
-            
-            <a
-              href="/adminpage/manage-content-updates"
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">📢</span>
-              </div>
-              <span className="text-xs font-medium text-center">Updates</span>
-            </a>
-            
-            <a 
-              href="/adminpage/manage-content" 
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">✏️</span>
-              </div>
-              <span className="text-xs font-medium text-center">Content</span>
-            </a>
-            
-            <a 
-              href="/adminpage/leaderboard" 
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">🏆</span>
-              </div>
-              <span className="text-xs font-medium text-center">Leaderboard</span>
-            </a>
-            
-            <a 
-              href="/adminpage/achievements" 
-              className="group flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/20 md:col-span-3 lg:col-span-1"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-red-400 to-red-500 rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <span className="text-white text-sm">🎖️</span>
-              </div>
-              <span className="text-xs font-medium text-center">Achievements</span>
-            </a>
-          </div>
-        </div>
-      </nav>
-
-      {/* ADMIN CONTENT */}
-      <main className="relative z-10 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 p-8 min-h-[calc(100vh-200px)]">
-            {children}
-          </div>
-        </div>
-      </main>
     </div>
   );
 }
@@ -460,8 +384,25 @@ function AdminLayout({ children }) {
 // ============================================
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <BrowserRouter>
-       <Toaster position="top-right" reverseOrder={false} />
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: "rgba(10,10,12,0.92)",
+            color: "#EDEDEF",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            fontSize: "14px",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.6), 0 0 40px rgba(94,106,210,0.10)",
+            backdropFilter: "blur(16px)",
+          },
+          success: { iconTheme: { primary: "#5E6AD2", secondary: "#EDEDEF" } },
+          error: { iconTheme: { primary: "#F43F5E", secondary: "#EDEDEF" } },
+        }}
+      />
       <Routes>
         {/* 
           ============================================
@@ -760,5 +701,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </MotionConfig>
   );
 }

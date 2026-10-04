@@ -21,44 +21,44 @@ const CommentCard = ({ comment, postId, depth = 0, onAddReply, onUpvoteComment }
   };
 
   return (
-    <div className={depth > 0 ? "ml-8 mt-5 border-l-2 border-gray-200 pl-4" : "mt-6"}>
-      <div className="bg-gray-50 rounded-xl p-5">
-        <p className="font-medium text-gray-800 mb-2">{comment.content}</p>
+    <div className={depth > 0 ? "ml-6 mt-4 border-l border-white/10 pl-4" : "mt-6"}>
+      <div className="rounded-xl border border-line bg-white/[0.02] p-5">
+        <p className="mb-2 font-medium text-fg">{comment.content}</p>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+        <div className="mb-4 flex items-center gap-3 text-[13px] text-fg-muted">
           <span>{comment.isAnonymous ? 'Anonymous' : comment.author}</span>
           <span>•</span>
           <span>{comment.upvotes} upvote{comment.upvotes !== 1 ? 's' : ''}</span>
         </div>
 
-        <div className="flex gap-6 text-sm">
+        <div className="-ml-2 flex gap-1">
           <button
             onClick={() => onUpvoteComment(comment.id)}
-            className="flex items-center gap-1.5 font-medium text-gray-600 hover:text-blue-600 transition"
+            className="btn-ghost btn-sm"
           >
-            <ArrowUp size={18} />
+            <ArrowUp size={15} />
             Upvote
           </button>
           <button
             onClick={() => setShowReply(!showReply)}
-            className="flex items-center gap-1.5 font-medium text-gray-600 hover:text-gray-800 transition"
+            className="btn-ghost btn-sm"
           >
-            <MessageSquare size={18} />
+            <MessageSquare size={15} />
             Reply
           </button>
-          <button className="flex items-center gap-1.5 font-medium text-gray-600 hover:text-gray-800 transition">
-            <Share2 size={18} />
+          <button className="btn-ghost btn-sm">
+            <Share2 size={15} />
             Share
           </button>
         </div>
 
         {showReply && (
           <div className="mt-5">
-            <div className="flex gap-2 mb-3">
-              <button onClick={() => setMode('Public')} className={`px-4 py-1.5 rounded-lg text-xs font-medium ${mode === 'Public' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}>
+            <div className="tabs mb-3">
+              <button onClick={() => setMode('Public')} className={`tab ${mode === 'Public' ? 'tab-active' : ''}`}>
                 Public
               </button>
-              <button onClick={() => setMode('Anonymous')} className={`px-4 py-1.5 rounded-lg text-xs font-medium ${mode === 'Anonymous' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}>
+              <button onClick={() => setMode('Anonymous')} className={`tab ${mode === 'Anonymous' ? 'tab-active' : ''}`}>
                 Anonymous
               </button>
             </div>

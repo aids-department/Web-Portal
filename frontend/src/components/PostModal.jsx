@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Upload, XCircle } from 'lucide-react';
+import Modal from './ui/Modal';
 
 const PostModal = ({ onClose, onSubmit }) => {
   const [title, setTitle] = useState('');
@@ -34,47 +35,47 @@ const PostModal = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Create Post</h2>
-          <button onClick={onClose}><X size={28} /></button>
+    <Modal z="z-50" className="max-h-screen max-w-2xl overflow-y-auto">
+      <div className="p-6 sm:p-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold tracking-tight text-fg">Create Post</h2>
+          <button onClick={onClose} aria-label="Close" className="btn-icon"><X size={20} /></button>
         </div>
 
-        <div className="flex gap-3 mb-6">
-          <button onClick={() => setMode('Public')} className={`px-4 py-2 rounded-xl ${mode === 'Public' ? 'bg-blue-900 text-white' : 'bg-gray-100'}`}>Public</button>
-          <button onClick={() => setMode('Anonymous')} className={`px-4 py-2 rounded-xl ${mode === 'Anonymous' ? 'bg-blue-900 text-white' : 'bg-gray-100'}`}>Anonymous</button>
+        <div className="tabs mb-6">
+          <button onClick={() => setMode('Public')} className={`tab ${mode === 'Public' ? 'tab-active' : ''}`}>Public</button>
+          <button onClick={() => setMode('Anonymous')} className={`tab ${mode === 'Anonymous' ? 'tab-active' : ''}`}>Anonymous</button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" className="w-full px-4 py-3 border rounded-xl mb-4" />
-          <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="What's on your mind?" className="w-full px-4 py-3 border rounded-xl h-32 mb-4" />
+          <input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" className="field mb-4 py-3" />
+          <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="What's on your mind?" className="field mb-4 h-32 py-3" />
 
           {media.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="mb-4 grid grid-cols-3 gap-3">
               {media.map((m, i) => (
-                <div key={i} className="relative">
-                  {m.type === 'image' ? <img src={m.preview} className="rounded-lg" /> : <video src={m.preview} controls className="rounded-lg" />}
-                  <button type="button" onClick={() => removeMedia(i)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1">
-                    <XCircle size={20} />
+                <div key={i} className="relative overflow-hidden rounded-lg border border-line">
+                  {m.type === 'image' ? <img src={m.preview} className="w-full" /> : <video src={m.preview} controls className="w-full" />}
+                  <button type="button" onClick={() => removeMedia(i)} aria-label="Remove" className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-canvas/80 text-fg backdrop-blur hover:text-rose-300">
+                    <XCircle size={18} />
                   </button>
                 </div>
               ))}
             </div>
           )}
 
-          <label className="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer mb-6">
-            <Upload size={40} className="mx-auto mb-2 text-gray-400" />
-            <p>Click or drag images/videos</p>
+          <label className="mb-6 block cursor-pointer rounded-xl border border-dashed border-white/15 p-8 text-center text-fg-muted transition-colors hover:border-line-accent hover:bg-accent/[0.04] hover:text-fg">
+            <Upload size={32} className="mx-auto mb-2" strokeWidth={1.5} />
+            <p className="text-sm">Click or drag images/videos</p>
             <input type="file" multiple accept="image/*,video/*" onChange={handleFileChange} className="hidden" />
           </label>
 
-          <button type="submit" className="w-full bg-blue-900 text-white py-3 rounded-xl font-bold hover:bg-blue-800">
+          <button type="submit" className="btn-primary btn-lg w-full">
             Post
           </button>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
 

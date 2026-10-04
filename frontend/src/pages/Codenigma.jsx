@@ -1,7 +1,46 @@
 import React from "react";
+import PageHeader from "../components/ui/PageHeader";
+import SpotlightCard from "../components/ui/SpotlightCard";
+import { Stagger, StaggerItem } from "../components/ui/Reveal";
 
 const sampleNames = (prefix, count) =>
   Array.from({ length: count }).map((_, i) => `${prefix} ${i + 1}`);
+
+// Shared by Codenigma and Genesys: one ranked list per year
+export function YearBoards({ years }) {
+  return (
+    <Stagger className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-2 lg:grid-cols-4">
+      {Object.entries(years).map(([year, list]) => (
+        <StaggerItem key={year} className="h-full">
+          <SpotlightCard interactive className="h-full">
+            <div className="flex flex-col gap-4 p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="h-card">Year {year}</h3>
+                <span className="pill-neutral font-mono">Top {list.length}</span>
+              </div>
+              <table className="table-ln text-[13px]">
+                <thead>
+                  <tr>
+                    <th className="w-10 px-2">#</th>
+                    <th className="px-2">Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {list.map((name, idx) => (
+                    <tr key={name}>
+                      <td className="px-2 py-2 font-mono text-fg-muted">{idx + 1}</td>
+                      <td className="px-2 py-2 font-medium">{name}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SpotlightCard>
+        </StaggerItem>
+      ))}
+    </Stagger>
+  );
+}
 
 export default function Codenigma() {
   const years = {
@@ -12,62 +51,9 @@ export default function Codenigma() {
   };
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6 sm:p-8 md:p-12">
-      
-      {/* Decorative orbs */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
-
-      <div className="relative z-10 max-w-7xl mx-auto">
-        
-        {/* Title */}
-        <h1 className="text-center text-4xl sm:text-5xl font-extrabold mb-12 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-          Codenigma — Top 10 (by Year)
-        </h1>
-
-        {/* Glass Wrapper */}
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/40 p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            
-            {Object.entries(years).map(([year, list]) => (
-              <div
-                key={year}
-                className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/40 p-6 hover:shadow-xl transition"
-              >
-                <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
-                  Year {year}
-                </h3>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-gray-700">
-                    <thead>
-                      <tr className="border-b border-gray-300/60">
-                        <th className="text-left py-2 font-semibold">#</th>
-                        <th className="text-left py-2 font-semibold">Name</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {list.map((name, idx) => (
-                        <tr
-                          key={name}
-                          className="border-b border-gray-200/60 last:border-none"
-                        >
-                          <td className="py-2 pr-4 font-medium text-gray-600">
-                            {idx + 1}
-                          </td>
-                          <td className="py-2 font-medium">{name}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-              </div>
-            ))}
-
-          </div>
-        </div>
-      </div>
+    <div className="container-ln">
+      <PageHeader eyebrow="Coding contest" title="Codenigma" accent="Top 10 (by Year)" />
+      <YearBoards years={years} />
     </div>
   );
 }

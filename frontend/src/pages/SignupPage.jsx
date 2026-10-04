@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import AuthShell, { BrandMark } from '../components/ui/AuthShell';
+import { Alert } from '../components/ui/States';
 
 const YEAR_OPTIONS = [
   { value: '1', label: '1st Year' },
@@ -94,121 +97,99 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="font-brand bg-brand-ground px-5 sm:px-8 lg:px-11 py-8 sm:py-9 lg:py-11">
-      <div className="max-w-[980px] mx-auto border border-brand-edge grid grid-cols-1 md:grid-cols-2">
-        {/* Info panel */}
-        <div className="bg-brand-navy p-8 flex flex-col justify-between gap-8">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 bg-white grid place-items-center">
-              <div className="w-2 h-2 bg-brand-red" />
-            </div>
-            <span className="font-bold text-[12.5px] tracking-[0.14em] text-white">AI &amp; DS</span>
-          </div>
-          <div className="flex flex-col gap-5">
-            <h2 className="m-0 text-[28px] leading-[1.15] font-semibold text-white max-w-[15ch]">
-              What an account gives you
+    <AuthShell
+      aside={
+        <>
+          <BrandMark />
+          <div className="flex flex-col gap-6">
+            <h2 className="max-w-[15ch] text-3xl font-semibold leading-[1.1] tracking-tight">
+              <span className="text-gradient">What an account gives you</span>
             </h2>
-            <div className="flex flex-col gap-3.5">
-              {BENEFITS.map((b) => (
-                <div key={b.title} className="border-t border-[#23345c] pt-3 flex flex-col gap-1">
-                  <span className="text-[13.5px] font-medium text-white">{b.title}</span>
-                  <span className="text-[12.5px] leading-[1.5] text-brand-on-navy">{b.body}</span>
+            <div className="flex flex-col gap-3">
+              {BENEFITS.map((b, i) => (
+                <div key={b.title} className="flex gap-3 rounded-xl border border-line bg-white/[0.03] p-4">
+                  <span className="grid h-6 w-6 flex-none place-items-center rounded-md bg-accent/15 font-mono text-[11px] text-indigo-200 shadow-[inset_0_0_0_1px_rgba(94,106,210,0.4)]">
+                    {i + 1}
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[14px] font-medium text-fg">{b.title}</span>
+                    <span className="text-[13px] leading-[1.5] text-fg-muted">{b.body}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <span className="text-[11.5px] leading-[1.5] text-brand-on-navy-muted">
+          <span className="text-[12.5px] leading-[1.5] text-fg-muted">
             Sign up with your department email so your posts and profile stay tied to a real member.
           </span>
-        </div>
-
-        {/* Form panel */}
-        <div className="bg-white p-8 flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <h1 className="m-0 text-[30px] font-semibold tracking-[-0.02em] text-brand-navy">Create an account</h1>
-            <span className="text-[13px] text-brand-ink-soft">Join the AI &amp; DS Association</span>
-          </div>
-
-          {error && (
-            <div className="bg-brand-red-tint text-brand-red-deep px-3.5 py-3 text-[13px]">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="bg-brand-blue-tint text-brand-blue px-3.5 py-3 text-[13px]">
-              {success}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <Field label="Full name" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="As on the roll list" />
-              <Field label="Username" name="username" value={formData.username} onChange={handleChange} placeholder="Choose a username" />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <Field label="Department email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@aids.dept" />
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
-                  Year of study
-                </span>
-                <select
-                  name="year"
-                  value={formData.year}
-                  onChange={handleChange}
-                  className="border border-brand-ink-faint px-3 py-3 text-[13px] text-brand-ink outline-none focus:border-brand-navy bg-white"
-                >
-                  <option value="">Select your year</option>
-                  {YEAR_OPTIONS.map((y) => (
-                    <option key={y.value} value={y.value}>{y.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <Field label="Password" name="password" type="password" value={formData.password} onChange={handleChange} placeholder="At least 6 characters" />
-              <Field label="Confirm" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} placeholder="Repeat it" />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="text-left px-[18px] py-3.5 bg-brand-red text-white font-semibold text-[13px] disabled:opacity-50"
-            >
-              {loading ? 'Creating account…' : 'Create account'}
-            </button>
-          </form>
-
-          <div className="border-t border-brand-row pt-4 flex justify-between items-center gap-3 flex-wrap">
-            <span className="text-[12.5px] text-brand-ink-soft">Already have one?</span>
-            <Link
-              to="/login"
-              className="text-[12.5px] font-semibold text-brand-blue border-b-2 border-brand-red pb-0.5"
-            >
-              Sign in
-            </Link>
-          </div>
-        </div>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">Create an account</h1>
+        <span className="text-[14px] text-fg-muted">Join the AI &amp; DS Association</span>
       </div>
-    </div>
+
+      {error && <Alert>{error}</Alert>}
+      {success && <Alert tone="success">{success}</Alert>}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          <Field label="Full name" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="As on the roll list" />
+          <Field label="Username" name="username" value={formData.username} onChange={handleChange} placeholder="Choose a username" />
+        </div>
+
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          <Field label="Department email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@aids.dept" />
+          <label className="flex flex-col">
+            <span className="field-label">Year of study</span>
+            <select
+              name="year"
+              value={formData.year}
+              onChange={handleChange}
+              className="field py-3"
+            >
+              <option value="">Select your year</option>
+              {YEAR_OPTIONS.map((y) => (
+                <option key={y.value} value={y.value}>{y.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          <Field label="Password" name="password" type="password" value={formData.password} onChange={handleChange} placeholder="At least 6 characters" />
+          <Field label="Confirm" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} placeholder="Repeat it" />
+        </div>
+
+        <button type="submit" disabled={loading} className="btn-primary btn-lg mt-2 w-full">
+          {loading ? 'Creating account…' : 'Create account'}
+        </button>
+      </form>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+        <span className="text-[13px] text-fg-muted">Already have one?</span>
+        <Link to="/login" className="btn-ghost btn-sm text-accent-bright">
+          Sign in
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+    </AuthShell>
   );
 };
 
 const Field = ({ label, name, value, onChange, placeholder, type = 'text' }) => (
-  <div className="flex flex-col gap-1.5">
-    <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">
-      {label}
-    </span>
+  <label className="flex flex-col">
+    <span className="field-label">{label}</span>
     <input
       type={type}
       name={name}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="border border-brand-ink-faint px-3 py-3 text-[13px] text-brand-ink outline-none focus:border-brand-navy"
+      className="field py-3"
     />
-  </div>
+  </label>
 );
 
 export default SignupPage;

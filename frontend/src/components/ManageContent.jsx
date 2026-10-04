@@ -4,6 +4,9 @@ import {
   MapPin, User, MessageSquare, ThumbsUp, 
   Filter, ChevronDown, ChevronUp, ExternalLink
 } from "lucide-react";
+import PageHeader from "./ui/PageHeader";
+import Modal from "./ui/Modal";
+import { EmptyState } from "./ui/States";
 
 export default function ManageContent() {
   const [activeTab, setActiveTab] = useState("events");
@@ -272,62 +275,70 @@ export default function ManageContent() {
     if (!deleteModal.show) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-red-100 rounded-full text-red-600">
-              <AlertTriangle size={28} />
+      <Modal z="z-50" className="max-w-md">
+        <div className="p-6">
+          <div className="mb-4 flex items-start gap-4">
+            <div className="grid h-12 w-12 flex-none place-items-center rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-300">
+              <AlertTriangle size={24} strokeWidth={1.75} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-lg font-semibold capitalize tracking-tight text-fg">
                 Delete {deleteModal.subType || deleteModal.type}?
               </h3>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="mt-1 text-[13.5px] text-fg-muted">
                 This will permanently delete "{truncateText(deleteModal.name, 50)}"
               </p>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
-            <button 
+          <div className="mt-6 flex justify-end gap-2.5">
+            <button
               onClick={() => setDeleteModal({ show: false, type: "", id: "", name: "", subType: "", postId: null })}
-              className="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors border border-gray-200"
+              className="btn-secondary"
             >
               Cancel
             </button>
-            <button 
+            <button
               onClick={handleDelete}
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors shadow-md"
+              className="btn bg-rose-600 text-white shadow-[0_0_0_1px_rgba(244,63,94,0.5),0_4px_12px_rgba(244,63,94,0.3),inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:bg-rose-500"
             >
               {loading ? "Deleting..." : "Yes, Delete It"}
             </button>
           </div>
         </div>
-      </div>
+      </Modal>
     );
   };
 
+  const ExpandToggle = ({ id, isExpanded }) => (
+    <button
+      onClick={() => toggleExpand(id)}
+      className="mt-2 flex items-center gap-1 text-[13px] font-medium text-accent-bright hover:text-indigo-300"
+    >
+      {isExpanded ? (
+        <>Show Less <ChevronUp size={15} /></>
+      ) : (
+        <>Show More <ChevronDown size={15} /></>
+      )}
+    </button>
+  );
+
   const renderEvents = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search events by name, organizer, venue..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
-            value={eventSearchQuery}
-            onChange={(e) => setEventSearchQuery(e.target.value)}
-          />
-        </div>
-        
+    <div className="space-y-5">
+      <div className="flex flex-col gap-3 md:flex-row">
+        <SearchBox
+          placeholder="Search events by name, organizer, venue..."
+          value={eventSearchQuery}
+          onChange={(e) => setEventSearchQuery(e.target.value)}
+        />
+
         <div className="relative">
-          <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Filter className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted" size={18} />
           <select
             value={eventTypeFilter}
             onChange={(e) => setEventTypeFilter(e.target.value)}
-            className="pl-12 pr-8 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer min-w-[200px]"
+            className="field min-w-[200px] cursor-pointer appearance-none py-3 pl-11 pr-8"
           >
             {eventTypes.map((type) => (
               <option key={type} value={type}>
@@ -335,96 +346,61 @@ export default function ManageContent() {
               </option>
             ))}
           </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted" size={15} />
         </div>
       </div>
 
       {filteredEvents.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <p className="text-gray-500">No events found.</p>
-        </div>
+        <Empty>No events found.</Empty>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredEvents.map((event) => {
             const isExpanded = expandedItems.has(event._id);
-            
+
             return (
-              <div key={event._id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+              <div key={event._id} className="surface p-5 transition-colors hover:border-line-hover sm:p-6">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-bold text-gray-900">{event.eventName}</h3>
-                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-bold uppercase">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-[16px] font-semibold tracking-tight text-fg">{event.eventName}</h3>
+                      <span className="pill font-mono uppercase tracking-wider">
                         {event.eventType}
                       </span>
                     </div>
-                    
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar size={16} className="text-gray-400" />
-                        <span>{formatDate(event.startDate)}</span>
-                      </div>
-                      {event.venue && (
-                        <div className="flex items-center gap-1.5">
-                          <MapPin size={16} className="text-gray-400" />
-                          <span>{event.venue}</span>
-                        </div>
-                      )}
-                      {event.organizer && (
-                        <div className="flex items-center gap-1.5">
-                          <User size={16} className="text-gray-400" />
-                          <span>{event.organizer}</span>
-                        </div>
-                      )}
+
+                    <div className="mb-3 flex flex-wrap items-center gap-4 text-[13px] text-fg-muted">
+                      <Meta icon={Calendar}>{formatDate(event.startDate)}</Meta>
+                      {event.venue && <Meta icon={MapPin}>{event.venue}</Meta>}
+                      {event.organizer && <Meta icon={User}>{event.organizer}</Meta>}
                     </div>
 
                     {event.description && (
                       <div className="mt-3">
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <p className="text-[13.5px] leading-relaxed text-fg/80">
                           {isExpanded ? event.description : truncateText(event.description, 200)}
                         </p>
-                        {event.description.length > 200 && (
-                          <button
-                            onClick={() => toggleExpand(event._id)}
-                            className="text-blue-600 text-sm font-medium mt-2 flex items-center gap-1 hover:text-blue-700"
-                          >
-                            {isExpanded ? (
-                              <>Show Less <ChevronUp size={16} /></>
-                            ) : (
-                              <>Show More <ChevronDown size={16} /></>
-                            )}
-                          </button>
-                        )}
+                        {event.description.length > 200 && <ExpandToggle id={event._id} isExpanded={isExpanded} />}
                       </div>
                     )}
                   </div>
 
                   {event.poster && (
-                    <img 
-                      src={event.poster} 
+                    <img
+                      src={event.poster}
                       alt={event.eventName}
-                      className="w-24 h-32 object-cover rounded-lg border border-gray-200"
+                      className="h-32 w-24 flex-none rounded-lg border border-line object-cover"
                     />
                   )}
                 </div>
 
-                <div className="mt-4 flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                <div className="mt-4 flex items-center justify-end gap-2 border-t border-line pt-4">
                   {event.registrationLink && (
-                    <a
-                      href={event.registrationLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
-                    >
-                      <ExternalLink size={16} /> View Registration
+                    <a href={event.registrationLink} target="_blank" rel="noreferrer" className="btn-ghost btn-sm">
+                      <ExternalLink size={15} /> View Registration
                     </a>
                   )}
-                  
-                  <button
-                    onClick={() => openDeleteModal("event", event._id, event.eventName)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition"
-                  >
-                    <Trash2 size={16} /> Delete
-                  </button>
+
+                  <DeleteButton onClick={() => openDeleteModal("event", event._id, event.eventName)} />
                 </div>
               </div>
             );
@@ -435,106 +411,67 @@ export default function ManageContent() {
   );
 
   const renderPosts = () => (
-    <div className="space-y-6">
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="Search posts by title, content, or author..."
-          className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-purple-500 outline-none"
-          value={postSearchQuery}
-          onChange={(e) => setPostSearchQuery(e.target.value)}
-        />
-      </div>
+    <div className="space-y-5">
+      <SearchBox
+        placeholder="Search posts by title, content, or author..."
+        value={postSearchQuery}
+        onChange={(e) => setPostSearchQuery(e.target.value)}
+      />
 
       {filteredPosts.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <p className="text-gray-500">No posts found.</p>
-        </div>
+        <Empty>No posts found.</Empty>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredPosts.map((post) => {
             const isExpanded = expandedItems.has(post._id);
-            
+
             return (
-              <div key={post._id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-bold text-gray-900">{post.title}</h3>
-                      {post.isAnonymous && (
-                        <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
-                          Anonymous
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1.5">
-                        <User size={16} className="text-gray-400" />
-                        <span>{post.author?.username || "Unknown"}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Calendar size={16} className="text-gray-400" />
-                        <span>{formatDate(post.createdAt)}</span>
-                      </div>
+              <div key={post._id} className="surface p-5 transition-colors hover:border-line-hover sm:p-6">
+                <div className="mb-3 flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-[16px] font-semibold tracking-tight text-fg">{post.title}</h3>
+                      {post.isAnonymous && <span className="pill-neutral">Anonymous</span>}
                     </div>
 
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                    <div className="mb-3 flex flex-wrap items-center gap-4 text-[13px] text-fg-muted">
+                      <Meta icon={User}>{post.author?.username || "Unknown"}</Meta>
+                      <Meta icon={Calendar}>{formatDate(post.createdAt)}</Meta>
+                    </div>
+
+                    <p className="text-[13.5px] leading-relaxed text-fg/80">
                       {isExpanded ? post.content : truncateText(post.content, 250)}
                     </p>
-                    
-                    {post.content && post.content.length > 250 && (
-                      <button
-                        onClick={() => toggleExpand(post._id)}
-                        className="text-purple-600 text-sm font-medium mt-2 flex items-center gap-1 hover:text-purple-700"
-                      >
-                        {isExpanded ? (
-                          <>Show Less <ChevronUp size={16} /></>
-                        ) : (
-                          <>Show More <ChevronDown size={16} /></>
-                        )}
-                      </button>
-                    )}
+
+                    {post.content && post.content.length > 250 && <ExpandToggle id={post._id} isExpanded={isExpanded} />}
                   </div>
                 </div>
 
                 {post.images && post.images.length > 0 && (
-                  <div className="flex gap-2 mt-3 mb-3">
+                  <div className="mb-3 mt-3 flex gap-2">
                     {post.images.slice(0, 3).map((img, idx) => (
-                      <img 
+                      <img
                         key={`${post._id}-img-${idx}`}
-                        src={img.url} 
+                        src={img.url}
                         alt=""
-                        className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                        className="h-20 w-20 rounded-lg border border-line object-cover"
                       />
                     ))}
                     {post.images.length > 3 && (
-                      <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 text-sm font-medium">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-line bg-white/[0.04] text-[13px] font-medium text-fg-muted">
                         +{post.images.length - 3}
                       </div>
                     )}
                   </div>
                 )}
 
-                <div className="mt-4 flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1.5">
-                      <ThumbsUp size={16} className="text-gray-400" />
-                      <span>{post.upvotes?.length || 0} upvotes</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MessageSquare size={16} className="text-gray-400" />
-                      <span>{post.comments?.length || 0} comments</span>
-                    </div>
+                <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
+                  <div className="flex items-center gap-4 font-mono text-[12px] text-fg-muted">
+                    <Meta icon={ThumbsUp}>{post.upvotes?.length || 0} upvotes</Meta>
+                    <Meta icon={MessageSquare}>{post.comments?.length || 0} comments</Meta>
                   </div>
-                  
-                  <button
-                    onClick={() => openDeleteModal("post", post._id, post.title)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition"
-                  >
-                    <Trash2 size={16} /> Delete
-                  </button>
+
+                  <DeleteButton onClick={() => openDeleteModal("post", post._id, post.title)} />
                 </div>
               </div>
             );
@@ -545,99 +482,79 @@ export default function ManageContent() {
   );
 
   const renderComments = () => (
-    <div className="space-y-6">
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="Search comments by content, author, or post title..."
-          className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-green-500 outline-none"
-          value={commentSearchQuery}
-          onChange={(e) => setCommentSearchQuery(e.target.value)}
-        />
-      </div>
+    <div className="space-y-5">
+      <SearchBox
+        placeholder="Search comments by content, author, or post title..."
+        value={commentSearchQuery}
+        onChange={(e) => setCommentSearchQuery(e.target.value)}
+      />
 
       {filteredComments.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <p className="text-gray-500">No comments found.</p>
-        </div>
+        <Empty>No comments found.</Empty>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredComments.map((comment) => {
             const indentStyle = comment.depth > 0 ? { marginLeft: `${Math.min(comment.depth * 24, 96)}px` } : {};
-            const bgColor = comment.isReply ? 'bg-green-50' : 'bg-white';
-            const borderColor = comment.isReply ? 'border-green-200' : 'border-gray-200';
-            
+
             return (
-              <div 
-                key={comment._id} 
+              <div
+                key={comment._id}
                 style={indentStyle}
-                className={`${bgColor} p-6 rounded-xl border ${borderColor} shadow-sm hover:shadow-md transition-all`}
+                className={`surface p-5 transition-colors hover:border-line-hover sm:p-6 ${comment.isReply ? 'border-l-2 border-l-accent/50' : ''}`}
               >
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex-1">
-                    <div className="mb-3 pb-3 border-b border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-xs text-gray-500">Comment on post:</p>
+                <div className="mb-3 flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-3 border-b border-line pb-3">
+                      <div className="mb-1 flex items-center gap-2">
+                        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-fg-muted">Comment on post:</p>
                         {comment.isReply && (
-                          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                          <span className="pill">
                             ↳ Reply {comment.depth > 1 ? `(Level ${comment.depth})` : ''}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm font-semibold text-gray-700">{comment.postTitle}</p>
+                      <p className="text-[13.5px] font-semibold text-fg">{comment.postTitle}</p>
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1.5">
-                        <User size={16} className="text-gray-400" />
-                        <span className="font-medium">
+                    <div className="mb-3 flex flex-wrap items-center gap-4 text-[13px] text-fg-muted">
+                      <Meta icon={User}>
+                        <span className="font-medium text-fg/90">
                           {comment.isAnonymous ? "Anonymous" : (comment.author?.username || "Unknown")}
                         </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Calendar size={16} className="text-gray-400" />
-                        <span>{formatDateTime(comment.createdAt)}</span>
-                      </div>
+                      </Meta>
+                      <Meta icon={Calendar}>{formatDateTime(comment.createdAt)}</Meta>
                     </div>
 
-                    <p className="text-gray-700 leading-relaxed">{comment.content}</p>
+                    <p className="leading-relaxed text-fg/85">{comment.content}</p>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1.5">
-                      <ThumbsUp size={16} className="text-gray-400" />
-                      <span>{comment.upvotes?.length || 0} upvotes</span>
-                    </div>
+                <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
+                  <div className="flex items-center gap-4 font-mono text-[12px] text-fg-muted">
+                    <Meta icon={ThumbsUp}>{comment.upvotes?.length || 0} upvotes</Meta>
                     {comment.replies && comment.replies.length > 0 && (
-                      <div className="flex items-center gap-1.5">
-                        <MessageSquare size={16} className="text-gray-400" />
-                        <span>{comment.replies.length} replies</span>
-                      </div>
+                      <Meta icon={MessageSquare}>{comment.replies.length} replies</Meta>
                     )}
                   </div>
-                  
-                  <button
+
+                  <DeleteButton
                     onClick={() => openDeleteModal(
-                      "comment", 
-                      comment._id, 
-                      truncateText(comment.content, 30), 
-                      comment.isReply ? "reply" : "comment", 
+                      "comment",
+                      comment._id,
+                      truncateText(comment.content, 30),
+                      comment.isReply ? "reply" : "comment",
                       comment.postId
                     )}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition"
                   >
-                    <Trash2 size={16} /> Delete {comment.isReply ? 'Reply' : 'Comment'}
-                  </button>
+                    Delete {comment.isReply ? 'Reply' : 'Comment'}
+                  </DeleteButton>
                 </div>
 
                 {comment.replies && comment.replies.length > 0 && (
-                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
-                    <AlertTriangle size={16} className="text-yellow-600 mt-0.5 shrink-0" />
-                    <p className="text-xs text-yellow-800">
-                      <strong>Warning:</strong> Deleting this comment will also delete all {comment.replies.length} nested {comment.replies.length === 1 ? 'reply' : 'replies'}.
+                  <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 p-3">
+                    <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-300" />
+                    <p className="text-[12.5px] text-amber-100/90">
+                      <strong className="font-semibold">Warning:</strong> Deleting this comment will also delete all {comment.replies.length} nested {comment.replies.length === 1 ? 'reply' : 'replies'}.
                     </p>
                   </div>
                 )}
@@ -649,61 +566,42 @@ export default function ManageContent() {
     </div>
   );
 
+  const TABS = [
+    { id: "events", label: "Events", count: events.length },
+    { id: "posts", label: "Posts", count: posts.length },
+    { id: "comments", label: "Comments", count: comments.length },
+  ];
+
   return (
-    <div className="max-w-6xl mx-auto p-8 font-sans relative">
+    <div className="relative mx-auto max-w-6xl">
       {renderDeleteModal()}
 
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-800">Content Management</h1>
-          <div className="flex gap-2">
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-              Events: {events.length}
-            </span>
-            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold">
-              Posts: {posts.length}
-            </span>
-            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-              Comments: {comments.length}
-            </span>
+      <PageHeader
+        compact
+        eyebrow="Moderation"
+        title="Content Management"
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <span className="pill-neutral font-mono">Events: {events.length}</span>
+            <span className="pill-neutral font-mono">Posts: {posts.length}</span>
+            <span className="pill-neutral font-mono">Comments: {comments.length}</span>
           </div>
+        }
+      >
+        <div className="tabs mt-6 flex w-full">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={`tab flex-1 py-2.5 ${activeTab === t.id ? "tab-active" : ""}`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
+      </PageHeader>
 
-        <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
-          <button
-            onClick={() => setActiveTab("events")}
-            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === "events"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-800"
-            }`}
-          >
-            Events
-          </button>
-          <button
-            onClick={() => setActiveTab("posts")}
-            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === "posts"
-                ? "bg-white text-purple-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-800"
-            }`}
-          >
-            Posts
-          </button>
-          <button
-            onClick={() => setActiveTab("comments")}
-            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === "comments"
-                ? "bg-white text-green-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-800"
-            }`}
-          >
-            Comments
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-8">
+      <div className="animate-fade-in" key={activeTab}>
         {activeTab === "events" && renderEvents()}
         {activeTab === "posts" && renderPosts()}
         {activeTab === "comments" && renderComments()}
@@ -711,3 +609,27 @@ export default function ManageContent() {
     </div>
   );
 }
+
+// Module-scope helpers: defining these inside ManageContent would remount
+// them (and drop input focus) on every keystroke.
+const SearchBox = ({ value, onChange, placeholder }) => (
+  <div className="relative flex-1">
+    <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted" size={18} />
+    <input type="text" placeholder={placeholder} className="field py-3 pl-11" value={value} onChange={onChange} />
+  </div>
+);
+
+const Meta = ({ icon: Icon, children }) => (
+  <div className="flex items-center gap-1.5">
+    <Icon size={14} className="text-fg-muted/70" />
+    <span>{children}</span>
+  </div>
+);
+
+const DeleteButton = ({ onClick, children = "Delete" }) => (
+  <button onClick={onClick} className="btn-danger btn-sm">
+    <Trash2 size={15} /> {children}
+  </button>
+);
+
+const Empty = ({ children }) => <EmptyState title={children} />;

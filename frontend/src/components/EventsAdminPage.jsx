@@ -14,6 +14,7 @@ import {
   Pencil,
   Trash
 } from "lucide-react";
+import PageHeader from "./ui/PageHeader";
 
 export default function EventsAdminPage() {
 
@@ -240,166 +241,191 @@ export default function EventsAdminPage() {
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-6 px-4">
+    <div className="mx-auto max-w-5xl">
 
-      <div className="max-w-5xl mx-auto">
+      <PageHeader
+        compact
+        eyebrow="Content"
+        title="Events Admin Panel"
+        actions={
+          <div className="tabs">
+            <button
+              onClick={()=>setActiveTab("upcoming")}
+              className={`tab flex items-center gap-2 px-4 py-2 ${activeTab==="upcoming" ? "tab-active" : ""}`}
+            >
+              <Plus className="h-4 w-4"/>
+              Add Event
+            </button>
 
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Events Admin Panel
-        </h1>
+            <button
+              onClick={()=>setActiveTab("manage")}
+              className={`tab flex items-center gap-2 px-4 py-2 ${activeTab==="manage" ? "tab-active" : ""}`}
+            >
+              <Users className="h-4 w-4"/>
+              Manage Events
+            </button>
+          </div>
+        }
+      />
 
-        <div className="flex justify-center gap-3 mb-6">
+      {activeTab==="manage" && (
 
-          <button
-            onClick={()=>setActiveTab("upcoming")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
-              activeTab==="upcoming"
-              ? "bg-blue-600 text-white"
-              : "bg-white text-gray-700"
-            }`}
-          >
-            <Plus className="w-4 h-4"/>
-            Add Event
-          </button>
+        <div className="surface edge-highlight p-6 animate-fade-in">
 
-          <button
-            onClick={()=>setActiveTab("manage")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
-              activeTab==="manage"
-              ? "bg-purple-600 text-white"
-              : "bg-white text-gray-700"
-            }`}
-          >
-            <Users className="w-4 h-4"/>
-            Manage Events
-          </button>
+          <h2 className="mb-5 flex items-center justify-between text-[15px] font-semibold text-fg">
+            Existing Events
+            <span className="font-mono text-[11px] font-normal text-fg-muted">{events.length} total</span>
+          </h2>
 
-        </div>
+          <div className="space-y-2">
 
-        {activeTab==="manage" && (
+            {events.map(ev=>(
+              <div key={ev._id} className="group flex items-center justify-between gap-3 rounded-xl border border-line bg-white/[0.02] p-3.5 transition-colors hover:border-line-hover hover:bg-white/[0.04]">
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-
-            <h2 className="font-bold text-lg mb-4">Existing Events</h2>
-
-            <div className="space-y-3">
-
-              {events.map(ev=>(
-                <div key={ev._id} className="flex justify-between items-center border p-3 rounded">
-
-                  <div>
-                    <p className="font-semibold">{ev.eventName}</p>
-                    <p className="text-sm text-gray-500">{ev.eventType}</p>
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="icon-tile h-9 w-9 flex-none">
+                    <Calendar className="h-4 w-4 text-fg-muted" strokeWidth={1.75}/>
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-fg">{ev.eventName}</p>
+                    <p className="text-[12.5px] text-fg-muted">{ev.eventType}</p>
                   </div>
+                </div>
 
-                  <div className="flex gap-2">
+                <div className="flex flex-none gap-1.5">
 
-                    <button
-                      onClick={()=>handleEdit(ev)}
-                      className="p-2 bg-blue-500 text-white rounded"
-                    >
-                      <Pencil size={16}/>
-                    </button>
+                  <button
+                    onClick={()=>handleEdit(ev)}
+                    aria-label="Edit event"
+                    className="btn-secondary h-9 w-9 p-0"
+                  >
+                    <Pencil size={15}/>
+                  </button>
 
-                    <button
-                      onClick={()=>handleDelete(ev._id)}
-                      className="p-2 bg-red-500 text-white rounded"
-                    >
-                      <Trash size={16}/>
-                    </button>
-
-                  </div>
+                  <button
+                    onClick={()=>handleDelete(ev._id)}
+                    aria-label="Delete event"
+                    className="btn-danger h-9 w-9 p-0"
+                  >
+                    <Trash size={15}/>
+                  </button>
 
                 </div>
-              ))}
 
-            </div>
+              </div>
+            ))}
 
           </div>
 
-        )}
+        </div>
 
-        {activeTab==="upcoming" && (
+      )}
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+      {activeTab==="upcoming" && (
 
-            {step==="category" ? (
+        <div className="surface edge-highlight p-6 sm:p-8 animate-fade-in">
 
-              <div className="text-center">
+          {step==="category" ? (
 
-                <h2 className="text-xl font-bold mb-6">
-                  Select Event Category
-                </h2>
+            <div className="mx-auto flex max-w-md flex-col items-center py-6 text-center">
 
-                <select
-                  value={selectedCategory}
-                  onChange={(e)=>setSelectedCategory(e.target.value)}
-                  className="w-full max-w-md mx-auto p-3 border rounded-lg"
-                >
-                  <option value="">Choose category...</option>
-                  {categories.map(cat=>(
-                    <option key={cat}>{cat}</option>
-                  ))}
-                </select>
+              <span className="icon-tile mb-4 h-12 w-12">
+                <Calendar className="h-5 w-5 text-accent-bright" strokeWidth={1.5}/>
+              </span>
 
-                <button
-                  onClick={()=>selectedCategory && setStep("form")}
-                  className="mt-6 px-8 py-3 bg-blue-600 text-white rounded-lg flex items-center gap-2 mx-auto"
-                >
-                  Next
-                  <ArrowRight size={16}/>
-                </button>
+              <h2 className="mb-6 text-xl font-semibold tracking-tight text-fg">
+                Select Event Category
+              </h2>
 
+              <select
+                value={selectedCategory}
+                onChange={(e)=>setSelectedCategory(e.target.value)}
+                className="field py-3"
+              >
+                <option value="">Choose category...</option>
+                {categories.map(cat=>(
+                  <option key={cat}>{cat}</option>
+                ))}
+              </select>
+
+              <button
+                onClick={()=>selectedCategory && setStep("form")}
+                className="btn-primary btn-lg mt-6"
+              >
+                Next
+                <ArrowRight size={16}/>
+              </button>
+
+            </div>
+
+          ):(
+            <form onSubmit={handleUpcomingSubmit} className="space-y-4">
+
+              <div className="mb-2 flex items-center gap-2">
+                <span className="pill">{selectedCategory}</span>
+                {editingEventId && <span className="pill-neutral">Editing</span>}
               </div>
 
-            ):(
-              <form onSubmit={handleUpcomingSubmit} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <AdminField label="Event Name"><input name="name" required placeholder="Event Name" className="field" value={eventData.name} onChange={handleEventChange}/></AdminField>
 
-                  <input name="name" required placeholder="Event Name" className="p-3 border rounded-lg" value={eventData.name} onChange={handleEventChange}/>
-
-                  <select name="mode" required className="p-3 border rounded-lg" value={eventData.mode} onChange={handleEventChange}>
+                <AdminField label="Mode">
+                  <select name="mode" required className="field" value={eventData.mode} onChange={handleEventChange}>
                     <option value="">Mode</option>
                     <option>Online</option>
                     <option>Offline</option>
                   </select>
+                </AdminField>
 
-                  <input name="venue" required placeholder="Venue" className="p-3 border rounded-lg" value={eventData.venue} onChange={handleEventChange}/>
+                <AdminField label="Venue"><input name="venue" required placeholder="Venue" className="field" value={eventData.venue} onChange={handleEventChange}/></AdminField>
 
-                  <input name="contact" required placeholder="Contact Info" className="p-3 border rounded-lg" value={eventData.contact} onChange={handleEventChange}/>
+                <AdminField label="Contact Info"><input name="contact" required placeholder="Contact Info" className="field" value={eventData.contact} onChange={handleEventChange}/></AdminField>
 
-                  <input type="date" name="startDate" required className="p-3 border rounded-lg" value={eventData.startDate} onChange={handleEventChange}/>
+                <AdminField label="Start date"><input type="date" name="startDate" required className="field" value={eventData.startDate} onChange={handleEventChange}/></AdminField>
 
-                  <input type="date" name="endDate" required className="p-3 border rounded-lg" value={eventData.endDate} onChange={handleEventChange}/>
+                <AdminField label="End date"><input type="date" name="endDate" required className="field" value={eventData.endDate} onChange={handleEventChange}/></AdminField>
 
-                  <input type="time" name="startTime" required className="p-3 border rounded-lg" value={eventData.startTime} onChange={handleEventChange}/>
+                <AdminField label="Start time"><input type="time" name="startTime" required className="field" value={eventData.startTime} onChange={handleEventChange}/></AdminField>
 
-                  <input type="time" name="endTime" className="p-3 border rounded-lg" value={eventData.endTime} onChange={handleEventChange}/>
+                <AdminField label="End time"><input type="time" name="endTime" className="field" value={eventData.endTime} onChange={handleEventChange}/></AdminField>
 
-                  <input type="date" name="deadlines" required className="p-3 border rounded-lg" value={eventData.deadlines} onChange={handleEventChange}/>
+                <AdminField label="Deadline"><input type="date" name="deadlines" required className="field" value={eventData.deadlines} onChange={handleEventChange}/></AdminField>
 
-                  <input name="registrationLink" placeholder="Registration Link" className="p-3 border rounded-lg" value={eventData.registrationLink} onChange={handleEventChange}/>
+                <AdminField label="Registration Link"><input name="registrationLink" placeholder="Registration Link" className="field" value={eventData.registrationLink} onChange={handleEventChange}/></AdminField>
 
-                </div>
+              </div>
 
-                <textarea name="description" placeholder="Description" className="w-full p-3 border rounded-lg" rows={3} value={eventData.description} onChange={handleEventChange}/>
+              <AdminField label="Description">
+                <textarea name="description" placeholder="Description" className="field resize-none" rows={3} value={eventData.description} onChange={handleEventChange}/>
+              </AdminField>
 
-                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg flex items-center gap-2">
+              <div className="flex flex-wrap gap-2.5 border-t border-line pt-5">
+                <button className="btn-primary">
                   <Save size={16}/>
                   {editingEventId ? "Update Event":"Save Event"}
                 </button>
+              </div>
 
-              </form>
-            )}
+            </form>
+          )}
 
-          </div>
+        </div>
 
-        )}
-
-      </div>
+      )}
 
     </div>
   );
 
+}
+
+// Label wrapper for admin form controls. Inputs previously relied on
+// placeholders alone; a visible label keeps them readable once filled.
+function AdminField({ label, children }) {
+  return (
+    <label className="flex flex-col">
+      <span className="field-label">{label}</span>
+      {children}
+    </label>
+  );
 }

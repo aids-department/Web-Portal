@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, Upload, XCircle, FileText } from 'lucide-react';
+import { X, XCircle, FileText, Search, PenSquare, ImagePlus, Send, MessagesSquare, MessageSquare, Bookmark, Share2, PencilLine, Trash2, ArrowLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import PageHeader from '../components/ui/PageHeader';
+import Modal from '../components/ui/Modal';
+import { Spotlight } from '../components/ui/SpotlightCard';
+import { useSpotlight } from '../components/ui/useSpotlight';
+import { LoadingState, EmptyState } from '../components/ui/States';
+import { Reveal } from '../components/ui/Reveal';
+import { EASE } from '../components/ui/motion';
+import { UpvoteButton, ActionLink } from '../components/PostActions';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import CommentThread from '../components/CommentThread';
@@ -298,15 +307,15 @@ const PostsPage = () => {
 
   if (loading) {
     return (
-      <div className="font-brand px-5 sm:px-8 lg:px-12 py-10">
-        <p className="text-brand-ink-soft italic text-[13.5px]">Loading posts…</p>
+      <div className="container-ln">
+        <LoadingState label="Loading posts" />
       </div>
     );
   }
 
   if (selectedPost) {
     return (
-      <div className="font-brand relative">
+      <div className="relative">
         <PostThread
           post={selectedPost}
           onBack={() => setSelectedPost(null)}
@@ -337,47 +346,49 @@ const PostsPage = () => {
   }
 
   return (
-    <div className="font-brand px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] flex flex-col gap-5.5 gap-y-5">
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div className="flex flex-col gap-2">
-          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-            Student board
-          </span>
-          <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
-            Posts
-          </h1>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {SORT_OPTIONS.map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setSortBy(val)}
-              className={`px-3.5 py-2 text-[12px] font-semibold ${
-                sortBy === val ? 'bg-brand-navy text-white' : 'border border-brand-edge text-brand-ink-soft'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="container-ln flex flex-col gap-5 pb-8">
+      <PageHeader
+        eyebrow="Student board"
+        title="Posts"
+        description="Ask questions, share wins and start discussions with the department."
+        spacing="pt-14 pb-4 sm:pt-20 sm:pb-6 lg:pt-24"
+        actions={
+          <div className="tabs" role="group" aria-label="Sort posts">
+            {SORT_OPTIONS.map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setSortBy(val)}
+                aria-pressed={sortBy === val}
+                className={`tab ${sortBy === val ? 'tab-active' : ''}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-stretch border-2 border-brand-navy max-w-sm flex-1 min-w-[220px]">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="relative min-w-[220px] max-w-sm flex-1">
+          <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-fg-muted" />
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search posts…"
-            className="flex-1 px-3.5 py-2.5 text-[13px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+            aria-label="Search posts"
+            className="field pl-10"
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-1.5">
           {VIEW_OPTIONS.map(([val, label]) => (
             <button
               key={val}
               onClick={() => setViewFilter(val)}
-              className={`px-3 py-1.5 text-[11.5px] font-medium ${
-                viewFilter === val ? 'bg-brand-navy text-white' : 'border border-brand-edge text-brand-ink-soft'
+              aria-pressed={viewFilter === val}
+              className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-medium transition-[background-color,color,box-shadow] duration-200 ${
+                viewFilter === val
+                  ? 'bg-accent/15 text-indigo-100 shadow-[inset_0_0_0_1px_rgba(94,106,210,0.45)]'
+                  : 'text-fg-muted shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] hover:bg-white/[0.04] hover:text-fg'
               }`}
             >
               {label}
@@ -387,74 +398,84 @@ const PostsPage = () => {
       </div>
 
       {/* New post composer */}
-      <form onSubmit={handleCreatePost} className="border border-brand-edge p-5 flex flex-col gap-3.5">
-        <span className="text-[11px] font-semibold tracking-[0.16em] uppercase text-brand-navy">New post</span>
-        <input
-          required
-          value={composerTitle}
-          onChange={(e) => setComposerTitle(e.target.value)}
-          placeholder="Title"
-          className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy placeholder:text-brand-ink-faint"
-        />
-        <textarea
-          required
-          value={composerContent}
-          onChange={(e) => setComposerContent(e.target.value)}
-          placeholder="Say what you want to say."
-          rows={3}
-          className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] leading-[1.6] text-brand-ink outline-none focus:border-brand-navy resize-none placeholder:text-brand-ink-faint"
-        />
+      <Reveal>
+        <form onSubmit={handleCreatePost} className="surface edge-highlight flex flex-col gap-3.5 p-5 focus-within:border-line-accent">
+          <span className="eyebrow flex items-center gap-2">
+            <PenSquare size={12} />
+            New post
+          </span>
+          <input
+            required
+            value={composerTitle}
+            onChange={(e) => setComposerTitle(e.target.value)}
+            placeholder="Title"
+            className="field py-3 text-[15px] font-medium"
+          />
+          <textarea
+            required
+            value={composerContent}
+            onChange={(e) => setComposerContent(e.target.value)}
+            placeholder="Say what you want to say."
+            rows={3}
+            className="field resize-none py-3 leading-[1.6]"
+          />
 
-        {composerImages.length > 0 && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-            {composerImages.map((img, i) => (
-              <div key={i} className="relative border border-brand-edge">
-                <img src={img.preview} className="w-full h-20 object-cover" alt="" />
-                <button
-                  type="button"
-                  onClick={() => removeComposerImage(i)}
-                  className="absolute top-1 right-1 bg-white/90 text-brand-red"
-                >
-                  <XCircle size={16} />
-                </button>
-              </div>
-            ))}
+          {composerImages.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+              {composerImages.map((img, i) => (
+                <div key={i} className="group/img relative overflow-hidden rounded-lg border border-line">
+                  <img src={img.preview} className="h-20 w-full object-cover" alt="" />
+                  <button
+                    type="button"
+                    onClick={() => removeComposerImage(i)}
+                    aria-label="Remove image"
+                    className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-canvas/80 text-fg backdrop-blur transition-colors hover:text-rose-300"
+                  >
+                    <XCircle size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-line pt-3.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="btn-ghost btn-sm cursor-pointer">
+                <ImagePlus size={15} />
+                Attach images
+                <input type="file" multiple accept="image/*" onChange={handleComposerFiles} className="hidden" />
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 px-2 text-[13px] text-fg-muted">
+                <input
+                  type="checkbox"
+                  checked={composerAnonymous}
+                  onChange={(e) => setComposerAnonymous(e.target.checked)}
+                  className="h-3.5 w-3.5 rounded accent-[#5E6AD2]"
+                />
+                Post anonymously
+              </label>
+            </div>
+            <button type="submit" className="btn-primary">
+              Publish
+              <Send size={14} />
+            </button>
           </div>
-        )}
-        <label className="flex items-center gap-2.5 border border-dashed border-brand-ink-faint px-3.5 py-3 cursor-pointer text-[12.5px] text-brand-ink-soft w-fit">
-          <Upload size={15} />
-          Attach images
-          <input type="file" multiple accept="image/*" onChange={handleComposerFiles} className="hidden" />
-        </label>
-
-        <div className="flex justify-between items-center gap-3.5 flex-wrap">
-          <label className="flex items-center gap-2.5 text-[12.5px] text-[#3a3838]">
-            <input
-              type="checkbox"
-              checked={composerAnonymous}
-              onChange={(e) => setComposerAnonymous(e.target.checked)}
-              className="w-3.5 h-3.5"
-            />
-            Post anonymously
-          </label>
-          <button type="submit" className="px-[18px] py-3 bg-brand-red text-white text-[12.5px] font-semibold">
-            Publish
-          </button>
-        </div>
-      </form>
+        </form>
+      </Reveal>
 
       {/* Feed */}
-      <div className="flex flex-col border-t-2 border-brand-navy">
+      <div className="flex flex-col gap-3">
         {filteredPosts.length === 0 ? (
-          <div className="border-b border-brand-row p-10 text-center">
-            <p className="m-0 text-[13.5px] text-brand-ink-soft">
-              {viewFilter === 'mine'
+          <EmptyState
+            icon={MessagesSquare}
+            title={
+              viewFilter === 'mine'
                 ? "You haven't posted anything yet."
                 : viewFilter === 'saved'
                 ? "You haven't saved any posts yet."
-                : 'No posts yet. Be the first to post!'}
-            </p>
-          </div>
+                : 'No posts yet. Be the first to post!'
+            }
+          />
         ) : (
           filteredPosts.map((post) => (
             <PostRow
@@ -492,59 +513,57 @@ const PostRow = ({ post, onOpen, onUpvote, onShare, onSave, isSaved, currentUser
   const hasUpvoted = post.upvotes?.includes(currentUserId);
   const isOwner = post.author?._id === currentUserId || post.author?.id === currentUserId;
   const when = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const { ref, onMouseMove } = useSpotlight();
 
   return (
     <div
+      ref={ref}
+      onMouseMove={onMouseMove}
       onClick={onOpen}
-      className="grid grid-cols-[48px_1fr] sm:grid-cols-[64px_1fr] gap-4 border-b border-brand-row px-1.5 py-[18px] cursor-pointer hover:bg-[#f7f9fc]"
+      className="group surface edge-highlight surface-interactive grid cursor-pointer grid-cols-[44px_1fr] gap-3 p-4 hover:translate-y-0 sm:grid-cols-[56px_1fr] sm:gap-4 sm:p-5"
     >
-      <div className="flex flex-col items-center gap-1 pt-0.5">
-        <button
-          onClick={onUpvote}
-          title={hasUpvoted ? "Remove upvote" : "Upvote post"}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded transition-colors ${
-            hasUpvoted
-              ? 'bg-brand-red-tint text-brand-red font-semibold'
-              : 'hover:bg-brand-ground text-brand-ink-soft hover:text-brand-navy'
-          }`}
-        >
-          <span className="text-[12px] leading-none">▲</span>
-          <span className="text-[13px] font-semibold tabular-nums">{post.upvotes?.length || 0}</span>
-        </button>
+      <Spotlight />
+      <div className="relative flex flex-col items-center gap-1 pt-0.5">
+        <UpvoteButton active={hasUpvoted} count={post.upvotes?.length || 0} onClick={onUpvote} />
       </div>
-      <div className="min-w-0 flex flex-col gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="relative flex min-w-0 flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2 text-[12.5px]">
           {!post.isAnonymous ? (
-            <button onClick={(e) => onProfileClick(post.author, e)} className="text-[11.5px] text-brand-blue font-medium">
+            <button onClick={(e) => onProfileClick(post.author, e)} className="font-medium text-fg transition-colors hover:text-accent-bright">
               {displayName}
             </button>
           ) : (
-            <span className="text-[11.5px] text-brand-ink-soft">{displayName}</span>
+            <span className="text-fg-muted">{displayName}</span>
           )}
-          <span className="text-[11.5px] text-brand-ink-soft">· {when}</span>
+          <span className="text-fg-muted">· {when}</span>
         </div>
-        <h3 className="m-0 text-[17px] font-semibold text-brand-navy leading-[1.3]">{post.title}</h3>
-        <p className="m-0 max-w-[88ch] text-[13px] leading-[1.65] text-brand-ink-soft line-clamp-2">
+        <h3 className="text-[17px] font-semibold leading-snug tracking-tight text-fg">{post.title}</h3>
+        <p className="line-clamp-2 max-w-[88ch] text-[13.5px] leading-[1.65] text-fg-muted">
           {post.content}
         </p>
-        <div className="flex items-center gap-4 flex-wrap">
-          <span className="text-[11.5px] font-medium text-brand-blue tabular-nums">
+        <div className="-ml-2 flex flex-wrap items-center gap-1 pt-1">
+          <span className="flex items-center gap-1.5 px-2 py-1 font-mono text-[12px] tabular-nums text-fg-muted">
+            <MessageSquare size={13} />
             {post.comments?.length || 0} replies
           </span>
-          <button onClick={onSave} className={`text-[11.5px] font-medium ${isSaved ? 'text-brand-navy' : 'text-brand-ink-soft'}`}>
+          <ActionLink onClick={onSave} active={isSaved}>
+            <Bookmark size={13} className={isSaved ? 'fill-current' : ''} />
             {isSaved ? 'Saved' : 'Save'}
-          </button>
-          <button onClick={onShare} className="text-[11.5px] font-medium text-brand-ink-soft">
+          </ActionLink>
+          <ActionLink onClick={onShare}>
+            <Share2 size={13} />
             Share
-          </button>
+          </ActionLink>
           {isOwner && (
             <>
-              <button onClick={onEdit} className="text-[11.5px] font-medium text-brand-ink-soft">
+              <ActionLink onClick={onEdit}>
+                <PencilLine size={13} />
                 Edit
-              </button>
-              <button onClick={onDelete} className="text-[11.5px] font-medium text-brand-red">
+              </ActionLink>
+              <ActionLink onClick={onDelete} danger>
+                <Trash2 size={13} />
                 Delete
-              </button>
+              </ActionLink>
             </>
           )}
         </div>
@@ -579,58 +598,53 @@ const PostThread = ({
   };
 
   return (
-    <div>
-      <div className="px-5 sm:px-8 lg:px-12 py-4 border-b border-brand-edge flex items-center gap-2 flex-wrap">
-        <button onClick={onBack} className="text-[12px] font-medium text-brand-blue hover:underline">
+    <div className="container-ln pb-8">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 pt-8 text-[13px]">
+        <button onClick={onBack} className="btn-ghost btn-sm -ml-3">
+          <ArrowLeft size={14} />
           Posts
         </button>
-        <span className="text-[12px] text-brand-ink-faint">/</span>
-        <span className="text-[12px] text-brand-ink-soft truncate max-w-[40ch]">{post.title}</span>
-      </div>
+        <ChevronRight size={14} className="text-fg-muted/60" />
+        <span className="max-w-[40ch] truncate text-fg-muted">{post.title}</span>
+      </nav>
 
-      <div className="px-5 sm:px-8 lg:px-12 py-7 sm:py-8 lg:py-9 max-w-[900px] flex flex-col gap-6">
-        <div className="grid grid-cols-[48px_1fr] sm:grid-cols-[64px_1fr] gap-4">
+      <div className="mx-auto mt-5 flex max-w-[900px] flex-col gap-5">
+        <motion.article
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="surface edge-highlight grid grid-cols-[44px_1fr] gap-3 p-5 sm:grid-cols-[60px_1fr] sm:gap-4 sm:p-7"
+        >
           <div className="flex flex-col items-center gap-1">
-            <button
-              onClick={onUpvote}
-              title={hasUpvoted ? "Remove upvote" : "Upvote post"}
-              className={`flex flex-col items-center gap-0.5 px-2.5 py-2 rounded transition-colors ${
-                hasUpvoted
-                  ? 'bg-brand-red-tint text-brand-red font-semibold'
-                  : 'hover:bg-brand-ground text-brand-ink-soft hover:text-brand-navy'
-              }`}
-            >
-              <span className="text-[14px] leading-none">▲</span>
-              <span className="text-[15px] font-semibold tabular-nums">{post.upvotes?.length || 0}</span>
-            </button>
+            <UpvoteButton active={hasUpvoted} count={post.upvotes?.length || 0} onClick={onUpvote} size="lg" />
           </div>
-          <div className="min-w-0 flex flex-col gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-[12.5px]">
               {!post.isAnonymous ? (
-                <button onClick={(e) => onProfileClick(post.author, e)} className="text-[11.5px] text-brand-blue font-medium">
+                <button onClick={(e) => onProfileClick(post.author, e)} className="font-medium text-fg transition-colors hover:text-accent-bright">
                   {displayName}
                 </button>
               ) : (
-                <span className="text-[11.5px] text-brand-ink-soft">{displayName}</span>
+                <span className="text-fg-muted">{displayName}</span>
               )}
-              <span className="text-[11.5px] text-brand-ink-soft">· {when}</span>
-              {post.isEdited && <span className="text-[11px] italic text-brand-ink-faint">(edited)</span>}
+              <span className="text-fg-muted">· {when}</span>
+              {post.isEdited && <span className="pill-neutral text-[10.5px]">edited</span>}
             </div>
-            <h1 className="m-0 text-[24px] sm:text-[30px] leading-[1.2] font-semibold text-brand-navy max-w-[28ch]">
-              {post.title}
+            <h1 className="max-w-[28ch] text-2xl font-semibold leading-[1.2] tracking-tight sm:text-3xl">
+              <span className="text-gradient">{post.title}</span>
             </h1>
-            <p className="m-0 max-w-[76ch] text-[14.5px] leading-[1.75] text-[#3a3838] whitespace-pre-line">
+            <p className="max-w-[76ch] whitespace-pre-line text-[15px] leading-[1.75] text-fg/85">
               {post.content}
             </p>
 
             {post.images?.length > 0 && (
-              <div className={`grid gap-1 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              <div className={`grid gap-1.5 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 {post.images.slice(0, 4).map((img, i) => (
-                  <div key={i} className="relative aspect-video bg-brand-ground border border-brand-edge overflow-hidden">
-                    <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  <div key={i} className="relative aspect-video overflow-hidden rounded-xl border border-line bg-canvas-elevated">
+                    <img src={img.url} alt="" className="h-full w-full object-cover" />
                     {i === 3 && post.images.length > 4 && (
-                      <div className="absolute inset-0 bg-black/70 grid place-items-center">
-                        <span className="text-white font-semibold text-xl">+{post.images.length - 4}</span>
+                      <div className="absolute inset-0 grid place-items-center bg-canvas/75 backdrop-blur-sm">
+                        <span className="text-xl font-semibold text-fg">+{post.images.length - 4}</span>
                       </div>
                     )}
                   </div>
@@ -638,51 +652,60 @@ const PostThread = ({
               </div>
             )}
 
-            <div className="flex gap-4 flex-wrap border-t border-brand-row pt-3">
-              <button onClick={onShare} className="text-[12px] font-medium text-brand-ink-soft">Share</button>
-              <button onClick={onSave} className={`text-[12px] font-medium ${isSaved ? 'text-brand-navy' : 'text-brand-ink-soft'}`}>
+            <div className="-ml-2 flex flex-wrap gap-1 border-t border-line pt-3">
+              <ActionLink onClick={onShare}>
+                <Share2 size={13} />
+                Share
+              </ActionLink>
+              <ActionLink onClick={onSave} active={isSaved}>
+                <Bookmark size={13} className={isSaved ? 'fill-current' : ''} />
                 {isSaved ? 'Saved' : 'Save'}
-              </button>
+              </ActionLink>
               {isOwner && (
                 <>
-                  <button onClick={onEdit} className="text-[12px] font-medium text-brand-ink-soft">Edit</button>
-                  <button onClick={onDelete} className="text-[12px] font-medium text-brand-red">Delete</button>
+                  <ActionLink onClick={onEdit}>
+                    <PencilLine size={13} />
+                    Edit
+                  </ActionLink>
+                  <ActionLink onClick={onDelete} danger>
+                    <Trash2 size={13} />
+                    Delete
+                  </ActionLink>
                 </>
               )}
             </div>
           </div>
-        </div>
+        </motion.article>
 
-        <div className="border border-brand-edge p-4 flex flex-col gap-3">
-          <form onSubmit={handleNewComment} className="flex flex-col gap-2.5">
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Add a reply"
-              className="border border-brand-ink-faint px-3.5 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy placeholder:text-brand-ink-faint"
-            />
-            <div className="flex justify-between items-center gap-3.5 flex-wrap">
-              <div className="flex items-center gap-3.5">
-                <label className="flex items-center gap-2 text-[12.5px] text-[#3a3838]">
-                  <input
-                    type="checkbox"
-                    checked={mode === 'Anonymous'}
-                    onChange={(e) => setMode(e.target.checked ? 'Anonymous' : 'Public')}
-                    className="w-3.5 h-3.5"
-                  />
-                  Reply anonymously
-                </label>
-              </div>
-              <button type="submit" className="px-[17px] py-2.5 bg-brand-navy text-white text-[12px] font-semibold">
-                Reply
-              </button>
-            </div>
-          </form>
-        </div>
+        <form onSubmit={handleNewComment} className="surface flex flex-col gap-3 p-4 focus-within:border-line-accent">
+          <input
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Add a reply"
+            className="field py-3"
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3.5">
+            <label className="flex cursor-pointer items-center gap-2 text-[13px] text-fg-muted">
+              <input
+                type="checkbox"
+                checked={mode === 'Anonymous'}
+                onChange={(e) => setMode(e.target.checked ? 'Anonymous' : 'Public')}
+                className="h-3.5 w-3.5 rounded accent-[#5E6AD2]"
+              />
+              Reply anonymously
+            </label>
+            <button type="submit" className="btn-primary btn-sm">
+              Reply
+            </button>
+          </div>
+        </form>
 
-        <div className="flex flex-col border-t-2 border-brand-navy pt-1">
+        <div className="flex flex-col gap-1">
+          <span className="eyebrow mb-2 mt-2">
+            {post.comments?.length || 0} {post.comments?.length === 1 ? 'reply' : 'replies'}
+          </span>
           {!post.comments || post.comments.length === 0 ? (
-            <p className="pt-4 text-[13px] italic text-brand-ink-soft">No comments yet. Be the first!</p>
+            <p className="pt-2 text-[13px] text-fg-muted">No comments yet. Be the first!</p>
           ) : (
             post.comments.map((comment) => (
               <CommentThread
@@ -718,46 +741,38 @@ const EditPostModal = ({ post, onClose, onSubmit }) => {
   const handleSubmit = (e) => { e.preventDefault(); onSubmit({ title, content }); };
 
   return (
-    <>
-      <div onClick={onClose} className="fixed inset-0 z-[9998] bg-black/50" />
-      <div className="font-brand fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90vw] max-w-[480px] bg-white border border-brand-edge">
-        <div className="bg-brand-navy px-6 py-4 flex items-center justify-between">
-          <h2 className="m-0 text-[15px] font-semibold text-white">Edit post</h2>
-          <button onClick={onClose} className="text-brand-on-navy">
-            <X size={16} />
+    <Modal onBackdropClick={onClose} onEscape={onClose} z="z-[9999]" className="max-w-[480px]">
+      <div className="flex items-center justify-between border-b border-line px-6 py-4">
+        <h2 className="text-[15px] font-semibold text-fg">Edit post</h2>
+        <button onClick={onClose} aria-label="Close" className="btn-icon h-8 w-8">
+          <X size={16} />
+        </button>
+      </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6">
+        <label className="flex flex-col">
+          <span className="field-label">Title</span>
+          <input required value={title} onChange={(e) => setTitle(e.target.value)} className="field" />
+        </label>
+        <label className="flex flex-col">
+          <span className="field-label">Content</span>
+          <textarea
+            required
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={5}
+            className="field resize-none leading-[1.6]"
+          />
+        </label>
+        <div className="flex gap-2.5 pt-1">
+          <button type="button" onClick={onClose} className="btn-secondary flex-1">
+            Cancel
+          </button>
+          <button type="submit" className="btn-primary flex-1">
+            Save changes
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-3.5">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Title</span>
-            <input
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="border border-brand-ink-faint px-3 py-2.5 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-brand-ink-soft">Content</span>
-            <textarea
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={5}
-              className="border border-brand-ink-faint px-3 py-2.5 text-[13.5px] leading-[1.6] text-brand-ink outline-none focus:border-brand-navy resize-none"
-            />
-          </div>
-          <div className="flex gap-2.5 pt-1">
-            <button type="button" onClick={onClose} className="flex-1 py-2.5 border border-brand-ink-faint text-[13px] font-medium text-brand-ink-soft">
-              Cancel
-            </button>
-            <button type="submit" className="flex-1 py-2.5 bg-brand-navy text-white text-[13px] font-semibold">
-              Save changes
-            </button>
-          </div>
-        </form>
-      </div>
-    </>
+      </form>
+    </Modal>
   );
 };
 
@@ -766,50 +781,57 @@ const EditPostModal = ({ post, onClose, onSubmit }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const ProfileModal = ({ position, selectedProfile, onClose }) => (
   <>
-    <div className="fixed inset-0 z-[999] bg-black/40" onClick={onClose} />
-    <div
-      className="font-brand absolute z-[1000] bg-white border border-brand-edge shadow-lg w-full max-w-sm max-h-[90vh] overflow-y-auto"
+    <div className="fixed inset-0 z-[999] bg-canvas-deep/60 backdrop-blur-sm" onClick={onClose} />
+    <motion.div
+      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.25, ease: EASE }}
+      className="edge-highlight absolute z-[1000] max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-2xl border border-white/10 bg-canvas-elevated/95 shadow-popover backdrop-blur-xl"
       style={{
         top: Math.min(position.top, window.innerHeight - 500),
         left: window.innerWidth < 768 ? '50%' : Math.min(position.left, window.innerWidth - 320),
-        transform: window.innerWidth < 768 ? 'translateX(-50%)' : 'none',
+        // framer-motion owns `transform`, so the mobile centering offset goes through `x`
+        x: window.innerWidth < 768 ? '-50%' : 0,
       }}
     >
-      <div className="p-5 flex flex-col gap-5">
-        <div className="flex justify-between items-center">
-          <h3 className="m-0 text-[15px] font-semibold text-brand-navy">Profile</h3>
-          <button onClick={onClose} className="text-brand-ink-soft"><X size={17} /></button>
+      <div className="flex flex-col gap-5 p-5">
+        <div className="flex items-center justify-between">
+          <h3 className="eyebrow">Profile</h3>
+          <button onClick={onClose} aria-label="Close" className="btn-icon h-8 w-8"><X size={16} /></button>
         </div>
 
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="w-20 h-20 bg-brand-navy overflow-hidden grid place-items-center text-white text-2xl font-semibold">
-            {selectedProfile.profileImage?.url ? (
-              <img src={selectedProfile.profileImage.url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              selectedProfile.name?.[0]?.toUpperCase() || selectedProfile.username?.[0]?.toUpperCase() || 'U'
-            )}
+          <div className="relative">
+            <div aria-hidden="true" className="absolute -inset-2 rounded-full bg-accent/30 blur-xl" />
+            <div className="relative grid h-20 w-20 place-items-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-b from-accent/60 to-accent/20 text-2xl font-semibold text-white">
+              {selectedProfile.profileImage?.url ? (
+                <img src={selectedProfile.profileImage.url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                selectedProfile.name?.[0]?.toUpperCase() || selectedProfile.username?.[0]?.toUpperCase() || 'U'
+              )}
+            </div>
           </div>
-          <h4 className="m-0 text-[17px] font-semibold text-brand-navy">
+          <h4 className="mt-1 text-[17px] font-semibold tracking-tight text-fg">
             {selectedProfile.name || selectedProfile.username}
           </h4>
-          <p className="m-0 text-[12.5px] text-brand-ink-soft">
+          <p className="text-[12.5px] text-fg-muted">
             {selectedProfile.year ? `${selectedProfile.year} Year Student` : 'Student'}
           </p>
         </div>
 
         {selectedProfile.bio && (
           <div className="flex flex-col gap-2">
-            <span className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-brand-navy">About</span>
-            <p className="m-0 text-[13px] leading-[1.6] text-[#3a3838] bg-brand-ground p-3">{selectedProfile.bio}</p>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">About</span>
+            <p className="rounded-xl border border-line bg-white/[0.03] p-3 text-[13px] leading-[1.6] text-fg/85">{selectedProfile.bio}</p>
           </div>
         )}
 
         {selectedProfile.skills?.length > 0 && (
           <div className="flex flex-col gap-2">
-            <span className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-brand-navy">Skills</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">Skills</span>
             <div className="flex flex-wrap gap-1.5">
               {selectedProfile.skills.map((skill, i) => (
-                <span key={i} className="px-2.5 py-1 border border-brand-ink-faint text-[11px] text-[#3a3838]">{skill}</span>
+                <span key={i} className="pill-neutral">{skill}</span>
               ))}
             </div>
           </div>
@@ -817,36 +839,36 @@ const ProfileModal = ({ position, selectedProfile, onClose }) => (
 
         {selectedProfile.socialLinks && (
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-brand-navy">Connect</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">Connect</span>
             {selectedProfile.socialLinks.github && (
-              <a href={selectedProfile.socialLinks.github} target="_blank" rel="noreferrer" className="text-[12.5px] text-brand-blue">GitHub profile</a>
+              <a href={selectedProfile.socialLinks.github} target="_blank" rel="noreferrer" className="text-[13px] text-accent-bright hover:text-indigo-300">GitHub profile</a>
             )}
             {selectedProfile.socialLinks.leetcode && (
-              <a href={selectedProfile.socialLinks.leetcode} target="_blank" rel="noreferrer" className="text-[12.5px] text-brand-blue">LeetCode profile</a>
+              <a href={selectedProfile.socialLinks.leetcode} target="_blank" rel="noreferrer" className="text-[13px] text-accent-bright hover:text-indigo-300">LeetCode profile</a>
             )}
             {selectedProfile.socialLinks.linkedin && (
-              <a href={selectedProfile.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-[12.5px] text-brand-blue">LinkedIn profile</a>
+              <a href={selectedProfile.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-[13px] text-accent-bright hover:text-indigo-300">LinkedIn profile</a>
             )}
           </div>
         )}
 
         {selectedProfile.achievements?.length > 0 && (
           <div className="flex flex-col gap-2">
-            <span className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-brand-navy">Achievements</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">Achievements</span>
             <div className="flex flex-col gap-2">
               {selectedProfile.achievements.slice(0, 3).map((a) => (
-                <div key={a._id} className="border border-brand-edge p-2.5">
-                  <h6 className="m-0 text-[12.5px] font-semibold text-brand-navy mb-1">{a.title}</h6>
-                  {a.description && <p className="m-0 text-[11.5px] text-brand-ink-soft mb-1.5">{a.description}</p>}
+                <div key={a._id} className="rounded-xl border border-line bg-white/[0.02] p-3">
+                  <h6 className="mb-1 text-[13px] font-semibold text-fg">{a.title}</h6>
+                  {a.description && <p className="mb-1.5 text-[12px] text-fg-muted">{a.description}</p>}
                   {a.certificate?.url && (
-                    <a href={a.certificate.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] text-brand-blue">
+                    <a href={a.certificate.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11.5px] text-accent-bright">
                       <FileText size={11} /> View certificate
                     </a>
                   )}
                 </div>
               ))}
               {selectedProfile.achievements.length > 3 && (
-                <p className="m-0 text-[11px] text-brand-ink-soft text-center">
+                <p className="text-center text-[11.5px] text-fg-muted">
                   +{selectedProfile.achievements.length - 3} more
                 </p>
               )}
@@ -855,17 +877,12 @@ const ProfileModal = ({ position, selectedProfile, onClose }) => (
         )}
 
         {selectedProfile.resume?.url && (
-          <a
-            href={selectedProfile.resume.url}
-            target="_blank"
-            rel="noreferrer"
-            className="border-t border-brand-row pt-3.5 flex items-center justify-center gap-2 py-2.5 bg-brand-navy text-white text-[12.5px] font-semibold"
-          >
+          <a href={selectedProfile.resume.url} target="_blank" rel="noreferrer" className="btn-primary w-full">
             <FileText size={14} /> View resume
           </a>
         )}
       </div>
-    </div>
+    </motion.div>
   </>
 );
 

@@ -41,7 +41,7 @@ export default function HeroCanvas() {
         vx: 0,
         vy: 0,
         s: Math.random() < 0.12 ? 2.4 : 1.4,
-        red: Math.random() < 0.09,
+        accent: Math.random() < 0.09,
       });
     }
 
@@ -66,9 +66,8 @@ export default function HeroCanvas() {
     const tick = () => {
       if (!running) return;
       t += 0.006;
-      ctx.fillStyle = "#0b1730";
-      ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(90,130,200,0.15)";
+      ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(94,106,210,0.22)";
       ctx.lineWidth = 1;
       for (let a = 0; a < hubs.length; a++) {
         for (let b = a + 1; b < hubs.length; b++) {
@@ -95,7 +94,7 @@ export default function HeroCanvas() {
         p.vy *= 0.9;
         p.x += p.vx;
         p.y += p.vy;
-        ctx.fillStyle = p.red ? "rgba(221,43,15,0.95)" : "rgba(190,208,235,0.75)";
+        ctx.fillStyle = p.accent ? "rgba(140,150,255,1)" : "rgba(237,237,239,0.55)";
         ctx.fillRect(p.x, p.y, p.s, p.s);
       }
       raf = requestAnimationFrame(tick);

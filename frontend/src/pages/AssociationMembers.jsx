@@ -2,10 +2,20 @@
 import React from "react";
 import MemberCard from "../components/MemberCard";
 import membersData from "../data/membersData";
+import PageHeader from "../components/ui/PageHeader";
+import { Reveal, Stagger, StaggerItem } from "../components/ui/Reveal";
 
 /* ===============================
    Reusable Role Section Component
    =============================== */
+const RoleTitle = ({ children }) => (
+  <h4 className="mb-6 flex items-center justify-center gap-3 text-center font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+    <span className="h-px w-8 bg-gradient-to-r from-transparent to-white/20" />
+    {children}
+    <span className="h-px w-8 bg-gradient-to-l from-transparent to-white/20" />
+  </h4>
+);
+
 const RoleSection = ({
   title,
   members,
@@ -25,26 +35,20 @@ const RoleSection = ({
       : "grid-cols-1 md:grid-cols-2";
 
   return (
-    <div className="mb-16">
-      <h4 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-        {title}
-      </h4>
+    <div className="mb-14 last:mb-0">
+      <RoleTitle>{title}</RoleTitle>
 
       <div className="flex justify-center">
-        <div
-          className={`grid ${gridCols} gap-6 ${maxWidth} w-full`}
-        >
+        <Stagger className={`grid ${gridCols} w-full gap-5 ${maxWidth}`}>
           {members.map((member) => (
-            <div
+            <StaggerItem
               key={member.id}
-              className={`ring-1 ring-blue-200 rounded-2xl ${
-                centerSingle ? "mx-auto max-w-sm" : ""
-              }`}
+              className={centerSingle ? "mx-auto w-full max-w-sm" : ""}
             >
               <MemberCard member={member} />
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </div>
   );
@@ -81,38 +85,22 @@ const AssociationMembers = () => {
   }, {});
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 p-6 sm:p-8 md:p-12">
-      {/* Decorative background elements */}
-      <div className="fixed top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-200/10 to-transparent rounded-full -translate-y-48 translate-x-48 pointer-events-none"></div>
-      <div className="fixed bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/10 to-transparent rounded-full translate-y-40 -translate-x-40 pointer-events-none"></div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="relative bg-gradient-to-br from-cyan-50 via-white to-blue-50 backdrop-blur-lg px-6 py-5 rounded-3xl shadow-2xl border border-white/30 mb-10 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Association Members
-            </h2>
-            <p className="text-gray-500 mt-1">
-              Leadership and club representatives of the AI & DS Association
-            </p>
-          </div>
-        </div>
+    <div className="flex flex-col">
+      {/* Header */}
+      <PageHeader
+        eyebrow="AI & DS Association"
+        title="Association Members"
+        description="Leadership and club representatives of the AI & DS Association"
+        spacing="pt-6 pb-10 sm:pt-10 sm:pb-12 lg:pt-12"
+      />
 
       {/* ===============================
          GENERAL ASSOCIATION MEMBERS
          =============================== */}
-      <section className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 px-8 py-10 mb-16 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+      <section className="surface edge-highlight relative mb-12 overflow-hidden px-5 py-10 sm:px-8">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-0 h-64 w-[600px] -translate-x-1/2 rounded-full bg-accent/15 blur-[100px]" />
 
-        <div className="relative z-10">
-
+        <div className="relative">
           {/* President */}
           <RoleSection
             title="President"
@@ -145,33 +133,25 @@ const AssociationMembers = () => {
           {(associationByRole["Joint Secretary"] ||
             associationByRole["Joint Treasurer"]) && (
             <div className="mb-4">
-              <h4 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-                Joint Secretary & Joint Treasurer
-              </h4>
+              <RoleTitle>Joint Secretary &amp; Joint Treasurer</RoleTitle>
 
               {/* Joint Secretaries */}
-              <div className="flex justify-center mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full">
+              <div className="mb-5 flex justify-center">
+                <Stagger className="grid w-full max-w-4xl grid-cols-1 gap-5 md:grid-cols-2">
                   {(associationByRole["Joint Secretary"] || []).map((member) => (
-                    <div
-                      key={member.id}
-                      className="ring-1 ring-blue-200 rounded-2xl"
-                    >
+                    <StaggerItem key={member.id}>
                       <MemberCard member={member} />
-                    </div>
+                    </StaggerItem>
                   ))}
-                </div>
+                </Stagger>
               </div>
 
               {/* Joint Treasurer */}
               <div className="flex justify-center">
                 {(associationByRole["Joint Treasurer"] || []).map((member) => (
-                  <div
-                    key={member.id}
-                    className="ring-1 ring-blue-200 rounded-2xl max-w-sm w-full"
-                  >
+                  <Reveal key={member.id} className="w-full max-w-sm">
                     <MemberCard member={member} />
-                  </div>
+                  </Reveal>
                 ))}
               </div>
             </div>
@@ -182,44 +162,37 @@ const AssociationMembers = () => {
       {/* ===============================
          CLUB REPRESENTATIVES
          =============================== */}
-      <section className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 px-8 py-10 mb-16 hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-200/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-
-        <div className="relative z-10">
-          <h3 className="text-2xl font-bold text-blue-900 mb-1">
-            Club Representatives
-          </h3>
-
-          <div className="w-20 h-1 bg-blue-800 rounded-full mb-6"></div>
+      <section className="surface edge-highlight relative mb-8 overflow-hidden px-5 py-10 sm:px-8">
+        <div className="relative">
+          <Reveal className="mb-10 flex flex-col gap-3">
+            <span className="eyebrow-accent">Clubs</span>
+            <h3 className="h-section">
+              <span className="text-gradient">Club Representatives</span>
+            </h3>
+          </Reveal>
 
           {Object.entries(clubGroups).map(([clubName, members]) => (
-            <div key={clubName} className="mb-14">
-              <h4 className="text-xl font-semibold text-gray-800 mb-1">
+            <div key={clubName} className="mb-12 border-t border-line pt-8 last:mb-0">
+              <h4 className="text-lg font-semibold tracking-tight text-fg">
                 {clubName}
               </h4>
-              <p className="text-gray-500 mb-5">
+              <p className="mb-6 mt-1 text-[14px] text-fg-muted">
                 Representatives coordinating activities under {clubName}
               </p>
 
               <div className="flex justify-center">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full">
+                <Stagger className="grid w-full max-w-4xl grid-cols-1 gap-5 md:grid-cols-2">
                   {members.map((member) => (
-                    <div
-                      key={member.id}
-                      className="ring-1 ring-blue-200 rounded-2xl"
-                    >
+                    <StaggerItem key={member.id}>
                       <MemberCard member={member} />
-                    </div>
+                    </StaggerItem>
                   ))}
-                </div>
+                </Stagger>
               </div>
             </div>
           ))}
         </div>
       </section>
-      </div>
     </div>
   );
 };

@@ -4,6 +4,8 @@
 // previously-duplicated (and slightly inconsistent) implementations.
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { ArrowBigUp, Reply, Trash2 } from 'lucide-react';
+import { ActionLink } from './PostActions';
 
 export default function CommentThread({
   comment,
@@ -37,12 +39,14 @@ export default function CommentThread({
   };
 
   const wrapperClass =
-    depth > 0 ? 'border-l-2 border-brand-edge pl-4 ml-2 pt-3.5 pb-3.5' : 'border-b border-brand-row pt-3.5 pb-3.5';
+    depth > 0
+      ? 'ml-3 border-l border-white/10 pl-4 pt-3.5 pb-1 sm:ml-[11px]'
+      : 'rounded-xl border border-line bg-white/[0.02] p-4 mb-2 transition-colors hover:border-line-hover';
 
   if (comment.content === '[deleted]') {
     return (
       <div className={`flex flex-col gap-2 ${wrapperClass}`}>
-        <p className="m-0 text-[12.5px] italic text-brand-ink-faint">[deleted]</p>
+        <p className="text-[12.5px] italic text-fg-muted/70">[deleted]</p>
         {comment.replies?.map((reply) => (
           <CommentThread
             key={reply._id}
@@ -62,74 +66,77 @@ export default function CommentThread({
 
   return (
     <div className={`flex flex-col gap-2 ${wrapperClass}`}>
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`w-[22px] h-[22px] grid place-items-center text-[9px] font-semibold ${
-            comment.isAnonymous ? 'bg-brand-ink-faint text-white' : 'bg-brand-navy text-white'
+          className={`grid h-[22px] w-[22px] place-items-center rounded-full text-[9px] font-semibold ${
+            comment.isAnonymous
+              ? 'bg-white/10 text-fg-muted'
+              : 'bg-gradient-to-b from-accent/70 to-accent/30 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.1)]'
           }`}
         >
           {initials}
         </span>
-        <span className="text-[12.5px] font-medium text-brand-navy">{displayName}</span>
+        <span className="text-[13px] font-medium text-fg">{displayName}</span>
         {comment.createdAt && (
-          <span className="text-[11.5px] text-brand-ink-soft">
+          <span className="text-[12px] text-fg-muted">
             {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
           </span>
         )}
-        <span className="text-[11.5px] text-brand-ink-soft tabular-nums">
+        <span className="font-mono text-[11px] tabular-nums text-fg-muted">
           {comment.upvotes?.length || 0} points
         </span>
-        {comment.isEdited && <span className="text-[11px] italic text-brand-ink-faint">(edited)</span>}
+        {comment.isEdited && <span className="pill-neutral text-[10px]">edited</span>}
       </div>
 
-      <p className="m-0 max-w-[74ch] text-[13.5px] leading-[1.7] text-[#3a3838]">{comment.content}</p>
+      <p className="max-w-[74ch] text-[14px] leading-[1.7] text-fg/85">{comment.content}</p>
 
-      <div className="flex gap-3.5 flex-wrap">
-        <button
+      <div className="-ml-2 flex flex-wrap gap-1">
+        <ActionLink
           onClick={() => (depth === 0 ? onUpvoteComment(comment._id) : onUpvoteReply(comment._id))}
-          className={`text-[11.5px] font-medium ${hasUpvoted ? 'text-brand-blue' : 'text-brand-ink-soft'}`}
+          active={hasUpvoted}
         >
+          <ArrowBigUp size={14} className={hasUpvoted ? 'fill-current' : ''} />
           {hasUpvoted ? 'Upvoted' : 'Upvote'}
-        </button>
+        </ActionLink>
         {depth === 0 && (
-          <button onClick={() => setShowReply((s) => !s)} className="text-[11.5px] font-medium text-brand-blue">
+          <ActionLink onClick={() => setShowReply((s) => !s)} active={showReply}>
+            <Reply size={13} />
             Reply
-          </button>
+          </ActionLink>
         )}
         {isOwner && (
-          <button
+          <ActionLink
             onClick={() => (depth === 0 ? onDeleteComment(comment._id) : onDeleteReply(comment._id))}
-            className="text-[11.5px] font-medium text-brand-red"
+            danger
           >
+            <Trash2 size={13} />
             Delete
-          </button>
+          </ActionLink>
         )}
       </div>
 
       {showReply && (
-        <form onSubmit={handleReply} className="flex flex-col gap-2 max-w-[520px]">
+        <form onSubmit={handleReply} className="flex max-w-[520px] flex-col gap-2 animate-fade-in">
           <input
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             placeholder="Write a reply..."
-            className="border border-brand-ink-faint px-3 py-2 text-[12.5px] text-brand-ink outline-none focus:border-brand-navy"
+            className="field py-2 text-[13px]"
           />
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="tabs p-0.5">
               {['Public', 'Anonymous'].map((m) => (
                 <button
                   type="button"
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`px-2.5 py-1.5 text-[11px] font-medium ${
-                    mode === m ? 'bg-brand-navy text-white' : 'border border-brand-edge text-brand-ink-soft'
-                  }`}
+                  className={`tab px-2.5 py-1 text-[12px] ${mode === m ? 'tab-active' : ''}`}
                 >
                   {m}
                 </button>
               ))}
             </div>
-            <button type="submit" className="px-3.5 py-2 bg-brand-navy text-white text-[11.5px] font-semibold">
+            <button type="submit" className="btn-primary btn-sm">
               Send
             </button>
           </div>

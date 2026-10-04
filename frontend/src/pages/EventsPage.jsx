@@ -1,6 +1,11 @@
 // frontend/src/pages/EventsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, CalendarDays, List, LayoutGrid } from 'lucide-react';
+import { motion } from 'framer-motion';
+import PageHeader from '../components/ui/PageHeader';
+import { EmptyState } from '../components/ui/States';
+import { Stagger, StaggerItem } from '../components/ui/Reveal';
+import { EASE } from '../components/ui/motion';
 
 import UpcomingEventCard from '../components/UpcomingEventCard';
 import PastEventCard from '../components/PastEventCard';
@@ -42,74 +47,62 @@ const EventsPage = () => {
   }
 
   return (
-    <div className="font-brand px-5 sm:px-8 lg:px-12 py-7 sm:py-9 lg:py-[42px] flex flex-col gap-6">
-
-      {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div className="flex flex-col gap-2">
-          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-            What&apos;s on
-          </span>
-          <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
-            Events
-          </h1>
-        </div>
-
-        {/* Tab Switcher */}
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => setActiveTab('upcoming')}
-            className={`px-3.5 py-2 text-[11.5px] font-semibold transition-colors ${
-              activeTab === 'upcoming'
-                ? 'bg-brand-navy text-white'
-                : 'border border-brand-edge text-brand-ink-soft hover:bg-brand-ground'
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            onClick={() => setActiveTab('past')}
-            className={`px-3.5 py-2 text-[11.5px] font-semibold transition-colors ${
-              activeTab === 'past'
-                ? 'bg-brand-navy text-white'
-                : 'border border-brand-edge text-brand-ink-soft hover:bg-brand-ground'
-            }`}
-          >
-            Past
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 text-[11.5px] font-semibold transition-colors ${
-              activeTab === 'calendar'
-                ? 'bg-brand-navy text-white'
-                : 'border border-brand-edge text-brand-ink-soft hover:bg-brand-ground'
-            }`}
-          >
-            <CalendarDays size={14} />
-            Google Calendar
-          </button>
-        </div>
-      </div>
+    <div className="container-ln pb-8">
+      <PageHeader
+        eyebrow="What's on"
+        title="Events"
+        description="Workshops, talks, contests and everything else happening in the department."
+        actions={
+          /* Tab Switcher */
+          <div className="tabs" role="tablist" aria-label="Event views">
+            {[
+              { id: 'upcoming', label: 'Upcoming', count: upcomingEvents.length },
+              { id: 'past', label: 'Past', count: pastEvents.length },
+              { id: 'calendar', label: 'Google Calendar', Icon: CalendarDays },
+            ].map(({ id, label, count, Icon }) => (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={activeTab === id}
+                onClick={() => setActiveTab(id)}
+                className={`tab relative isolate flex items-center gap-1.5 ${activeTab === id ? 'text-fg' : ''}`}
+              >
+                {activeTab === id && (
+                  <motion.span
+                    layoutId="events-tab"
+                    transition={{ duration: 0.3, ease: EASE }}
+                    className="absolute inset-0 -z-10 rounded-lg bg-white/[0.08] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),0_1px_8px_rgba(0,0,0,0.35)]"
+                  />
+                )}
+                {Icon && <Icon size={14} />}
+                {label}
+                {count !== undefined && eventsData.length > 0 && (
+                  <span className="font-mono text-[10.5px] text-fg-muted">{count}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
       {/* When Google Calendar Tab is Active */}
       {activeTab === 'calendar' ? (
         <CalendarEmbed />
       ) : (
-        <>
+        <div className="flex flex-col gap-6">
           {/* Search + Layout Toggle */}
-          <div className="flex items-stretch gap-3 flex-wrap">
-            <div className="flex items-stretch border-2 border-brand-navy flex-1 min-w-[220px] max-w-md">
-              <span className="px-3 grid place-items-center text-brand-ink-faint">
-                <Search size={16} />
-              </span>
+          <div className="flex flex-wrap items-stretch gap-3">
+            <div className="relative min-w-[220px] max-w-md flex-1">
+              <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-fg-muted" />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search events..."
-                className="flex-1 min-w-0 py-3 text-[13.5px] text-brand-ink outline-none placeholder:text-brand-ink-faint"
+                aria-label="Search events"
+                className="field py-2.5 pl-10"
               />
             </div>
-            <div className="flex border-2 border-brand-navy" role="group" aria-label="Layout">
+            <div className="tabs" role="group" aria-label="Layout">
               {[
                 { mode: 'list', label: 'List', Icon: List },
                 { mode: 'grid', label: 'Grid', Icon: LayoutGrid },
@@ -118,11 +111,7 @@ const EventsPage = () => {
                   key={mode}
                   onClick={() => setViewMode(v => ({ ...v, [activeTab]: mode }))}
                   aria-pressed={layout === mode}
-                  className={`flex items-center gap-1.5 px-3.5 text-[11.5px] font-semibold transition-colors ${
-                    layout === mode
-                      ? 'bg-brand-navy text-white'
-                      : 'text-brand-ink-soft hover:bg-brand-ground'
-                  }`}
+                  className={`tab flex items-center gap-1.5 ${layout === mode ? 'tab-active' : ''}`}
                 >
                   <Icon size={15} />
                   {label}
@@ -132,45 +121,38 @@ const EventsPage = () => {
           </div>
 
           {/* Events List & Dynamic Sidebar Calendar */}
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,340px)] gap-7 items-start">
-            <div className="min-w-0 flex flex-col gap-3.5">
+          <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,2fr)_minmax(280px,340px)]">
+            <div className="flex min-w-0 flex-col gap-3.5">
               {filteredEvents.length === 0 ? (
-                <div className="border border-brand-edge p-10 text-center flex flex-col items-center gap-3">
-                  <CalendarDays className="text-brand-ink-faint" size={32} />
-                  <h3 className="m-0 text-[17px] font-semibold text-brand-navy">No events found</h3>
-                  <p className="m-0 text-[13px] text-brand-ink-soft">
-                    Try adjusting your search or check back later.
-                  </p>
-                </div>
+                <EmptyState
+                  icon={CalendarDays}
+                  title="No events found"
+                  description="Try adjusting your search or check back later."
+                />
               ) : layout === 'list' ? (
-                <div
-                  className={
-                    activeTab === 'upcoming'
-                      ? 'flex flex-col gap-3.5'
-                      : 'flex flex-col gap-px bg-brand-edge border border-brand-edge'
-                  }
-                >
+                <Stagger key={`${activeTab}-list`} className="flex flex-col gap-3.5">
                   {filteredEvents.map(event => (
-                    <EventCard key={event._id} event={event} onOpenModal={setSelectedEvent} layout="list" />
+                    <StaggerItem key={event._id}>
+                      <EventCard event={event} onOpenModal={setSelectedEvent} layout="list" />
+                    </StaggerItem>
                   ))}
-                </div>
+                </Stagger>
               ) : (
-                <div
-                  className={
-                    activeTab === 'upcoming'
-                      ? 'grid gap-3.5'
-                      : 'grid gap-px bg-brand-edge border border-brand-edge'
-                  }
+                <Stagger
+                  key={`${activeTab}-grid`}
+                  className="grid gap-4"
                   style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${activeTab === 'upcoming' ? 240 : 200}px, 1fr))` }}
                 >
                   {filteredEvents.map(event => (
-                    <EventCard key={event._id} event={event} onOpenModal={setSelectedEvent} layout="grid" />
+                    <StaggerItem key={event._id} className="h-full">
+                      <EventCard event={event} onOpenModal={setSelectedEvent} layout="grid" />
+                    </StaggerItem>
                   ))}
-                </div>
+                </Stagger>
               )}
             </div>
 
-            <div className="hidden lg:block sticky top-8">
+            <div className="sticky top-24 hidden lg:block">
               <EventCalendar
                 events={eventsData}
                 onViewFullCalendar={() => setActiveTab('calendar')}
@@ -178,7 +160,7 @@ const EventsPage = () => {
               />
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

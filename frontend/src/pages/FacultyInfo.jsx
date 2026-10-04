@@ -1,6 +1,10 @@
 import React from "react";
 import AboutTabs from "../components/AboutTabs";
 import FacultyCard from "../components/FacultyCard";
+import PageHeader from "../components/ui/PageHeader";
+import SpotlightCard from "../components/ui/SpotlightCard";
+import { Reveal, Stagger, StaggerItem } from "../components/ui/Reveal";
+import { ArrowUpRight } from "lucide-react";
 
 const FacultyInfo = () => {
   const hod = {
@@ -103,89 +107,86 @@ const FacultyInfo = () => {
   ].filter(Boolean);
 
   return (
-    <div className="font-brand">
+    <div>
       <AboutTabs />
 
-      <div className="px-5 sm:px-8 lg:px-12 pt-7 sm:pt-9 lg:pt-[42px] pb-6 flex items-end justify-between gap-5 flex-wrap">
-        <div className="flex flex-col gap-2">
-          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-            {faculty.length + 1} members
-          </span>
-          <h1 className="m-0 text-[32px] sm:text-[38px] lg:text-[44px] leading-none font-semibold tracking-[-0.02em] text-brand-navy">
-            Faculty
-          </h1>
-        </div>
-      </div>
+      <div className="container-ln">
+        <PageHeader
+          spacing="pt-10 pb-10 sm:pt-12 sm:pb-12"
+          eyebrow={`${faculty.length + 1} members`}
+          title="Faculty"
+          description="Researchers and educators across machine learning, data science and responsible AI."
+        />
 
-      {/* HOD */}
-      <div className="px-5 sm:px-8 lg:px-12 pb-5">
-        <div className="grid grid-cols-1 sm:grid-cols-[minmax(150px,220px)_minmax(0,2fr)] gap-6 border border-brand-edge p-6">
-          <div className="w-fit bg-brand-blue">
-            <img
-              src={hod.imageUrl}
-              alt={hod.name}
-              className="max-w-[200px] h-auto block"
-              onError={(e) => {
-                e.currentTarget.src = "https://via.placeholder.com/300x300?text=No+Image";
-              }}
-            />
-          </div>
-          <div className="min-w-0 flex flex-col gap-2.5">
-            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-brand-red">
-              Head of department
-            </span>
-            <h2 className="m-0 text-[28px] leading-[1.1] font-semibold text-brand-navy">{hod.name}</h2>
-            <span className="text-[13.5px] font-medium text-brand-blue">{hod.title}</span>
-            <div className="flex flex-wrap gap-1.5">
-              {hod.specialization.split(", ").map((s) => (
-                <span key={s} className="px-2.5 py-1 text-[11px] border border-brand-ink-faint text-brand-ink-soft">
-                  {s}
-                </span>
-              ))}
-            </div>
-            <div
-              className="grid gap-px bg-brand-edge border border-brand-edge mt-1.5"
-              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}
-            >
-              <div className="bg-white px-3.5 py-3">
-                <div className="text-[9.5px] font-medium tracking-[0.14em] uppercase text-brand-ink-soft">
-                  Email
+        {/* HOD */}
+        <Reveal className="mb-6">
+          <SpotlightCard variant="gradient">
+            <div className="grid grid-cols-1 gap-8 p-6 sm:grid-cols-[minmax(160px,240px)_minmax(0,1fr)] sm:p-8">
+              <div className="relative w-full max-w-[240px]">
+                <div aria-hidden="true" className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl" />
+                <div className="relative aspect-[4/5] overflow-hidden rounded-xl border border-white/10 bg-canvas-elevated">
+                  <img
+                    src={hod.imageUrl}
+                    alt={hod.name}
+                    className="h-full w-full object-cover object-top"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://via.placeholder.com/300x300?text=No+Image";
+                    }}
+                  />
                 </div>
-                <a
-                  href={`mailto:${hod.email}`}
-                  className="block pt-1.5 text-[13px] font-medium text-brand-blue"
-                >
-                  {hod.email}
-                </a>
               </div>
-              {hodLinks.map((l) => (
-                <div key={l.label} className="bg-white px-3.5 py-3">
-                  <div className="text-[9.5px] font-medium tracking-[0.14em] uppercase text-brand-ink-soft">
-                    {l.label}
-                  </div>
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block pt-1.5 text-[13px] font-medium text-brand-navy"
-                  >
-                    Visit
-                  </a>
+              <div className="flex min-w-0 flex-col gap-4">
+                <span className="eyebrow-accent">Head of department</span>
+                <div className="flex flex-col gap-1.5">
+                  <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                    <span className="text-gradient">{hod.name}</span>
+                  </h2>
+                  <span className="text-[15px] font-medium text-accent-bright">{hod.title}</span>
                 </div>
-              ))}
+                <div className="flex flex-wrap gap-1.5">
+                  {hod.specialization.split(", ").map((s) => (
+                    <span key={s} className="pill-neutral">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <a
+                    href={`mailto:${hod.email}`}
+                    className="group/link flex flex-col gap-1.5 rounded-xl border border-line bg-white/[0.03] px-4 py-3 transition-colors duration-200 hover:border-line-hover hover:bg-white/[0.05] xl:col-span-1"
+                  >
+                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">Email</span>
+                    <span className="truncate text-[13px] font-medium text-fg">{hod.email}</span>
+                  </a>
+                  {hodLinks.map((l) => (
+                    <a
+                      key={l.label}
+                      href={l.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group/link flex flex-col gap-1.5 rounded-xl border border-line bg-white/[0.03] px-4 py-3 transition-colors duration-200 hover:border-line-hover hover:bg-white/[0.05]"
+                    >
+                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted">{l.label}</span>
+                      <span className="flex items-center gap-1 text-[13px] font-medium text-fg">
+                        Visit
+                        <ArrowUpRight className="h-3.5 w-3.5 text-fg-muted transition-transform duration-200 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </SpotlightCard>
+        </Reveal>
 
-      {/* Faculty grid */}
-      <div
-        className="mx-5 sm:mx-8 lg:mx-12 mb-7 sm:mb-9 lg:mb-12 grid gap-px bg-brand-edge border border-brand-edge"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}
-      >
-        {faculty.map((f) => (
-          <FacultyCard key={f.email} faculty={f} />
-        ))}
+        {/* Faculty grid */}
+        <Stagger className="grid gap-5 pb-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {faculty.map((f) => (
+            <StaggerItem key={f.email}>
+              <FacultyCard faculty={f} />
+            </StaggerItem>
+          ))}
+        </Stagger>
       </div>
     </div>
   );

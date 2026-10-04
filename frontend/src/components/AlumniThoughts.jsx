@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Quote, Send } from "lucide-react";
+import { Reveal } from "./ui/Reveal";
+import { EmptyState } from "./ui/States";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://web-portal-760h.onrender.com');
 
@@ -138,42 +140,37 @@ export default function AlumniThoughts() {
   if (loading) return null;
 
   return (
-    <div className="font-brand">
+    <div>
       {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap mb-5">
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[10.5px] font-medium tracking-[0.2em] uppercase text-brand-red">
-            Voices
-          </span>
-          <h2 className="m-0 text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] text-brand-navy">
-            Thoughts from Alumni
+      <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-3">
+          <span className="eyebrow-accent">Voices</span>
+          <h2 className="h-section text-3xl sm:text-4xl">
+            <span className="text-gradient">Thoughts from Alumni</span>
           </h2>
         </div>
         {isAlumni && (
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-brand-navy text-white text-[12px] font-semibold tracking-[0.04em] hover:bg-brand-navy-deep transition-colors"
-          >
+          <button onClick={() => setShowForm(!showForm)} className="btn-primary">
             <Send size={13} />
             Share your thought
           </button>
         )}
-      </div>
+      </Reveal>
 
       {/* Post form (alumni only) */}
       {showForm && isAlumni && (
-        <div className="mb-5 border border-brand-edge bg-white p-5 flex flex-col gap-3">
+        <div className="surface mb-6 flex flex-col gap-3 p-5 animate-fade-in">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Share a thought, memory, or message with the department…"
             rows={3}
-            className="w-full border border-brand-ink-faint px-3.5 py-3 text-[13.5px] text-brand-ink outline-none focus:border-brand-navy resize-none placeholder:text-brand-ink-faint"
+            className="field resize-none py-3"
           />
-          <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <span
-              className={`text-[11px] tabular-nums ${
-                wordCount > 100 ? "text-brand-red font-semibold" : "text-brand-ink-soft"
+              className={`font-mono text-[11px] tabular-nums ${
+                wordCount > 100 ? "font-medium text-rose-400" : "text-fg-muted"
               }`}
             >
               {wordCount}/100 words
@@ -185,21 +182,21 @@ export default function AlumniThoughts() {
                   setText("");
                   setError("");
                 }}
-                className="px-3.5 py-2 border border-brand-ink-faint text-[11.5px] font-medium text-brand-ink-soft hover:bg-brand-ground"
+                className="btn-ghost btn-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={handlePost}
                 disabled={posting || !text.trim() || wordCount > 100}
-                className="px-4 py-2 bg-brand-red text-white text-[11.5px] font-semibold disabled:opacity-40"
+                className="btn-primary btn-sm"
               >
                 {posting ? "Posting…" : "Post"}
               </button>
             </div>
           </div>
           {error && (
-            <div className="bg-brand-red-tint text-brand-red-deep px-3 py-2 text-[12px]">
+            <div className="rounded-lg border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-[12.5px] text-rose-300">
               {error}
             </div>
           )}
@@ -208,27 +205,27 @@ export default function AlumniThoughts() {
 
       {/* Carousel */}
       {displayThoughts.length > 0 ? (
-        <div className="relative group">
+        <div className="group/carousel relative">
           {/* Navigation arrows */}
           <button
             onClick={() => scrollCarousel("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-9 h-9 bg-white border border-brand-edge shadow-md grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute left-0 top-1/2 z-10 grid h-10 w-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-canvas-elevated/90 text-fg opacity-0 shadow-popover backdrop-blur-xl transition-opacity duration-200 hover:bg-canvas-elevated focus-visible:opacity-100 group-hover/carousel:opacity-100"
             aria-label="Scroll left"
           >
-            <ChevronLeft size={16} className="text-brand-navy" />
+            <ChevronLeft size={16} />
           </button>
           <button
             onClick={() => scrollCarousel("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-9 h-9 bg-white border border-brand-edge shadow-md grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-0 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 translate-x-1/2 place-items-center rounded-full border border-white/10 bg-canvas-elevated/90 text-fg opacity-0 shadow-popover backdrop-blur-xl transition-opacity duration-200 hover:bg-canvas-elevated focus-visible:opacity-100 group-hover/carousel:opacity-100"
             aria-label="Scroll right"
           >
-            <ChevronRight size={16} className="text-brand-navy" />
+            <ChevronRight size={16} />
           </button>
 
           {/* Scrollable track */}
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+            className="flex gap-4 overflow-x-auto scroll-smooth px-0.5 pb-3 pt-0.5 [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)]"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             onMouseEnter={() => setAutoScroll(false)}
             onMouseLeave={() => setAutoScroll(true)}
@@ -236,17 +233,17 @@ export default function AlumniThoughts() {
             {displayThoughts.map((t) => (
               <div
                 key={t._id}
-                className="flex-shrink-0 w-[300px] border border-brand-edge bg-white p-5 flex flex-col gap-3"
+                className="surface edge-highlight flex w-[300px] flex-shrink-0 flex-col gap-4 p-5"
               >
-                <Quote size={20} className="text-brand-red opacity-60" />
-                <p className="m-0 text-[13.5px] leading-[1.7] text-brand-ink flex-1">
+                <Quote size={20} className="text-accent-bright/70" />
+                <p className="flex-1 text-[14px] leading-[1.7] text-fg/85">
                   {t.text}
                 </p>
-                <div className="border-t border-brand-row pt-3 flex items-center justify-between gap-2">
-                  <span className="text-[12.5px] font-semibold text-brand-navy">
+                <div className="flex items-center justify-between gap-2 border-t border-line pt-3">
+                  <span className="text-[13px] font-medium text-fg">
                     {t.authorName}
                   </span>
-                  <span className="text-[10.5px] text-brand-ink-faint tabular-nums">
+                  <span className="font-mono text-[10.5px] tabular-nums text-fg-muted">
                     {formatDate(t.createdAt)}
                   </span>
                 </div>
@@ -255,11 +252,7 @@ export default function AlumniThoughts() {
           </div>
         </div>
       ) : (
-        <div className="border border-brand-edge p-8 text-center">
-          <p className="m-0 text-[13.5px] text-brand-ink-soft">
-            No thoughts shared yet. Be the first to share!
-          </p>
-        </div>
+        <EmptyState icon={Quote} title="No thoughts shared yet. Be the first to share!" />
       )}
     </div>
   );

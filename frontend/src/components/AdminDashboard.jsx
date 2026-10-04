@@ -13,8 +13,13 @@ import {
   BarChart3,
   BookOpen,
   Clock,
-  UserPlus
+  UserPlus,
+  ArrowUpRight
 } from 'lucide-react';
+import PageHeader from './ui/PageHeader';
+import SpotlightCard from './ui/SpotlightCard';
+import { Spinner } from './ui/States';
+import { Stagger, StaggerItem } from './ui/Reveal';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -116,103 +121,103 @@ export default function AdminDashboard() {
     }
   };
 
-  const StatCard = ({ icon: Icon, title, value, change, color }) => (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg bg-gradient-to-r ${color}`}>
-          <Icon className="w-6 h-6 text-white" />
+  const StatCard = ({ icon: Icon, title, value, change }) => (
+    <SpotlightCard interactive className="h-full">
+      <div className="flex flex-col gap-4 p-5">
+        <div className="flex items-center justify-between">
+          <div className="icon-tile h-10 w-10">
+            <Icon className="h-[18px] w-[18px] text-accent-bright" strokeWidth={1.75} />
+          </div>
+          <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-medium text-emerald-300">+{change}%</span>
         </div>
-        <span className="text-green-600 text-sm font-medium bg-green-50 px-2 py-1 rounded-full">+{change}%</span>
+        <div>
+          <h3 className="text-3xl font-semibold tracking-tight tabular-nums text-fg">{value}</h3>
+          <p className="mt-1 text-[13px] text-fg-muted">{title}</p>
+        </div>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-1">{value}</h3>
-      <p className="text-gray-600 text-sm">{title}</p>
+    </SpotlightCard>
+  );
+
+  const QuickAction = ({ icon: Icon, title, description, onClick }) => (
+    <SpotlightCard as="button" interactive onClick={onClick} className="w-full text-left">
+      <div className="flex h-full flex-col gap-3 p-5">
+        <div className="flex items-center justify-between">
+          <div className="icon-tile h-10 w-10">
+            <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+          </div>
+          <ArrowUpRight className="h-4 w-4 text-fg-muted transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
+        </div>
+        <h3 className="mt-1 font-semibold tracking-tight text-fg">{title}</h3>
+        <p className="text-[13px] text-fg-muted">{description}</p>
+      </div>
+    </SpotlightCard>
+  );
+
+  const Panel = ({ icon: Icon, title, meta, children, className = '' }) => (
+    <div className={`surface flex flex-col p-5 ${className}`}>
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-fg">
+          <Icon className="h-4 w-4 text-accent-bright" strokeWidth={1.75} />
+          {title}
+        </h3>
+        <span className="font-mono text-[11px] text-fg-muted">{meta}</span>
+      </div>
+      {children}
     </div>
   );
 
-  const QuickAction = ({ icon: Icon, title, description, color, onClick }) => (
-    <button 
-      onClick={onClick}
-      className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow text-left w-full"
-    >
-      <div className={`p-3 rounded-lg bg-gradient-to-r ${color} mb-4 w-fit`}>
-        <Icon className="w-5 h-5 text-white" />
-      </div>
-      <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm">{description}</p>
-    </button>
+  const PanelSpinner = () => (
+    <div className="py-8 text-center">
+      <Spinner className="mx-auto h-6 w-6" />
+    </div>
   );
+
+  const Row = ({ title, sub }) => (
+    <div className="rounded-lg border border-line bg-white/[0.02] px-3.5 py-3 transition-colors hover:bg-white/[0.04]">
+      <p className="truncate text-[13.5px] font-medium text-fg">{title}</p>
+      <p className="mt-0.5 truncate text-[12px] text-fg-muted">{sub}</p>
+    </div>
+  );
+
+  const Empty = ({ children }) => <p className="py-4 text-center text-[13px] text-fg-muted">{children}</p>;
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Admin Dashboard
-        </h1>
-        <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
-        <p className="text-lg text-gray-600">
-          Monitor and manage your web portal analytics
-        </p>
-      </div>
+      <PageHeader
+        compact
+        eyebrow="Overview"
+        title="Admin Dashboard"
+        description="Monitor and manage your web portal analytics"
+      />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatCard 
-          icon={Users} 
-          title="Total Users" 
-          value={stats.loading ? '...' : stats.totalUsers} 
-          change={stats.userChange} 
-          color="from-blue-500 to-blue-600"
-        />
-        <StatCard 
-          icon={FileText} 
-          title="Total Posts" 
-          value={stats.loading ? '...' : stats.totalPosts} 
-          change={stats.postChange} 
-          color="from-green-500 to-green-600"
-        />
-        <StatCard 
-          icon={Calendar} 
-          title="Events" 
-          value={stats.loading ? '...' : stats.totalEvents} 
-          change={stats.eventChange} 
-          color="from-purple-500 to-purple-600"
-        />
-        <StatCard 
-          icon={Trophy} 
-          title="Achievements" 
-          value={stats.loading ? '...' : stats.totalAchievements} 
-          change={stats.achievementChange} 
-          color="from-orange-500 to-orange-600"
-        />
-        <StatCard 
-          icon={BookOpen} 
-          title="Question Papers" 
-          value={stats.loading ? '...' : stats.questionPapers} 
-          change={stats.qpChange} 
-          color="from-indigo-500 to-indigo-600"
-        />
-      </div>
+      <Stagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {[
+          { icon: Users, title: 'Total Users', value: stats.totalUsers, change: stats.userChange },
+          { icon: FileText, title: 'Total Posts', value: stats.totalPosts, change: stats.postChange },
+          { icon: Calendar, title: 'Events', value: stats.totalEvents, change: stats.eventChange },
+          { icon: Trophy, title: 'Achievements', value: stats.totalAchievements, change: stats.achievementChange },
+          { icon: BookOpen, title: 'Question Papers', value: stats.questionPapers, change: stats.qpChange },
+        ].map((s) => (
+          <StaggerItem key={s.title} className="h-full">
+            <StatCard icon={s.icon} title={s.title} value={stats.loading ? '...' : s.value} change={s.change} />
+          </StaggerItem>
+        ))}
+      </Stagger>
 
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Post Activity Timeline */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              Post Activity Timeline
-            </h3>
-            <span className="text-sm text-gray-500">Last 7 days</span>
-          </div>
-          <div className="h-64 relative bg-gray-50 rounded-lg p-4 overflow-hidden">
+        <Panel icon={TrendingUp} title="Post Activity Timeline" meta="Last 7 days">
+          <div className="relative h-64 overflow-hidden rounded-xl border border-line bg-canvas-elevated/60 p-4">
             {stats.loading ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="flex h-full items-center justify-center">
+                <Spinner className="h-8 w-8" />
               </div>
             ) : (
-              <svg className="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+              <svg className="h-full w-full" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
                 {(() => {
                   const last7Days = Array.from({length: 7}, (_, i) => {
                     const date = new Date();
@@ -224,33 +229,41 @@ export default function AdminDashboard() {
                     return { date, count: dayPosts, day: date.toLocaleDateString('en', { weekday: 'short' }) };
                   });
                   const maxCount = Math.max(...last7Days.map(d => d.count), 1);
-                  
+
                   const points = last7Days.map((day, index) => {
                     const x = (index * 50) + 50;
                     const y = 160 - ((day.count / maxCount) * 100);
                     return { x, y, count: day.count, day: day.day };
                   });
-                  
-                  const pathData = points.map((point, index) => 
+
+                  const pathData = points.map((point, index) =>
                     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
                   ).join(' ');
-                  
+                  const areaData = `${pathData} L ${points[points.length - 1].x} 160 L ${points[0].x} 160 Z`;
+
                   return (
                     <>
+                      <defs>
+                        <linearGradient id="dash-area" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#5E6AD2" stopOpacity="0.35" />
+                          <stop offset="100%" stopColor="#5E6AD2" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
                       {/* Grid lines */}
                       {[0, 1, 2, 3, 4].map(i => (
-                        <line key={i} x1="40" y1={40 + i * 25} x2="380" y2={40 + i * 25} stroke="#e5e7eb" strokeWidth="1" />
+                        <line key={i} x1="40" y1={40 + i * 25} x2="380" y2={40 + i * 25} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
                       ))}
-                      
-                      {/* Line path */}
-                      <path d={pathData} fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      
+
+                      {/* Area + line path */}
+                      <path d={areaData} fill="url(#dash-area)" />
+                      <path d={pathData} fill="none" stroke="#6872D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+
                       {/* Data points */}
                       {points.map((point, index) => (
                         <g key={index}>
-                          <circle cx={point.x} cy={point.y} r="3" fill="#3b82f6" stroke="white" strokeWidth="2" />
-                          <text x={point.x} y="185" textAnchor="middle" className="text-xs fill-gray-600">{point.day}</text>
-                          <text x={point.x} y={point.y - 8} textAnchor="middle" className="text-xs fill-gray-700 font-medium">{point.count}</text>
+                          <circle cx={point.x} cy={point.y} r="3.5" fill="#6872D9" stroke="#0a0a0c" strokeWidth="2" />
+                          <text x={point.x} y="185" textAnchor="middle" fontSize="11" fill="#8A8F98">{point.day}</text>
+                          <text x={point.x} y={point.y - 9} textAnchor="middle" fontSize="11" fontWeight="500" fill="#EDEDEF">{point.count}</text>
                         </g>
                       ))}
                     </>
@@ -260,161 +273,113 @@ export default function AdminDashboard() {
               </svg>
             )}
           </div>
-        </div>
+        </Panel>
 
         {/* Recent Posts */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-green-600" />
-              Recent Posts
-            </h3>
-            <span className="text-sm text-gray-500">{stats.totalPosts} total</span>
-          </div>
-          <div className="space-y-3">
+        <Panel icon={FileText} title="Recent Posts" meta={`${stats.totalPosts} total`}>
+          <div className="space-y-2">
             {stats.loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
-              </div>
+              <PanelSpinner />
             ) : stats.recentPosts.length > 0 ? (
               stats.recentPosts.map((post, index) => (
-                <div key={post._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 truncate">{post.title}</p>
-                  <p className="text-xs text-gray-600">
-                    by {post.author?.fullName || 'Anonymous'} • {new Date(post.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
+                <Row
+                  key={post._id || index}
+                  title={post.title}
+                  sub={`by ${post.author?.fullName || 'Anonymous'} • ${new Date(post.createdAt).toLocaleDateString()}`}
+                />
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent posts</p>
+              <Empty>No recent posts</Empty>
             )}
           </div>
-        </div>
+        </Panel>
 
         {/* Recent Users */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-purple-600" />
-              New Users
-            </h3>
-            <span className="text-sm text-gray-500">{stats.totalUsers} total</span>
-          </div>
-          <div className="space-y-3">
+        <Panel icon={UserPlus} title="New Users" meta={`${stats.totalUsers} total`}>
+          <div className="space-y-2">
             {stats.loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto"></div>
-              </div>
+              <PanelSpinner />
             ) : stats.recentUsers.length > 0 ? (
               stats.recentUsers.map((user, index) => (
-                <div key={user._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">{user.fullName || user.name || 'Anonymous'}</p>
-                  <p className="text-xs text-gray-600">
-                    {user.year || 'N/A'} Year • {user.email || 'No email'}
-                  </p>
-                </div>
+                <Row
+                  key={user._id || index}
+                  title={user.fullName || user.name || 'Anonymous'}
+                  sub={`${user.year || 'N/A'} Year • ${user.email || 'No email'}`}
+                />
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent users</p>
+              <Empty>No recent users</Empty>
             )}
           </div>
-        </div>
+        </Panel>
       </div>
 
       {/* Recent Events & Updates */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Recent Updates */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-indigo-600" />
-              Recent Updates
-            </h3>
-            <span className="text-sm text-gray-500">{stats.recentUpdates.length} updates</span>
-          </div>
-          <div className="space-y-3">
+        <Panel icon={Activity} title="Recent Updates" meta={`${stats.recentUpdates.length} updates`}>
+          <div className="space-y-2">
             {stats.loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
-              </div>
+              <PanelSpinner />
             ) : stats.recentUpdates.length > 0 ? (
               stats.recentUpdates.map((update, index) => (
-                <div key={update._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">{update.title}</p>
-                  <p className="text-xs text-gray-600">
-                    {new Date(update.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
+                <Row key={update._id || index} title={update.title} sub={new Date(update.createdAt).toLocaleDateString()} />
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent updates</p>
+              <Empty>No recent updates</Empty>
             )}
           </div>
-        </div>
+        </Panel>
 
         {/* Recent Events */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-orange-600" />
-              Recent Events
-            </h3>
-            <span className="text-sm text-gray-500">{stats.totalEvents} total</span>
-          </div>
-          <div className="space-y-3">
+        <Panel icon={Calendar} title="Recent Events" meta={`${stats.totalEvents} total`}>
+          <div className="space-y-2">
             {stats.loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600 mx-auto"></div>
-              </div>
+              <PanelSpinner />
             ) : stats.recentEvents.length > 0 ? (
               stats.recentEvents.map((event, index) => (
-                <div key={event._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">{event.eventName}</p>
-                  <p className="text-xs text-gray-600">
-                    {event.venue} • {new Date(event.startDate).toLocaleDateString()}
-                  </p>
-                </div>
+                <Row
+                  key={event._id || index}
+                  title={event.eventName}
+                  sub={`${event.venue} • ${new Date(event.startDate).toLocaleDateString()}`}
+                />
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent events</p>
+              <Empty>No recent events</Empty>
             )}
           </div>
-        </div>
+        </Panel>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <Plus className="w-6 h-6 text-blue-600" />
+        <h2 className="mb-5 flex items-center gap-2 text-xl font-semibold tracking-tight text-fg">
+          <Plus className="h-5 w-5 text-accent-bright" />
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <QuickAction 
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <QuickAction
             icon={Calendar}
             title="Create Event"
             description="Add new events to the portal"
-            color="from-blue-500 to-blue-600"
             onClick={() => window.location.href = '/adminpage/events'}
           />
-          <QuickAction 
+          <QuickAction
             icon={Trophy}
             title="Manage Achievements"
             description="Review pending achievements"
-            color="from-green-500 to-green-600"
             onClick={() => window.location.href = '/adminpage/achievements'}
           />
-          <QuickAction 
+          <QuickAction
             icon={Users}
             title="User Management"
             description="View and manage users"
-            color="from-purple-500 to-purple-600"
             onClick={() => window.location.href = '/adminpage/leaderboard'}
           />
-          <QuickAction 
+          <QuickAction
             icon={FileText}
             title="Content Updates"
             description="Manage recent updates"
-            color="from-orange-500 to-orange-600"
             onClick={() => window.location.href = '/adminpage/manage-content-updates'}
           />
         </div>

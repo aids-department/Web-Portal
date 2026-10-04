@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Spinner } from "./ui/States";
 
 export default function LeaderboardBox({ title, count }) {
   const category = title;
@@ -211,19 +212,31 @@ export default function LeaderboardBox({ title, count }) {
   const rowGrid = isEnigma ? "2fr 0.8fr 0.8fr" : "1fr";
 
   return (
-    <div style={styles.container}>
-      <div style={styles.box}>
-        <div style={styles.headerRow}>
-          <h3 style={styles.heading}>{title}</h3>
-          {loading && <div style={styles.loading}>Loading…</div>}
+    <div className="flex min-h-[400px] w-full flex-col gap-3">
+      <div className="surface h-[450px] overflow-y-auto p-4">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <h3 className="text-[15px] font-semibold tracking-tight text-fg">{title}</h3>
+          {loading && <Spinner className="h-4 w-4" />}
         </div>
+
+        {isEnigma && (
+          <div className="mb-2 grid gap-2 px-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted" style={{ gridTemplateColumns: rowGrid }}>
+            <span>Student</span>
+            <span>Score</span>
+            <span>Time</span>
+          </div>
+        )}
 
         {selected.map((student, index) => (
           <div
             key={index}
-            style={{ ...styles.row, gridTemplateColumns: rowGrid }}
+            className="relative mb-2 grid items-center gap-2"
+            style={{ gridTemplateColumns: rowGrid }}
           >
-            <div style={styles.nameCol}>
+            <div className="relative min-w-0">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-[10.5px] text-fg-muted/70">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               <input
                 type="text"
                 placeholder="Select student"
@@ -236,18 +249,18 @@ export default function LeaderboardBox({ title, count }) {
                     setActiveIndex(null);
                   }, 200);
                 }}
-                style={styles.input}
+                className="field py-2 pl-8 text-[13.5px]"
               />
 
               {activeIndex === index && suggestions.length > 0 && (
-                <div style={styles.dropdown}>
+                <div className="absolute left-0 top-full z-[1000] mt-1 max-h-[200px] w-full overflow-y-auto rounded-lg border border-line bg-canvas-elevated/95 p-1 shadow-popover backdrop-blur-xl">
                   {suggestions.map((s) => (
                     <div
                       key={s.roll}
                       onMouseDown={() => handleSelect(s, index)}
-                      style={styles.suggestion}
+                      className="cursor-pointer rounded-md px-2.5 py-2 text-[13px] text-fg transition-colors hover:bg-white/[0.06]"
                     >
-                      {s.name} — Year {s.year}
+                      {s.name} <span className="text-fg-muted">— Year {s.year}</span>
                     </div>
                   ))}
                 </div>
@@ -264,7 +277,7 @@ export default function LeaderboardBox({ title, count }) {
                     onChange={(e) =>
                       handleFieldChange(index, "score", e.target.value)
                     }
-                    style={styles.inputNumber}
+                    className="field px-2.5 py-2 font-mono text-[13px]"
                   />
                 </div>
 
@@ -276,7 +289,7 @@ export default function LeaderboardBox({ title, count }) {
                     onChange={(e) =>
                       handleFieldChange(index, "time", e.target.value)
                     }
-                    style={styles.inputNumber}
+                    className="field px-2.5 py-2 font-mono text-[13px]"
                   />
                 </div>
               </>
@@ -285,12 +298,12 @@ export default function LeaderboardBox({ title, count }) {
         ))}
       </div>
 
-      <div style={styles.footer}>
-        <button style={styles.button} onClick={handleSubmit}>
+      <div className="flex items-center justify-between gap-2">
+        <button className="btn-primary" onClick={handleSubmit}>
           Submit
         </button>
 
-        <div style={styles.meta}>
+        <div className="font-mono text-[11px] text-fg-muted">
           {lastSavedAt
             ? `Last saved: ${new Date(lastSavedAt).toLocaleString()}`
             : ""}
@@ -299,85 +312,3 @@ export default function LeaderboardBox({ title, count }) {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    width: "30%",
-    minHeight: "400px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-  },
-  box: {
-    width: "100%",
-    height: "450px",
-    padding: "12px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    background: "#fafafa",
-    overflowY: "auto",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-  },
-  headerRow: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  heading: { margin: 0, fontSize: "18px", fontWeight: 600, marginBottom: 20 },
-  loading: { fontSize: 12, color: "#666" },
-  row: {
-    display: "grid",
-    gap: 8,
-    alignItems: "center",
-    marginBottom: 10,
-    position: "relative",
-  },
-  nameCol: { position: "relative", minWidth: 0 },
-  input: {
-    width: "100%",
-    padding: "8px 10px",
-    fontSize: 14,
-    boxSizing: "border-box",
-    borderRadius: 4,
-    border: "1px solid #ccc",
-  },
-  inputNumber: {
-    width: "100%",
-    padding: "8px 10px",
-    fontSize: 14,
-    boxSizing: "border-box",
-    borderRadius: 4,
-    border: "1px solid #ccc",
-  },
-  dropdown: {
-    position: "absolute",
-    background: "#fff",
-    border: "1px solid #ddd",
-    width: "100%",
-    maxHeight: "200px",
-    overflowY: "auto",
-    borderRadius: 6,
-    zIndex: 1000,
-    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-    top: "100%",
-    left: 0,
-  },
-  suggestion: {
-    padding: "8px 10px",
-    cursor: "pointer",
-    borderBottom: "1px solid #f0f0f0",
-    fontSize: 14,
-  },
-  footer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  button: {
-    padding: "10px 14px",
-    background: "#4f46e5",
-    color: "white",
-    fontWeight: 600,
-    borderRadius: 8,
-    border: "none",
-    cursor: "pointer",
-  },
-  meta: { fontSize: 12, color: "#666" },
-};

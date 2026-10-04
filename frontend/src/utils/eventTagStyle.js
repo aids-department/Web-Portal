@@ -1,28 +1,29 @@
-// Event type -> tag color, following the AI & DS design system's four-tag
-// palette (see newdesign/AIDS Portal.dc.html "tag" map in the events views).
-const NAVY = { bg: "#0e1c3d", fg: "#ffffff" };
-const BLUE_TINT = { bg: "#e4eaf4", fg: "#1b3a6b" };
-const RED_TINT = { bg: "#ffe0d9", fg: "#ae1800" };
-const NEUTRAL = { bg: "#eae7e7", fg: "#444141" };
+// Event type -> tag color for the dark "Linear" design system.
+// Four quiet, translucent tints: competitive (accent), learning (sky),
+// culture (rose) and neutral. Text colours keep >4.5:1 contrast on #050506.
+const COMPETE = { bg: "rgba(94,106,210,0.16)", fg: "#C7CBF5", border: "rgba(94,106,210,0.35)" };
+const LEARN = { bg: "rgba(56,189,248,0.10)", fg: "#9FDCF7", border: "rgba(56,189,248,0.25)" };
+const CULTURE = { bg: "rgba(244,114,182,0.10)", fg: "#F5B3D3", border: "rgba(244,114,182,0.25)" };
+const NEUTRAL = { bg: "rgba(255,255,255,0.05)", fg: "#A1A6AE", border: "rgba(255,255,255,0.10)" };
 
 const TYPE_STYLES = {
-  hackathon: NAVY,
-  contest: NAVY,
-  competition: NAVY,
-  sports: NAVY,
-  workshop: BLUE_TINT,
-  seminar: BLUE_TINT,
-  training: BLUE_TINT,
-  trainings: BLUE_TINT,
-  conference: BLUE_TINT,
-  conferences: BLUE_TINT,
-  talk: RED_TINT,
-  literary: RED_TINT,
-  "literary fests": RED_TINT,
-  cultural: RED_TINT,
-  "cultural fests": RED_TINT,
-  management: RED_TINT,
-  "management fests": RED_TINT,
+  hackathon: COMPETE,
+  contest: COMPETE,
+  competition: COMPETE,
+  sports: COMPETE,
+  workshop: LEARN,
+  seminar: LEARN,
+  training: LEARN,
+  trainings: LEARN,
+  conference: LEARN,
+  conferences: LEARN,
+  talk: CULTURE,
+  literary: CULTURE,
+  "literary fests": CULTURE,
+  cultural: CULTURE,
+  "cultural fests": CULTURE,
+  management: CULTURE,
+  "management fests": CULTURE,
   internship: NEUTRAL,
   internships: NEUTRAL,
   online: NEUTRAL,

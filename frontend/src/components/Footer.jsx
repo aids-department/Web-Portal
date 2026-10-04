@@ -1,5 +1,6 @@
 // components/Footer.jsx
 import { Link } from "react-router-dom";
+import { Logo } from "./Navbar";
 
 export default function Footer() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -36,43 +37,40 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="font-brand bg-brand-navy px-4 py-8 sm:px-8 lg:px-11 sm:py-9 lg:py-11 flex flex-col gap-7">
-      <div className="grid gap-7" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 bg-white grid place-items-center">
-              <div className="w-2 h-2 bg-brand-red" />
-            </div>
-            <span className="font-bold text-[12.5px] leading-none tracking-[0.14em] text-white">
-              AI &amp; DS
-            </span>
+    <footer className="relative mt-24 border-t border-line bg-canvas-deep">
+      {/* soft accent line along the top edge */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(ellipse_at_top,rgba(94,106,210,0.10),transparent_70%)]" />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
+          <div className="flex flex-col gap-4">
+            <Logo />
+            <p className="max-w-[34ch] text-sm leading-relaxed text-fg-muted">
+              Department of Artificial Intelligence and Data Science.
+            </p>
           </div>
-          <p className="max-w-[34ch] text-[12.5px] leading-relaxed text-brand-on-navy">
-            Department of Artificial Intelligence and Data Science.
-          </p>
+
+          {columns.map((col) => (
+            <div key={col.title} className="flex flex-col gap-3">
+              <span className="eyebrow mb-1 text-[10.5px]">{col.title}</span>
+              {col.links.map((l) => (
+                <Link
+                  key={l.label}
+                  to={l.to}
+                  className="w-fit text-sm text-fg-muted transition-colors duration-200 hover:text-fg"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          ))}
         </div>
 
-        {columns.map((col) => (
-          <div key={col.title} className="flex flex-col gap-[11px]">
-            <span className="text-[10px] font-semibold leading-none tracking-[0.18em] uppercase text-brand-red">
-              {col.title}
-            </span>
-            {col.links.map((l) => (
-              <Link
-                key={l.label}
-                to={l.to}
-                className="text-[13px] leading-none text-brand-on-navy hover:text-white"
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className="border-t border-[#23345c] pt-[18px] flex flex-wrap justify-between gap-4">
-        <span className="text-[11.5px] leading-none text-[#6b7a95]">
-          Maintained by the AI&amp;DS department web committee.
-        </span>
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
+          <span className="text-xs text-fg-muted">Maintained by the AI&amp;DS department web committee.</span>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-fg-muted">AI &amp; DS · PSG iTech</span>
+        </div>
       </div>
     </footer>
   );

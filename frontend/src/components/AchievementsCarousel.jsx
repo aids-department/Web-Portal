@@ -32,11 +32,11 @@ export default function AchievementsCarousel() {
         }
     }, [achievements.length]);
 
-    if (loading) return <div className="h-48 flex items-center justify-center text-gray-500 italic">Loading achievements...</div>;
+    if (loading) return <div className="flex h-48 items-center justify-center text-sm text-fg-muted">Loading achievements...</div>;
     if (achievements.length === 0) return null;
 
     return (
-        <div className="relative w-full h-56 overflow-hidden rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+        <div className="surface-glass relative h-56 w-full overflow-hidden">
 
             {/* Slides Container */}
             <div
@@ -46,21 +46,21 @@ export default function AchievementsCarousel() {
                 {achievements.map((a) => (
                     <div key={a._id} className="w-full flex-shrink-0 h-full p-8 flex flex-col justify-center">
                         <div className="max-w-3xl mx-auto text-center">
-              <span className="inline-block px-3 py-1 mb-3 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 rounded-full">
+              <span className="pill mb-3 font-mono uppercase tracking-wider">
                 New Achievement
               </span>
-                            <h4 className="text-2xl font-bold text-gray-900 mb-2 truncate">
+                            <h4 className="mb-2 truncate text-2xl font-semibold tracking-tight text-fg">
                                 {a.title}
                             </h4>
-                            <p className="text-gray-600 line-clamp-2 mb-4 italic">
+                            <p className="mb-4 line-clamp-2 text-fg-muted">
                                 "{a.description}"
                             </p>
-                            <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-500">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs">
+                            <div className="flex items-center justify-center gap-2 text-sm font-medium text-fg-muted">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-accent/70 to-accent/30 text-xs text-white">
                                     {a.userId?.fullName?.charAt(0) || "A"}
                                 </div>
                                 <span>{a.userId?.fullName}</span>
-                                <span className="text-gray-300">•</span>
+                                <span className="text-fg-muted/40">•</span>
                                 <span>{a.userId?.year} Year</span>
                             </div>
                         </div>
@@ -75,7 +75,7 @@ export default function AchievementsCarousel() {
                         key={index}
                         onClick={() => setCurrent(index)}
                         className={`w-2 h-2 rounded-full transition-all ${
-                            index === current ? "bg-blue-600 w-6" : "bg-gray-300"
+                            index === current ? "bg-accent-bright w-6" : "bg-white/25"
                         }`}
                         aria-label={`Go to slide ${index + 1}`}
                     />
@@ -85,13 +85,13 @@ export default function AchievementsCarousel() {
             {/* Side arrows for manual navigation */}
             <button
                 onClick={() => setCurrent((c) => (c === 0 ? achievements.length - 1 : c - 1))}
-                className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted transition-colors hover:text-fg"
             >
                 ‹
             </button>
             <button
                 onClick={() => setCurrent((c) => (c === achievements.length - 1 ? 0 : c + 1))}
-                className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-fg-muted transition-colors hover:text-fg"
             >
                 ›
             </button>

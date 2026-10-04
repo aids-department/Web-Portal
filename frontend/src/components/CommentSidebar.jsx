@@ -20,33 +20,33 @@ const CommentSidebar = ({ post, onClose, onAddComment, onAddReply, onUpvoteComme
   };
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl border-l border-gray-200 overflow-y-auto z-50">
-      <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center z-10">
-        <h2 className="text-2xl font-bold">Comments</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          <X size={28} />
+    <div className="fixed right-0 top-0 z-50 h-full w-96 overflow-y-auto border-l border-line bg-canvas-elevated/95 shadow-popover backdrop-blur-xl">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-canvas-elevated/90 p-6 backdrop-blur-xl">
+        <h2 className="text-xl font-semibold tracking-tight text-fg">Comments</h2>
+        <button onClick={onClose} className="btn-icon">
+          <X size={20} />
         </button>
       </div>
 
       <div className="p-6">
-        <div className="bg-gray-50 rounded-xl p-5 mb-6">
-          <h3 className="font-bold text-lg mb-2">{post.title}</h3>
-          <p className="text-gray-700 mb-3">{post.content}</p>
-          <p className="text-sm text-gray-500">
+        <div className="mb-6 rounded-xl border border-line bg-white/[0.03] p-5">
+          <h3 className="mb-2 text-lg font-semibold tracking-tight text-fg">{post.title}</h3>
+          <p className="mb-3 text-fg/80">{post.content}</p>
+          <p className="text-[13px] text-fg-muted">
             — {post.isAnonymous ? 'Anonymous' : post.author}
           </p>
         </div>
 
-        <div className="flex gap-3 mb-5">
+        <div className="tabs mb-5">
           <button
             onClick={() => setMode('Public')}
-            className={`px-5 py-2 rounded-xl font-medium ${mode === 'Public' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}
+            className={`tab ${mode === 'Public' ? 'tab-active' : ''}`}
           >
             Public
           </button>
           <button
             onClick={() => setMode('Anonymous')}
-            className={`px-5 py-2 rounded-xl font-medium ${mode === 'Anonymous' ? 'bg-blue-900 text-white' : 'bg-gray-200'}`}
+            className={`tab ${mode === 'Anonymous' ? 'tab-active' : ''}`}
           >
             Anonymous
           </button>
@@ -56,7 +56,7 @@ const CommentSidebar = ({ post, onClose, onAddComment, onAddReply, onUpvoteComme
 
         <div className="mt-8">
           {post.comments.length === 0 ? (
-            <p className="text-center text-gray-500 py-12">No comments yet. Be the first!</p>
+            <p className="py-12 text-center text-fg-muted">No comments yet. Be the first!</p>
           ) : (
             post.comments.map((comment) => (
               <CommentCard

@@ -67,8 +67,8 @@ export default function BrickBreakerGame() {
     canvas.addEventListener('click', handleClick);
 
     const gameLoop = () => {
-      // Clear canvas with white background
-      ctx.fillStyle = '#ffffff';
+      // Clear canvas with the elevated surface colour
+      ctx.fillStyle = '#0a0a0c';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (gameState === 'playing') {
@@ -137,28 +137,28 @@ export default function BrickBreakerGame() {
         // Draw ball in gray
         ctx.beginPath();
         ctx.arc(gameData.ball.x, gameData.ball.y, gameData.ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#6b7280';
+        ctx.fillStyle = '#EDEDEF';
         ctx.fill();
-        ctx.strokeStyle = '#374151';
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         // Draw paddle with rounded corners
         const radius = gameData.paddle.height / 2;
-        ctx.fillStyle = '#6b7280';
+        ctx.fillStyle = '#6872D9';
         ctx.beginPath();
         ctx.roundRect(gameData.paddle.x, gameData.paddle.y, gameData.paddle.width, gameData.paddle.height, radius);
         ctx.fill();
-        ctx.strokeStyle = '#374151';
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         // Draw bricks in gray
         gameData.bricks.forEach((brick, index) => {
           if (brick.visible) {
-            ctx.fillStyle = '#6b7280';
+            ctx.fillStyle = 'rgba(94,106,210,0.55)';
             ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
-            ctx.strokeStyle = '#374151';
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.lineWidth = 1;
             ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
           }
@@ -166,8 +166,8 @@ export default function BrickBreakerGame() {
 
         // Draw instructions
         if (!gameData.ballMoving) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-          ctx.font = 'bold 18px Arial';
+          ctx.fillStyle = 'rgba(237, 237, 239, 0.9)';
+          ctx.font = '600 16px Inter, system-ui, sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText('🎮 Click to Launch!', canvas.width / 2, canvas.height / 2);
         }
@@ -175,29 +175,29 @@ export default function BrickBreakerGame() {
         // Draw waiting screen with game elements
         // Draw static paddle with rounded corners
         const radius = gameData.paddle.height / 2;
-        ctx.fillStyle = '#6b7280';
+        ctx.fillStyle = '#6872D9';
         ctx.beginPath();
         ctx.roundRect(gameData.paddle.x, gameData.paddle.y, gameData.paddle.width, gameData.paddle.height, radius);
         ctx.fill();
-        ctx.strokeStyle = '#374151';
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         // Draw static ball in gray
         ctx.beginPath();
         ctx.arc(gameData.ball.x, gameData.ball.y, gameData.ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#6b7280';
+        ctx.fillStyle = '#EDEDEF';
         ctx.fill();
-        ctx.strokeStyle = '#374151';
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         // Draw static bricks in gray
         gameData.bricks.forEach((brick, index) => {
           if (brick.visible) {
-            ctx.fillStyle = '#6b7280';
+            ctx.fillStyle = 'rgba(94,106,210,0.55)';
             ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
-            ctx.strokeStyle = '#374151';
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.lineWidth = 1;
             ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
           }
@@ -228,61 +228,61 @@ export default function BrickBreakerGame() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 rounded-lg shadow border border-blue-200 max-w-sm mx-auto">
+    <div className="mx-auto max-w-sm rounded-2xl border border-line bg-white/[0.03] p-3 shadow-card">
       {!isMobile && (
-        <div className="text-center mb-2">
-          <h4 className="text-base font-bold text-gray-800 mb-1">🧱 Mini Game</h4>
-          <div className="flex justify-center items-center gap-2 text-xs">
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">Score: {score}</span>
-            <span className="text-gray-600">Use ← → arrows</span>
+        <div className="mb-3 text-center">
+          <h4 className="mb-1.5 text-sm font-semibold text-fg">🧱 Mini Game</h4>
+          <div className="flex items-center justify-center gap-2 text-xs">
+            <span className="pill font-mono">Score: {score}</span>
+            <span className="text-fg-muted">Use ← → arrows</span>
           </div>
         </div>
       )}
-      
+
       {isMobile ? (
-        <div className="text-center py-6">
-          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3">
-            <p className="text-gray-600 text-sm mb-1">📱 Game not available on mobile</p>
-            <p className="text-gray-500 text-xs">Please use a desktop to play</p>
+        <div className="py-6 text-center">
+          <div className="rounded-xl border border-line bg-white/[0.03] p-3">
+            <p className="mb-1 text-sm text-fg">📱 Game not available on mobile</p>
+            <p className="text-xs text-fg-muted">Please use a desktop to play</p>
           </div>
         </div>
       ) : (
         <>
-          <canvas 
+          <canvas
             ref={canvasRef}
             width={350}
             height={250}
-            className="border-2 border-white rounded-lg bg-gradient-to-b from-slate-50 to-slate-100 mx-auto block cursor-pointer shadow-inner"
+            className="mx-auto block cursor-pointer rounded-xl border border-white/10 shadow-[inset_0_2px_12px_rgba(0,0,0,0.6)]"
           />
-          
-          <div className="text-center mt-2">
+
+          <div className="mt-3 text-center">
             {gameState === 'start' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-1">
-                <p className="text-green-800 font-medium text-xs">🚀 Click to Play!</p>
+              <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 p-1.5">
+                <p className="text-xs font-medium text-emerald-300">🚀 Click to Play!</p>
               </div>
             )}
-            
+
             {gameState === 'playing' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-1">
-                <p className="text-blue-800 text-xs font-medium">🎯 Destroy all bricks!</p>
+              <div className="rounded-lg border border-line-accent bg-accent/10 p-1.5">
+                <p className="text-xs font-medium text-indigo-200">🎯 Destroy all bricks!</p>
               </div>
             )}
-            
+
             {gameState === 'gameOver' && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-1">
-                <p className="text-red-800 font-bold text-xs mb-1">💥 Game Over!</p>
-                <p className="text-red-600 text-xs mb-1">Score: {score}</p>
-                <p className="text-gray-700 italic text-xs mb-1">"Can't you even win this simple game? 🙄"</p>
-                <p className="text-gray-600 text-xs">Click to retry</p>
+              <div className="rounded-lg border border-rose-500/25 bg-rose-500/10 p-2">
+                <p className="mb-1 text-xs font-semibold text-rose-300">💥 Game Over!</p>
+                <p className="mb-1 font-mono text-xs text-rose-200/80">Score: {score}</p>
+                <p className="mb-1 text-xs italic text-fg/80">"Can't you even win this simple game? 🙄"</p>
+                <p className="text-xs text-fg-muted">Click to retry</p>
               </div>
             )}
-            
+
             {gameState === 'won' && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1">
-                <p className="text-yellow-800 font-bold text-xs mb-1">🎉 You Won!</p>
-                <p className="text-yellow-700 text-xs mb-1">Score: {score}</p>
-                <p className="text-gray-700 italic text-xs mb-1">"Only if you had the same focus on your subjects! 😏"</p>
-                <p className="text-gray-600 text-xs">Click to play again</p>
+              <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-2">
+                <p className="mb-1 text-xs font-semibold text-amber-300">🎉 You Won!</p>
+                <p className="mb-1 font-mono text-xs text-amber-200/80">Score: {score}</p>
+                <p className="mb-1 text-xs italic text-fg/80">"Only if you had the same focus on your subjects! 😏"</p>
+                <p className="text-xs text-fg-muted">Click to play again</p>
               </div>
             )}
           </div>
